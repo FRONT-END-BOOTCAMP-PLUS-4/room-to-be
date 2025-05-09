@@ -1,4 +1,3 @@
-// backend/utils/mapper.ts
 import { Room as PrismaRoom } from '@prisma/client';
 import { Room } from '@/backend/domain/entities/Room';
 
@@ -14,9 +13,8 @@ export function toDomainRoom(p: PrismaRoom): Room {
   );
 }
 
-export function toPrismaRoom(r: Room): PrismaRoom {
+export function toPrismaRoom(r: Room): Omit<PrismaRoom, 'id'> {
   return {
-    id: r.id,
     name: r.name,
     width: r.width,
     height: r.height,
