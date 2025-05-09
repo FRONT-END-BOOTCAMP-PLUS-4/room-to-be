@@ -1,0 +1,58 @@
+// backend/infra/db/prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id
+  name       String
+  email      String   @unique
+  image      String?
+  created_at DateTime @default(now())
+  rooms      Room[]
+}
+
+model Room {
+  id            String   @id
+  name          String
+  width         Int
+  height        Int
+  thumbnail_url String
+  user_id       String
+  created_at    DateTime @default(now())
+
+  user          User     @relation(fields: [user_id], references: [id])
+  furnitures    PlacedFurniture[]
+}
+
+model Furniture {
+  id            String   @id
+  name          String
+  type          String
+  model_url     String
+  thumbnail_url String
+  created_at    DateTime @default(now())
+
+  placements    PlacedFurniture[]
+}
+
+model PlacedFurniture {
+  id           String   @id
+  room_id      String
+  furniture_id String
+  position_x   Float
+  position_y   Float
+  position_z   Float
+  rotation_y   Float
+  scale        Float
+  created_at   DateTime @default(now())
+
+  room         Room     @relation(fields: [room_id], references: [id])
+  furniture    Furniture @relation(fields: [furniture_id], references: [id])
+}
