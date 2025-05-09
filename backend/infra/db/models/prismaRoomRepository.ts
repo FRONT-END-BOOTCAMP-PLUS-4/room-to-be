@@ -1,8 +1,9 @@
 // backend/infra/models/PrismaRoomRepository.ts
-import { RoomRepository } from '@/backend/domain/repositories/RoomRepository';
-import { prisma } from '../prisma/prismaClient';
-import { toDomainRoom, toPrismaRoom } from '@/backend/utils/mapper';
 import { Room } from '@/backend/domain/entities/Room';
+import { RoomRepository } from '@/backend/domain/repositories/RoomRepository';
+import { toDomainRoom, toPrismaRoom } from '@/backend/utils/mapper';
+
+import { prisma } from '../prisma/prismaClient';
 
 export class PrismaRoomRepository implements RoomRepository {
   async findById(id: string): Promise<Room | null> {

@@ -1,4 +1,5 @@
 import { Room as PrismaRoom } from '@prisma/client';
+
 import { Room } from '@/backend/domain/entities/Room';
 
 export function toDomainRoom(p: PrismaRoom): Room {

@@ -1,4 +1,3 @@
-// backend/dto/CreateRoomDto.ts
 export interface CreateRoomDto {
   name: string;
   width: number;

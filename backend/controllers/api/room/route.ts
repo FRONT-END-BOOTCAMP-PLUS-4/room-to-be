@@ -1,8 +1,9 @@
 // backend/controllers/api/room/route.ts
 
-import { createRoom } from '@/backend/usecase/room/createRoom';
-import { CreateRoomDto } from '@/backend/dto/createRoomDto';
 import { NextRequest } from 'next/server';
+
+import { CreateRoomDto } from '@/backend/dto/createRoomDto';
+import { createRoom } from '@/backend/usecase/room/createRoom';
 
 export async function POST(req: NextRequest) {
   try {

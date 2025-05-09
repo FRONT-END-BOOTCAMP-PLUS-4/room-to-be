@@ -1,8 +1,6 @@
-// backend/usecases/room/createRoom.ts
-
-import { CreateRoomDto } from '@/backend/dto/createRoomDto';
 import { Room } from '@/backend/domain/entities/Room';
 import { PrismaRoomRepository } from '@/backend/infra/db/models/prismaRoomRepository';
+import { CreateRoomDto } from '@/backend/dto/createRoomDto';
 
 export async function createRoom(input: CreateRoomDto): Promise<Room> {
   const roomRepository = new PrismaRoomRepository();
