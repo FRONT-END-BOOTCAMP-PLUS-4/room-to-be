@@ -5,5 +5,7 @@
   "useTabs": false,
   "tabWidth": 2,
   "printWidth": 80,
-  "arrowParens": "always"
+  "arrowParens": "always",
+  "jsxSingleQuote": true,
+  "jsxBracketSameLine": false
 }
