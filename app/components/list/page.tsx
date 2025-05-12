@@ -16,14 +16,14 @@ function page() {
         />
       </ul>
 
-      <ul className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-[26px] gap-y-[48px] max-w-[1200px] mx-auto'>
+      <section className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-[26px] gap-y-[48px] max-w-[1200px] mx-auto'>
         <TemplateList />
         <TemplateList imageUrl={`/assets/images/room02.jpg`} />
         <TemplateList imageUrl={`/assets/images/room03.jpg`} />
         <TemplateList imageUrl={`/assets/images/room04.jpg`} />
         <TemplateList imageUrl={`/assets/images/room05.jpg`} />
         <TemplateList imageUrl={`/assets/images/room06.jpg`} />
-      </ul>
+      </section>
     </div>
   );
 }

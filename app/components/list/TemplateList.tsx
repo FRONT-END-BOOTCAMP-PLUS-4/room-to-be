@@ -12,7 +12,10 @@ export default function TemplateList({
   alt = '',
 }: TemplateListProps) {
   return (
-    <ListItem className='w-[360px] h-[252px] aspect-auto group relative'>
+    <ListItem
+      as='article'
+      className='w-[360px] h-[252px] aspect-auto group relative'
+    >
       <Image src={imageUrl} alt={alt} fill className='object-cover' />
       <div className='absolute inset-0 bg-black opacity-0 group-hover:opacity-60 transition-opacity duration-300'></div>
 

@@ -10,7 +10,10 @@ interface ListProps {
 
 export default function List({ imageUrl, alt = '', title }: ListProps) {
   return (
-    <ListItem className='w-full max-w-[400px] aspect-[10/7] group relative'>
+    <ListItem
+      as='li'
+      className='w-full max-w-[400px] aspect-[10/7] group relative'
+    >
       <Image src={imageUrl} alt={alt} fill className='object-cover' />
       <div
         className='absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500  cursor-pointer'
