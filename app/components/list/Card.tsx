@@ -7,7 +7,7 @@ interface ListItemProps {
   [key: string]: any;
 }
 
-export default function ListItem({
+export default function Card({
   as: Component = 'li',
   className = '',
   children,
