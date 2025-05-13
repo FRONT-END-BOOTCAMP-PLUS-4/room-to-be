@@ -9,6 +9,8 @@ import CameraController from './components/room/CameraController';
 import CameraButtons from './components/room/CameraButtons';
 import CenterMarker from './components/room/CenterMaker';
 
+import { useFurnitureStore } from '@/stores/useFurnitureStore';
+
 export default function SimulatorPage() {
   return (
     <div className='w-full h-screen relative'>
@@ -18,6 +20,9 @@ export default function SimulatorPage() {
         shadows
         camera={{ position: [5, 5, 5], fov: 50 }}
         className='w-full h-full'
+        onPointerMissed={() => {
+          useFurnitureStore.getState().clearSelection();
+        }}
       >
         <Suspense fallback={null}>
           <Room

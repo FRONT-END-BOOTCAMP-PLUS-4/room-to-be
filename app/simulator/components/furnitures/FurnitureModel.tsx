@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
+import * as THREE from 'three';
 
 interface FurnitureModelProps {
   id: string;
@@ -26,15 +27,31 @@ export default function FurnitureModel({
 }: FurnitureModelProps) {
   const { scene } = useGLTF(modelUrl);
   const { selectFurniture, selectedFurniture } = useFurnitureStore();
+  // TODO : 가구 중복 사용 가능한 지 여부 확인 후 수정 필요
+  const isSelected = selectedFurniture?.id === id;
 
   useEffect(() => {
     scene.traverse((child: any) => {
-      if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
+      if (!child.isMesh) return;
+      child.castShadow = true;
+      child.receiveShadow = true;
+
+      // 클릭 무시할 메쉬 이름들
+      const ignoredNames = ['FLOOR', 'WALL', 'CEILING', 'GLASS'];
+      const name = child.name?.toUpperCase?.() ?? '';
+      if (ignoredNames.includes(name)) {
+        child.raycast = () => null;
+        return;
+      }
+
+      // 선택 여부에 따라 하이라이트 색상 적용
+      const mat = child.material as THREE.MeshStandardMaterial;
+      if (mat) {
+        mat.emissive = new THREE.Color(isSelected ? 0x00ffff : 0x000000);
+        mat.emissiveIntensity = isSelected ? 0.8 : 0;
       }
     });
-  }, [scene]);
+  }, [scene, isSelected]);
 
   return (
     <primitive
@@ -42,7 +59,8 @@ export default function FurnitureModel({
       position={position}
       rotation={[0, rotationY, 0]}
       scale={[scale, scale, scale]}
-      onClick={() => {
+      onClick={(e: any) => {
+        e.stopPropagation(); 
         selectFurniture({
           id,
           name,
