@@ -1,20 +1,30 @@
 import Image from 'next/image';
 
-import ListItem from './ListItem';
+import Card from './Card';
 
-interface ListProps {
+interface SavedRoomCardProps {
   imageUrl: string;
   alt?: string;
   title?: string;
+  isPriority?: boolean;
 }
 
-export default function List({ imageUrl, alt = '', title }: ListProps) {
+export default function SavedRoomCard({
+  imageUrl,
+  alt = '',
+  title,
+  isPriority = false,
+}: SavedRoomCardProps) {
   return (
-    <ListItem
-      as='li'
-      className='w-full max-w-[400px] aspect-[10/7] group relative'
-    >
-      <Image src={imageUrl} alt={alt} fill className='object-cover' />
+    <Card as='li' className='w-full max-w-[400px] aspect-[10/7] group relative'>
+      <Image
+        src={imageUrl}
+        alt={alt}
+        fill
+        className='object-cover'
+        sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw'
+        priority={isPriority}
+      />
       <div
         className='absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500  cursor-pointer'
         style={{
@@ -26,6 +36,6 @@ export default function List({ imageUrl, alt = '', title }: ListProps) {
       <div className='absolute bottom-4 left-6 text-white text-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 cursor-pointer'>
         {title}
       </div>
-    </ListItem>
+    </Card>
   );
 }
