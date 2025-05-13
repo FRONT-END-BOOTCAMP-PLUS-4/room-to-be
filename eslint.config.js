@@ -1,9 +1,3 @@
-import js from '@eslint/js';
-import react from 'eslint-plugin-react';
-import simpleImportSort from 'eslint-plugin-simple-import-sort';
-import globals from 'globals';
-import tseslint from 'typescript-eslint';
-
 export default [
   {
     ignores: ['dist', 'node_modules'],
@@ -15,7 +9,7 @@ export default [
       parserOptions: {
         sourceType: 'module',
         ecmaVersion: 'latest',
-        project: false, // ✅ typescript-eslint 에러 해결
+        project: false,
       },
       globals: {
         ...globals.browser,
@@ -38,6 +32,12 @@ export default [
         {
           varsIgnorePattern: '^_',
           argsIgnorePattern: '^_',
+        },
+      ],
+      'react/no-unknown-property': [
+        'error',
+        {
+          ignore: ['position', 'args', 'rotation', 'scale', 'map'],
         },
       ],
       'simple-import-sort/imports': [
@@ -64,11 +64,10 @@ export default [
         },
       ],
       'simple-import-sort/exports': 'error',
-      
     },
     settings: {
       react: {
-        version: 'detect', // ✅ 경고 해결
+        version: 'detect',
       },
     },
   },
