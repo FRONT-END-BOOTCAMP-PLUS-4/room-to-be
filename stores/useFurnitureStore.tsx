@@ -3,10 +3,9 @@ import { create } from 'zustand';
 interface FurnitureInfo {
   id: string;
   name: string;
-  type: string;
-  modelUrl: string;
   thumbnailUrl: string;
   scale: number;
+  position: [number, number, number];
   rotationY: number;
 }
 

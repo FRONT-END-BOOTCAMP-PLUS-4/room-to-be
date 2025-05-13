@@ -1,12 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import FurnitureModel from './FunitureModel';
+import FurnitureModel from './FurnitureModel';
 
 interface PlacedFurniture {
   id: string;
-  furniture_id: string;
+  name: string;
+  furnitureId: string;
   modelUrl: string;
+  thumbnailUrl: string;
   positionX: number;
   positionY: number;
   positionZ: number;
@@ -18,8 +20,10 @@ interface Props {
   roomId: string;
 }
 
-export default function PlacedFurnitureList({ roomId }: Props) {
-  const [placedFurnitures, setPlacedFurnitures] = useState<PlacedFurniture[]>([]);
+export default function FurnitureList({ roomId }: Props) {
+  const [placedFurnitures, setPlacedFurnitures] = useState<PlacedFurniture[]>(
+    [],
+  );
 
   useEffect(() => {
     async function fetchPlacedFurnitures() {
@@ -41,6 +45,9 @@ export default function PlacedFurnitureList({ roomId }: Props) {
       {placedFurnitures.map((furniture) => (
         <FurnitureModel
           key={furniture.id}
+          id={furniture.id}
+          name={furniture.name}
+          thumbnailUrl={furniture.thumbnailUrl}
           modelUrl={furniture.modelUrl}
           position={[
             furniture.positionX,
