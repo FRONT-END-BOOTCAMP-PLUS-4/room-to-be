@@ -1,11 +1,16 @@
 // features/simulator/viewStore.ts
 import { create } from 'zustand';
 
-export const useViewStore = create<{
+interface ViewState {
   angle: number;
   setAngle: (angle: number) => void;
-}>((set) => ({
-  angle: 45,
-  setAngle: (a) => set({ angle: a }),
-}));
+  lastNormalAngle: number;
+  setLastNormalAngle: (angle: number) => void;
+}
 
+export const useViewStore = create<ViewState>((set) => ({
+  angle: 45,
+  setAngle: (angle) => set({ angle }),
+  lastNormalAngle: 45,
+  setLastNormalAngle: (lastNormalAngle) => set({ lastNormalAngle }),
+}));

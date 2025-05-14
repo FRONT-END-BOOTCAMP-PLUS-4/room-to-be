@@ -7,11 +7,19 @@ const VALID_ANGLES = [45, 135, 225, 315];
 export default function CameraButtons() {
   const angle = useViewStore((s) => s.angle);
   const setAngle = useViewStore((s) => s.setAngle);
+  const lastNormalAngle = useViewStore((s) => s.lastNormalAngle);
+  const setLastNormalAngle = useViewStore((s) => s.setLastNormalAngle);
 
   const handleRotate = () => {
+    if (angle === -1) {
+      return;
+    }
+
     const currentIndex = VALID_ANGLES.indexOf(angle);
     const nextIndex = (currentIndex + 1) % VALID_ANGLES.length;
+    const newAngle = VALID_ANGLES[nextIndex];
     setAngle(VALID_ANGLES[nextIndex]);
+    setLastNormalAngle(newAngle);
   };
 
   return (
@@ -23,10 +31,17 @@ export default function CameraButtons() {
         ↩ 회전
       </button>
       <button
-        onClick={() => setAngle(-1)} // 탑뷰
+        onClick={() => {
+          if (angle === -1) {
+            setAngle(lastNormalAngle);
+          } else {
+            setLastNormalAngle(angle);
+            setAngle(-1);
+          }
+        }}
         className='px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded text-lg'
       >
-        🔼 탑 뷰
+        {angle === -1 ? '🔄 3D 뷰' : '🔼 탑 뷰'}
       </button>
     </div>
   );
