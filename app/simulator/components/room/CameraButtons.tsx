@@ -12,6 +12,10 @@ export default function CameraButtons() {
 
   const handleRotate = () => {
     if (angle === -1) {
+      const currentIndex = VALID_ANGLES.indexOf(lastNormalAngle);
+      const nextIndex = (currentIndex + 1) % VALID_ANGLES.length;
+      const newAngle = VALID_ANGLES[nextIndex];
+      setLastNormalAngle(newAngle);
       return;
     }
 

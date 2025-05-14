@@ -9,9 +9,13 @@ interface CameraControllerProps {
   height: number;
 }
 
-export default function CameraController({ width, height }: CameraControllerProps) {
+export default function CameraController({
+  width,
+  height,
+}: CameraControllerProps) {
   const { camera } = useThree();
   const angle = useViewStore((s) => s.angle);
+  const lastNormalAngle = useViewStore((s) => s.lastNormalAngle);
 
   useEffect(() => {
     const r = 7;
@@ -19,7 +23,11 @@ export default function CameraController({ width, height }: CameraControllerProp
     const centerZ = height / 2;
 
     if (angle === -1) {
-      camera.position.set(centerX, 10, centerZ + 0.01); // 탑뷰는 살짝 위
+      const rad = (lastNormalAngle * Math.PI) / 180;
+
+      const offsetX = Math.sin(rad) * 0.5;
+      const offsetZ = Math.cos(rad) * 0.5;
+      camera.position.set(centerX + offsetX, 10, centerZ + offsetZ);
     } else {
       const rad = (angle * Math.PI) / 180;
       const x = centerX + r * Math.sin(rad);
@@ -29,7 +37,7 @@ export default function CameraController({ width, height }: CameraControllerProp
 
     camera.lookAt(centerX, 0, centerZ); // ✅ 항상 방의 중심 바라봄
     camera.updateProjectionMatrix();
-  }, [angle, width, height]);
+  }, [angle, lastNormalAngle, width, height]);
 
   return null;
 }
