@@ -24,11 +24,20 @@ export default function FurnitureList({ roomId }: Props) {
   const [placedFurnitures, setPlacedFurnitures] = useState<PlacedFurniture[]>(
     [],
   );
+  // 오류 방지 임시 값
+  const roomBoundary = {
+    xMin: 0,
+    xMax: 4,
+    zMin: 0,
+    zMax: 4,
+    yFloor: 0,
+    yWall: 2.5,
+  };
 
   useEffect(() => {
     async function fetchPlacedFurnitures() {
       try {
-        // TODO : 가구 정보 받아오는 api 연동 필요
+        // TODO : 가구 정보 받아오는 api 연동 필요, 방 크기도 받아와야 함
         // const res = await fetch(`/api/placed-furnitures?roomId=${roomId}`);
         // const data = await res.json();
         // setPlacedFurnitures(data);
@@ -44,6 +53,7 @@ export default function FurnitureList({ roomId }: Props) {
     <>
       {placedFurnitures.map((furniture) => (
         <FurnitureModel
+          roomBoundary={roomBoundary}
           key={furniture.id}
           id={furniture.id}
           name={furniture.name}
