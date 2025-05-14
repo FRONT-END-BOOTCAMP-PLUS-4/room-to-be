@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
 import * as THREE from 'three';
@@ -25,16 +25,18 @@ export default function FurnitureModel({
   rotationY=0,
   scale=1,
 }: FurnitureModelProps) {
-  const { scene } = useGLTF(modelUrl);
+  const gltf = useGLTF(modelUrl);
+  // scene을 깊은 복사하여 독립된 인스턴스로 사용
+  const clonedScene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
   const { selectFurniture, selectedFurniture } = useFurnitureStore();
-  // TODO : 가구 중복 사용 가능한 지 여부 확인 후 수정 필요
   const isSelected = selectedFurniture?.id === id;
 
   useEffect(() => {
-    scene.traverse((child: any) => {
+    clonedScene.traverse((child: any) => {
       if (!child.isMesh) return;
       child.castShadow = true;
       child.receiveShadow = true;
+      child.material = child.material.clone();
 
       // 클릭 무시할 메쉬 이름들
       const ignoredNames = ['FLOOR', 'WALL', 'CEILING', 'GLASS'];
@@ -51,11 +53,11 @@ export default function FurnitureModel({
         mat.emissiveIntensity = isSelected ? 0.8 : 0;
       }
     });
-  }, [scene, isSelected]);
+  }, [clonedScene, isSelected]);
 
   return (
     <primitive
-      object={scene}
+      object={clonedScene}
       position={position}
       rotation={[0, rotationY, 0]}
       scale={[scale, scale, scale]}
