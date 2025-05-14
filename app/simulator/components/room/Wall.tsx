@@ -12,6 +12,8 @@ export default function Wall({ width, height, texture }: WallProps) {
   const map = useLoader(TextureLoader, texture);
   const wallHeight = 2.5;
   const angle = useViewStore((s) => s.angle);
+  const isTopView = useViewStore((s) => s.isTopView);
+
   //앵글에 따라 숨길 벽
   const hideWallsByAngle: Record<number, string[]> = {
     [-1]: ['front', 'right', 'back', 'left'],
@@ -21,7 +23,13 @@ export default function Wall({ width, height, texture }: WallProps) {
     [315]: ['left', 'front'],
   };
 
-  const hiddenWalls = hideWallsByAngle[angle] ?? [];
+  let hiddenWalls: string[] = [];
+
+  if (isTopView) {
+    hiddenWalls = ['front', 'right', 'back', 'left'];
+  } else {
+    hiddenWalls = hideWallsByAngle[angle] ?? [];
+  }
 
   return (
     <>

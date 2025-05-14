@@ -15,29 +15,36 @@ export default function CameraController({
 }: CameraControllerProps) {
   const { camera } = useThree();
   const angle = useViewStore((s) => s.angle);
-  const lastNormalAngle = useViewStore((s) => s.lastNormalAngle);
+  const isTopView = useViewStore((s) => s.isTopView);
 
   useEffect(() => {
-    const r = 7;
     const centerX = width / 2;
     const centerZ = height / 2;
 
-    if (angle === -1) {
-      const rad = (lastNormalAngle * Math.PI) / 180;
+    if (isTopView) {
+      camera.position.y = 12;
 
-      const offsetX = Math.sin(rad) * 0.5;
-      const offsetZ = Math.cos(rad) * 0.5;
-      camera.position.set(centerX + offsetX, 10, centerZ + offsetZ);
+      const rad = (angle * Math.PI) / 180;
+      const r = 0.001;
+      const x = centerX + r * Math.sin(rad);
+      const z = centerZ + r * Math.cos(rad);
+
+      camera.position.x = x;
+      camera.position.z = z;
     } else {
+      const r = 7;
       const rad = (angle * Math.PI) / 180;
       const x = centerX + r * Math.sin(rad);
       const z = centerZ + r * Math.cos(rad);
-      camera.position.set(x, 5, z);
+
+      camera.position.x = x;
+      camera.position.y = 5;
+      camera.position.z = z;
     }
 
     camera.lookAt(centerX, 0, centerZ); // ✅ 항상 방의 중심 바라봄
     camera.updateProjectionMatrix();
-  }, [angle, lastNormalAngle, width, height]);
+  }, [angle, isTopView, width, height]);
 
   return null;
 }
