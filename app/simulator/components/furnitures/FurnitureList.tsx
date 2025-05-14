@@ -12,6 +12,9 @@ interface PlacedFurniture {
   positionX: number;
   positionY: number;
   positionZ: number;
+  scaleX: number;
+  scaleY: number;
+  scaleZ: number;
   rotationY: number;
   scale: number;
 }
@@ -65,7 +68,7 @@ export default function FurnitureList({ roomId }: Props) {
             furniture.positionZ,
           ]}
           rotationY={furniture.rotationY}
-          scale={furniture.scale}
+          scale={[furniture.scaleX, furniture.scaleY, furniture.scaleZ]}
         />
       ))}
     </>

@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
 import * as THREE from 'three';
-import { useFrame } from '@react-three/fiber';
 
 interface FurnitureModelProps {
   id: string;
@@ -13,7 +12,7 @@ interface FurnitureModelProps {
   thumbnailUrl: string;
   position?: [number, number, number]; // 기본값 [0,0,0], 위치 정보
   rotationY?: number; // Y축 기준 회전 각도 (기본값: 0)
-  scale?: number; // 크기 비율 (기본값: 1)
+  scale?: [number, number, number]; // 크기 비율 (기본값: 0.1, 0.1, 0.1)
   roomBoundary: {
     xMin: number;
     xMax: number;
@@ -29,10 +28,9 @@ export default function FurnitureModel({
   name,
   modelUrl,
   thumbnailUrl,
-  // TODO : 드래그 드롭했을 때의 좌표값으로 지정 필요
   position = [0, 0, 0],
   rotationY = 0,
-  scale = 1,
+  scale = [0.1, 0.1, 0.1],
   roomBoundary,
 }: FurnitureModelProps) {
   const gltf = useGLTF(modelUrl);
@@ -42,6 +40,9 @@ export default function FurnitureModel({
 
   const { selectFurniture, selectedFurniture } = useFurnitureStore();
   const isSelected = selectedFurniture?.id === id;
+
+  // 선택된 가구가 아닐 경우 scale 상태 관리
+  const [currentScale, setCurrentScale] = useState(scale);
 
   const [isDragging, setIsDragging] = useState(false);
 
@@ -68,6 +69,16 @@ export default function FurnitureModel({
       }
     });
   }, [clonedScene, isSelected]);
+
+  const arraysAreEqual = (arr1: number[], arr2: number[]) => {
+    return arr1.every((value, index) => value === arr2[index]);
+  };
+
+  useEffect(() => {
+    if (isSelected && selectedFurniture && !arraysAreEqual([selectedFurniture.scaleX, selectedFurniture.scaleY, selectedFurniture.scaleZ], currentScale)) {
+      setCurrentScale([selectedFurniture.scaleX, selectedFurniture.scaleY, selectedFurniture.scaleZ]); // 선택되었을 때 외부 scale을 적용
+    }
+  }, [isSelected, selectedFurniture?.scaleX, selectedFurniture?.scaleY, selectedFurniture?.scaleZ, currentScale]);
 
   useEffect(() => {
     const handleMouseUp = () => {
@@ -97,17 +108,20 @@ export default function FurnitureModel({
   const handlePointerDown = () => {
     setIsDragging(true);
     document.body.style.cursor = 'grabbing';
-    console.log(meshRef.current)
-
+    
     const pos = meshRef.current?.position;
     if (pos) {
       selectFurniture({
         id,
         name,
         thumbnailUrl,
-        position: [pos.x, pos.y, pos.z],
+        positionX: pos.x,
+        positionY: pos.y,
+        positionZ: pos.z,
         rotationY,
-        scale,
+        scaleX: currentScale[0],
+        scaleY: currentScale[1],
+        scaleZ: currentScale[2],
       });
     }
   };
@@ -116,7 +130,7 @@ export default function FurnitureModel({
     <primitive
       ref={meshRef}
       object={clonedScene}
-      scale={scale}
+      scale={currentScale} // 상태로 관리되는 scale 사용
       rotation-y={rotationY}
       position={position}
       onPointerOver={handlePointerOver}
