@@ -38,6 +38,7 @@ shadow-[0_0_15px_#00000026] flex flex-col items-center justify-center gap-4'
 
       {selectedFurniture && (
         <>
+          {/* 가구 정보 영역 */}
           <div className='w-full flex flex-col items-center'>
             <div
               className='mb-2 text-sm font-semibold text-white/70 text-center w-full truncate'
@@ -52,6 +53,13 @@ shadow-[0_0_15px_#00000026] flex flex-col items-center justify-center gap-4'
             />
           </div>
 
+          {/* 가구 스케일 고정 박스 */}
+          <div className='w-[159px] h-[28px] px-[10px] rounded-[8px] bg-white/30 flex items-center justify-between'>
+            <input type='checkbox' className='w-4 h-4 cursor-pointer' />
+            <span className='text-[12px] text-white'>크기 비율 유지</span>
+          </div>
+
+          {/* 가구 스케일 변경 */}
           {scaleInputs.map(({ label, key, scaleKey, originalKey }) => {
             const baseValue = selectedFurniture[key];
             const originalValue = selectedFurniture[originalKey];
