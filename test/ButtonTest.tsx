@@ -1,12 +1,12 @@
 'use client';
-import BoxTextButton from '@/app/components/BoxTextButton';
-import CircleIconButton from '@/app/components/CircleIconButton';
-import IconButton from '@/app/components/IconButton';
-import OnlyTextButton from '@/app/components/OnlyTextButton';
+import BoxTextButton from '@/app/components/buttons/BoxTextButton';
+import CircleIconButton from '@/app/components/buttons/CircleIconButton';
+import IconButton from '@/app/components/buttons/IconButton';
+import OnlyTextButton from '@/app/components/buttons/OnlyTextButton';
 
 export default function ButtonTest() {
   return (
-    <>
+    <div className='w-screen h-screen flex flex-col gap-2 bg-black'>
       <div className='flex gap-2'>
         <BoxTextButton>화살표 BoxTextButton</BoxTextButton>
         <BoxTextButton showImg={true}>화살표</BoxTextButton>
@@ -27,6 +27,6 @@ export default function ButtonTest() {
         <CircleIconButton imageSrc='assets/icons/trash.svg' />
         <CircleIconButton imageSrc='assets/icons/share.svg' />
       </div>
-    </>
+    </div>
   );
 }
