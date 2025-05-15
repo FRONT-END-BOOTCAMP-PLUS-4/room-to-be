@@ -75,11 +75,63 @@ export default function FurnitureModel({
   };
 
   useEffect(() => {
-    if (isSelected && selectedFurniture && !arraysAreEqual([selectedFurniture.scaleX, selectedFurniture.scaleY, selectedFurniture.scaleZ], currentScale)) {
-      setCurrentScale([selectedFurniture.scaleX, selectedFurniture.scaleY, selectedFurniture.scaleZ]); // 선택되었을 때 외부 scale을 적용
+    if (
+      isSelected &&
+      selectedFurniture &&
+      !arraysAreEqual(
+        [
+          selectedFurniture.scaleX,
+          selectedFurniture.scaleY,
+          selectedFurniture.scaleZ,
+        ],
+        currentScale,
+      )
+    ) {
+      setCurrentScale([
+        selectedFurniture.scaleX,
+        selectedFurniture.scaleY,
+        selectedFurniture.scaleZ,
+      ]); // 선택되었을 때 외부 scale을 적용
     }
-  }, [isSelected, selectedFurniture?.scaleX, selectedFurniture?.scaleY, selectedFurniture?.scaleZ, currentScale]);
+  }, [
+    isSelected,
+    selectedFurniture?.scaleX,
+    selectedFurniture?.scaleY,
+    selectedFurniture?.scaleZ,
+    currentScale,
+  ]);
 
+  // 실제 사이즈 받아오는 로직
+  const [baseSize, setBaseSize] = useState<[number, number, number] | null>(
+    null,
+  );
+
+  useEffect(() => {
+    const ignoredNames = ['FLOOR', 'WALL', 'CEILING', 'GLASS'];
+    const boundingBox = new THREE.Box3();
+    const tempBox = new THREE.Box3();
+
+    // 초기화
+    boundingBox.makeEmpty();
+
+    // baseSize 계산용: 무시하지 않을 메쉬만 경계 계산
+    clonedScene.traverse((child: any) => {
+      if (!child.isMesh) return;
+
+      const name = child.name?.toUpperCase?.() ?? '';
+      if (ignoredNames.includes(name)) return;
+
+      tempBox.setFromObject(child);
+      boundingBox.union(tempBox); // 전체 경계에 추가
+    });
+
+    const size = new THREE.Vector3();
+    boundingBox.getSize(size);
+
+    setBaseSize([Math.floor(size.x*10), Math.floor(size.y*10), Math.floor(size.z*10)]);
+  }, [clonedScene]);
+
+  // 커서 모양 바꾸는 로직
   useEffect(() => {
     const handleMouseUp = () => {
       if (isDragging) {
@@ -108,22 +160,37 @@ export default function FurnitureModel({
   const handlePointerDown = () => {
     setIsDragging(true);
     document.body.style.cursor = 'grabbing';
-    
+
     const pos = meshRef.current?.position;
-    if (pos) {
-      selectFurniture({
-        id,
-        name,
-        thumbnailUrl,
-        positionX: pos.x,
-        positionY: pos.y,
-        positionZ: pos.z,
-        rotationY,
-        scaleX: currentScale[0],
-        scaleY: currentScale[1],
-        scaleZ: currentScale[2],
-      });
-    }
+    if (pos && baseSize) {
+  const scaleX = currentScale[0];
+  const scaleY = currentScale[1];
+  const scaleZ = currentScale[2];
+
+  const baseX = Math.round(baseSize[0] * (scaleX / scale[0]));
+  const baseY = Math.round(baseSize[1] * (scaleY / scale[1]));
+  const baseZ = Math.round(baseSize[2] * (scaleZ / scale[2]));
+
+  selectFurniture({
+    id,
+    name,
+    thumbnailUrl,
+    positionX: pos.x,
+    positionY: pos.y,
+    positionZ: pos.z,
+    rotationY,
+    scaleX,
+    scaleY,
+    scaleZ,
+    baseX,
+    baseY,
+    baseZ,
+    originalBaseX: baseSize[0],
+    originalBaseY: baseSize[1],
+    originalBaseZ: baseSize[2],
+    originalScale: scale[0],
+  });
+}
   };
 
   return (
