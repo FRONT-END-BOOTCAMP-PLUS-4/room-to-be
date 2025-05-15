@@ -1,4 +1,3 @@
-// backend/infra/db/prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
   output   = "../../../../node_modules/.prisma/client"
@@ -32,14 +31,16 @@ model Room {
 }
 
 model Furniture {
-  id            String   @id @default(uuid())
-  name          String
-  type          String
-  model_url     String
-  thumbnail_url String
-  created_at    DateTime @default(now())
+  id             String   @id
+  name           String
+  type           String
+  model_url      String
+  thumbnail_url  String
+  created_at     DateTime @default(now())
 
-  placements    PlacedFurniture[]
+  placement_type String  
+
+  placedFurnitures PlacedFurniture[]
 }
 
 model PlacedFurniture {
@@ -50,9 +51,12 @@ model PlacedFurniture {
   position_y   Float
   position_z   Float
   rotation_y   Float
-  scale        Float
+  scale_x      Float
+  scale_y      Float
+  scale_z      Float
   created_at   DateTime @default(now())
 
-  room         Room     @relation(fields: [room_id], references: [id])
+  room         Room      @relation(fields: [room_id], references: [id])
   furniture    Furniture @relation(fields: [furniture_id], references: [id])
 }
+
