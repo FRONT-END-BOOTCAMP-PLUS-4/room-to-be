@@ -4,7 +4,11 @@ import BoxTextButton from '../buttons/BoxTextButton';
 import TemplateList from '../list/TemplateCard';
 import Modal from './Modal';
 
-export default function TemplateSelectModal() {
+interface TemplateSelectModalProps {
+  onBack: () => void;
+}
+
+export default function TemplateSelectModal({onBack}:TemplateSelectModalProps) {
   const templates = [
     {
       id: 1,
@@ -38,7 +42,7 @@ export default function TemplateSelectModal() {
     },
   ];
   return (
-    <Modal width='1280px' height='773px' onBack={() => '뒤로 가기 로직 추가 필요'}>
+    <Modal width='1280px' height='773px' onBack={onBack}>
       <div className='flex flex-wrap justify-center'>
         {templates.map(({ id, imageUrl, tags }) => (
           <div key={id} className='flex flex-col w-[360px] h-[290px] mb-[50px] mx-[13px]'>

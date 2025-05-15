@@ -1,10 +1,18 @@
-'use client'
+'use client';
 
 import { useRouter } from 'next/navigation';
 import Modal from './Modal';
 import StartModalItem from './StartModalItem';
 
-export default function InteriorStartModal() {
+interface InteriorStartModalProps {
+  onSelectTemplate: () => void;
+  onSelectRoomSize: () => void;
+}
+
+export default function InteriorStartModal({
+  onSelectTemplate,
+  onSelectRoomSize,
+}: InteriorStartModalProps) {
   const router = useRouter();
 
   return (
@@ -15,7 +23,7 @@ export default function InteriorStartModal() {
           src='/assets/images/newroom.png'
           contentText='비어있는 페이지에서 인테리어를 시작합니다.'
           btnText='빈 프로젝트 시작하기'
-          onClick={()=>'현재모달 닫고 Template Select 모달 뜨게해야 함'}
+          onClick={onSelectRoomSize}
         />
         <div className='h-[450px] w-px bg-white' />
         <StartModalItem
@@ -23,7 +31,7 @@ export default function InteriorStartModal() {
           src='/assets/images/template.png'
           contentText='템플릿을 사용하여 인테리어를 시작합니다.'
           btnText='템플릿으로 시작하기'
-          onClick={()=>'현재모달 닫고 Room Size 모달 뜨게해야 함'}
+          onClick={onSelectTemplate}
         />
       </div>
     </Modal>

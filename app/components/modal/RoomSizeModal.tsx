@@ -5,11 +5,15 @@ import Modal from './Modal';
 import BoxTextButton from '../buttons/BoxTextButton';
 import LabeledNumberInput from './LabeledNumberInput';
 
-export default function RoomSizeModal() {
+interface RoomSizeModalProps {
+  onBack: () => void;
+}
+
+export default function RoomSizeModal({onBack}:RoomSizeModalProps) {
   const [mode, setMode] = useState<'pyeong' | 'meter'>('pyeong');
 
   return (
-    <Modal width='340px'>
+    <Modal width='340px' onBack={onBack} showBackIconOnly>
       <div className='flex flex-col w-full justify-center text-center items-center pb-[15px]'>
         <span className='text-white text-[16px] mb-5'>
           방 크기를 입력해 주세요.

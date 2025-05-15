@@ -8,6 +8,7 @@ interface ModalProps {
   width: string;
   height?: string;
   onBack?: () => void;
+  showBackIconOnly?: boolean;
   children: React.ReactNode;
 }
 
@@ -15,9 +16,10 @@ export default function Modal({
   width,
   height,
   onBack,
+  showBackIconOnly = false,
   children,
 }: ModalProps) {
-
+  
   const router = useRouter();
   const onClose = () => {
     router.push('/');
@@ -34,9 +36,11 @@ export default function Modal({
             {onBack && (
               <>
                 <IconButton imageSrc='/assets/icons/left.svg' width={23} height={36} onClick={onBack} />
-                <span className="ml-[26px] text-white text-[36px] font-semibold">
-                  Template
-                </span>
+                {!showBackIconOnly && (
+                  <span className="ml-[26px] text-white text-[36px] font-semibold">
+                    Template
+                  </span>
+                )}
               </>
             )}
           </div>
