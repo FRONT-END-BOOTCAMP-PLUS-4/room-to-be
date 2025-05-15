@@ -50,7 +50,7 @@ export default function FurnitureSizeInput({
 
   return (
     <div className='flex items-center w-full justify-between gap-2'>
-      <label className='text-sm mr-2 whitespace-nowrap'>{label}</label>
+      <label className='text-sm mr-2 whitespace-nowrap text-white/70'>{label}</label>
       <input
         type='number'
         min={10}
@@ -58,9 +58,9 @@ export default function FurnitureSizeInput({
         value={inputValue}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        className='w-[90px] px-2 py-1 text-right rounded-md text-sm border border-transparent bg-transparent focus:outline-none focus:border-black/10 focus:bg-black/10 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+        className='text-white w-[90px] px-2 py-1 text-right rounded-md text-sm border border-transparent bg-transparent focus:outline-none focus:border-black/10 focus:bg-black/10 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
       />
-      <span className='text-sm'>mm</span>
+      <span className='text-sm text-white/70'>mm</span>
     </div>
   );
 }
