@@ -4,15 +4,17 @@ import Image from 'next/image';
 import { ButtonHTMLAttributes } from 'react';
 import clsx from 'clsx';
 
-type AirplaneIconButtonProps = {
+type CircleIconButtonProps = {
   className?: string;
+  imageSrc: string;
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
-export default function AirplaneIconButton({
+export default function CircleIconButton({
   className,
   type,
+  imageSrc,
   ...props
-}: AirplaneIconButtonProps) {
+}: CircleIconButtonProps) {
   return (
     <button
       type={type ?? 'button'}
@@ -22,7 +24,7 @@ export default function AirplaneIconButton({
       )}
       {...props}
     >
-      <Image src='/assets/icons/share.svg' alt='share' width={15} height={15} />
+      <Image src={imageSrc} alt={imageSrc} width={15} height={15} />
     </button>
   );
 }
