@@ -34,7 +34,7 @@ export default function Modal({
             {onBack && (
               <>
                 <IconButton imageSrc='/assets/icons/left.svg' width={23} height={36} onClick={onBack} />
-                <span className="ml-[26px] text-white text-lg font-semibold">
+                <span className="ml-[26px] text-white text-[36px] font-semibold">
                   Template
                 </span>
               </>
