@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useFurnitureStore } from '@/stores/useFurnitureStore'
-import FurnitureSizeInput from './FurnitureSizeInput'
-import { Slider } from '@/components/ui/slider'
-import { CustomCheckButton } from '@/app/components/buttons/CustomCheckButton'
+import { useState } from 'react';
+import { useFurnitureStore } from '@/stores/useFurnitureStore';
+import FurnitureSizeInput from './FurnitureSizeInput';
+import { Slider } from '@/components/ui/slider';
+import { CustomCheckButton } from '@/app/components/buttons/CustomCheckButton';
 
 const scaleInputs = [
   {
@@ -25,11 +25,11 @@ const scaleInputs = [
     scaleKey: 'scaleY',
     originalKey: 'originalBaseY',
   },
-] as const
+] as const;
 
 export default function FurnitureController() {
-  const { selectedFurniture, updateSelectedFurniture } = useFurnitureStore()
-  const [isScaleLocked, setIsScaleLocked] = useState(false)
+  const { selectedFurniture, updateSelectedFurniture } = useFurnitureStore();
+  const [isScaleLocked, setIsScaleLocked] = useState(false);
 
   return (
     <div
@@ -69,49 +69,88 @@ export default function FurnitureController() {
           {isScaleLocked ? (
             <div className='w-full'>
               <div className='flex h-[39px]'>
-                <label className='text-[12px] text-white/70 pt-[6px]'>스케일</label>
+                <label className='text-[12px] text-white/70 pt-[6px]'>
+                  스케일
+                </label>
               </div>
-              <Slider
-                value={[Math.round(selectedFurniture.baseX)]}
-                min={10}
-                max={3000}
-                step={1}
-                onValueChange={([val]) => {
-                  const {
-                    originalBaseX,
-                    originalBaseY,
-                    originalBaseZ,
-                    originalScale,
-                  } = selectedFurniture
+              {(() => {
+                const {
+                  originalBaseX,
+                  originalBaseY,
+                  originalBaseZ,
+                  originalScale,
+                } = selectedFurniture;
 
-                  const scaleRatio = val / originalBaseX
-                  const newScale = scaleRatio * originalScale
+                const currentBaseX = selectedFurniture.baseX;
 
-                  updateSelectedFurniture({
-                    baseX: Math.round(val),
-                    baseY: Math.round(originalBaseY * scaleRatio),
-                    baseZ: Math.round(originalBaseZ * scaleRatio),
-                    scaleX: newScale,
-                    scaleY: newScale,
-                    scaleZ: newScale,
-                  })
-                }}
-              />
+                // baseX를 기준으로 비율 유지 가능한 스케일 범위 계산
+                const minRatio = Math.max(
+                  10 / originalBaseX,
+                  10 / originalBaseY,
+                  10 / originalBaseZ,
+                );
+                const maxRatio = Math.min(
+                  3000 / originalBaseX,
+                  3000 / originalBaseY,
+                  3000 / originalBaseZ,
+                );
+
+                const minBaseX = Math.round(originalBaseX * minRatio);
+                const maxBaseX = Math.round(originalBaseX * maxRatio);
+
+                return (
+                  <Slider
+                    value={[Math.round(currentBaseX)]}
+                    min={minBaseX}
+                    max={maxBaseX}
+                    step={1}
+                    onValueChange={([val]) => {
+                      const scaleRatio = val / originalBaseX;
+
+                      const newBaseX = Math.round(val);
+                      const newBaseY = Math.round(originalBaseY * scaleRatio);
+                      const newBaseZ = Math.round(originalBaseZ * scaleRatio);
+
+                      const isValid =
+                        newBaseX >= 10 &&
+                        newBaseX <= 3000 &&
+                        newBaseY >= 10 &&
+                        newBaseY <= 3000 &&
+                        newBaseZ >= 10 &&
+                        newBaseZ <= 3000;
+
+                      if (!isValid) return;
+
+                      const newScale = scaleRatio * originalScale;
+
+                      updateSelectedFurniture({
+                        baseX: newBaseX,
+                        baseY: newBaseY,
+                        baseZ: newBaseZ,
+                        scaleX: newScale,
+                        scaleY: newScale,
+                        scaleZ: newScale,
+                      });
+                    }}
+                  />
+                );
+              })()}
             </div>
           ) : (
             scaleInputs.map(({ label, key, scaleKey, originalKey }) => {
-              const baseValue = selectedFurniture[key]
-              const originalValue = selectedFurniture[originalKey]
-              const isModified = baseValue !== originalValue
-              const displayValue = isModified ? baseValue : originalValue
+              const baseValue = selectedFurniture[key];
+              const originalValue = selectedFurniture[originalKey];
+              const isModified = baseValue !== originalValue;
+              const displayValue = isModified ? baseValue : originalValue;
 
               const handleChange = (val: number) => {
-                const newScale = (val / originalValue) * selectedFurniture.originalScale
+                const newScale =
+                  (val / originalValue) * selectedFurniture.originalScale;
                 updateSelectedFurniture({
                   [key]: Math.round(val),
                   [scaleKey]: newScale,
-                })
-              }
+                });
+              };
 
               return (
                 <div key={key} className='w-full'>
@@ -129,11 +168,11 @@ export default function FurnitureController() {
                     className='mt-2'
                   />
                 </div>
-              )
+              );
             })
           )}
         </>
       )}
     </div>
-  )
+  );
 }
