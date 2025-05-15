@@ -1,12 +1,12 @@
 'use client';
 
-import Image from 'next/image';
 import React from 'react';
+import { useRouter } from 'next/navigation';
+import IconButton from '../buttons/IconButton';
 
 interface ModalProps {
   width: string;
-  height: string;
-  onClose: () => void;
+  height?: string;
   onBack?: () => void;
   children: React.ReactNode;
 }
@@ -14,10 +14,15 @@ interface ModalProps {
 export default function Modal({
   width,
   height,
-  onClose,
   onBack,
   children,
 }: ModalProps) {
+
+  const router = useRouter();
+  const onClose = () => {
+    router.push('/');
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-lg">
       <div
@@ -28,17 +33,7 @@ export default function Modal({
           <div className="flex items-center">
             {onBack && (
               <>
-                <button
-                  onClick={onBack}
-                  className="text-white hover:text-gray-300"
-                >
-                  <Image
-                    src="/assets/icons/left.svg"
-                    alt="뒤로가기"
-                    width={23}
-                    height={28}
-                  />
-                </button>
+                <IconButton imageSrc='/assets/icons/left.svg' width={23} height={36} onClick={onBack} />
                 <span className="ml-[26px] text-white text-lg font-semibold">
                   Template
                 </span>
@@ -46,17 +41,7 @@ export default function Modal({
             )}
           </div>
 
-          <button
-            onClick={onClose}
-            className="text-white hover:text-gray-300"
-          >
-            <Image
-              src="/assets/icons/cross.svg"
-              alt="모달 닫기"
-              width={28}
-              height={28}
-            />
-          </button>
+          <IconButton imageSrc='/assets/icons/cross.svg' width={28} height={28} onClick={onClose} />
         </div>
 
         <div className="mt-4 flex flex-1 items-center justify-center">
