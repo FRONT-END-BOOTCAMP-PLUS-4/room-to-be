@@ -1,0 +1,75 @@
+'use client';
+
+import { useState } from 'react';
+import Modal from './Modal';
+import BoxTextButton from '../buttons/BoxTextButton';
+import LabeledNumberInput from './LabeledNumberInput';
+
+export default function RoomSizeModal() {
+  const [mode, setMode] = useState<'pyeong' | 'meter'>('pyeong');
+
+  return (
+    <Modal width='340px'>
+      <div className='flex flex-col w-full justify-center text-center items-center pb-[15px]'>
+        <span className='text-white text-[16px] mb-5'>
+          방 크기를 입력해 주세요.
+        </span>
+
+        <div className='w-[182px] flex justify-between mb-6 text-white text-[16px]'>
+          <label className='flex items-center gap-3'>
+            <input
+              type='radio'
+              name='mode'
+              value='pyeong'
+              className='appearance-none w-[14px] h-[14px] rounded-full border border-white bg-white/20 checked:bg-white checked:ring-1 checked:ring-white cursor-pointer'
+              checked={mode === 'pyeong'}
+              onChange={() => setMode('pyeong')}
+            />
+            평수
+          </label>
+          <label className='flex items-center gap-3'>
+            <input
+              type='radio'
+              name='mode'
+              value='meter'
+              className='appearance-none w-[14px] h-[14px] rounded-full border border-white bg-white/20 checked:bg-white checked:ring-1 checked:ring-white cursor-pointer'
+              checked={mode === 'meter'}
+              onChange={() => setMode('meter')}
+            />
+            m (미터)
+          </label>
+        </div>
+
+        {mode === 'pyeong' ? (
+          <LabeledNumberInput unitLabel='평' placeholder='00' />
+        ) : (
+          <div className='flex flex-col gap-[10px]'>
+            <LabeledNumberInput
+              leftLabel='가로'
+              unitLabel='m'
+              placeholder='00'
+            />
+            <LabeledNumberInput
+              leftLabel='세로'
+              unitLabel='m'
+              placeholder='00'
+            />
+            <LabeledNumberInput
+              leftLabel='높이'
+              unitLabel='m'
+              placeholder='00'
+            />
+          </div>
+        )}
+
+        <BoxTextButton
+          showImg
+          onClick={() => '입력 정보 가지고 인테리어 페이지로 이동 로직 추가'}
+          className='mt-[26px]'
+        >
+          3D 인테리어 하러가기
+        </BoxTextButton>
+      </div>
+    </Modal>
+  );
+}
