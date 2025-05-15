@@ -29,7 +29,6 @@ export async function getRoomsByUserId(
   if (!res.ok) {
     throw new Error(`방 목록 불러오기 실패: ${res.status}`);
   }
-
   const data = await res.json();
   return data.rooms;
 }

@@ -10,7 +10,7 @@ export async function uploadRoomThumbnail(
   roomId: string,
 ): Promise<string> {
   const filePath = `room-thumbnails/${roomId}.png`;
-
+  
   const { error } = await supabase.storage
     .from('r2b') // 실제 버킷 이름
     .upload(filePath, blob, {
@@ -20,8 +20,6 @@ export async function uploadRoomThumbnail(
 
   if (error) throw error;
 
-  const { data } = supabase.storage
-    .from('roomtobe-assets')
-    .getPublicUrl(filePath);
+  const { data } = supabase.storage.from('r2b').getPublicUrl(filePath);
   return data.publicUrl;
 }

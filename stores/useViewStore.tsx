@@ -1,4 +1,3 @@
-// features/simulator/viewStore.ts
 import { create } from 'zustand';
 
 export const useViewStore = create<{
@@ -8,4 +7,3 @@ export const useViewStore = create<{
   angle: 45,
   setAngle: (a) => set({ angle: a }),
 }));
-

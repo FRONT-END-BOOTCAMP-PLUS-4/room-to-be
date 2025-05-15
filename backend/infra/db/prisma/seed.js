@@ -12,8 +12,8 @@ async function main() {
     update: {},
     create: {
       id: '1',
-      name: '멋쟁이팀장님',
-      email: 'test@example.com',
+      name: '안농',
+      email: 'sj@gmail.com',
       image: 'https://via.placeholder.com/150',
     },
   });

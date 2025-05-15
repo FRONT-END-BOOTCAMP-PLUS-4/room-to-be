@@ -20,6 +20,7 @@ export class PrismaRoomRepository implements RoomRepository {
     const data = await prisma.room.findMany({
       where: { user_id: userId },
     });
+    
     return data.map(toDomainRoom);
   }
 }
