@@ -10,6 +10,7 @@ import UnlockedScaleInputs from './UnlockedScaleInputs';
 
 import LightButton from '@/app/components/buttons/LightButton';
 import DarkButton from '@/app/components/buttons/DarkButton';
+import FurnitureControllerBtn from './FurnitureControllerBtn';
 
 export default function FurnitureController() {
   const { selectedFurniture, updateSelectedFurniture } = useFurnitureStore();
@@ -18,6 +19,17 @@ export default function FurnitureController() {
 
   return (
     <div className='w-[219px] px-[30px] py-[25px] rounded-[30px] bg-gradient-to-r from-white/10 to-black/20 backdrop-blur-md shadow-[0_0_15px_#00000026] flex flex-col items-center justify-center gap-4'>
+      {/* 카메라 모드 버튼 */}
+      <div className='w-full flex gap-[10px]'>
+        <FurnitureControllerBtn
+          width={14}
+          height={14}
+          icon='/assets/icons/view-mode.svg'
+        />
+        <FurnitureControllerBtn text='3D 뷰' />
+      </div>
+
+      {/* 조명 모드 버튼 */}
       <div className='flex gap-[10px]'>
         <LightButton
           onClick={() => setIsLight(true)}
@@ -31,6 +43,7 @@ export default function FurnitureController() {
 
       {selectedFurniture && (
         <>
+          <div className='w-[156px] h-px bg-white/20' />
           <FurnitureThumbnailInfo
             name={selectedFurniture.name}
             thumbnailUrl={selectedFurniture.thumbnailUrl}
@@ -53,27 +66,35 @@ export default function FurnitureController() {
             />
           )}
 
-          <div className="flex gap-2">
-            <button
-              className="px-3 py-1 rounded bg-white/30 hover:bg-white/50 transition"
-              onClick={() => {
+          {/* 가구 조작 버튼 모음 */}
+          <div className='w-full flex flex-col gap-[10px]'>
+            <div className='w-full flex gap-[10px]'>
+              <FurnitureControllerBtn
+                width={14}
+                height={14}
+                icon='/assets/icons/rotate-left.svg'
+                onClick={() => {
                 updateSelectedFurniture({
                   rotationY: selectedFurniture.rotationY + Math.PI / 4, // 반시계 방향으로 회전
                 });
               }}
-            >
-              ⟲
-            </button>
-            <button
-              className="px-3 py-1 rounded bg-white/30 hover:bg-white/50 transition"
-              onClick={() => {
+              />
+              <FurnitureControllerBtn
+                width={14}
+                height={14}
+                icon='/assets/icons/rotate-right.svg'
+                onClick={() => {
                 updateSelectedFurniture({
                   rotationY: selectedFurniture.rotationY - Math.PI / 4, // 시계 방향으로 회전
                 });
               }}
-            >
-              ⟳
-            </button>
+              />
+            </div>
+            <FurnitureControllerBtn text='이전 상태로 되돌리기' />
+            <div className='w-full flex gap-[10px]'>
+              <FurnitureControllerBtn text='삭제' />
+              <FurnitureControllerBtn text='초기화' />
+            </div>
           </div>
         </>
       )}
