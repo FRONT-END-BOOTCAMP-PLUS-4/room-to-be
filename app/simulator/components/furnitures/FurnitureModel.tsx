@@ -50,11 +50,6 @@ export default function FurnitureModel({
   const [currentScale, setCurrentScale] = useState(scale);
   const [currentRotationY, setCurrentRotationY] = useState(rotationY);
   const [isDragging, setIsDragging] = useState(false);
-  const { onPointerDown } = useDragPosition(
-    meshRef,
-    roomBoundary,
-    setIsDragging,
-  );
 
   // 선택 가구 하이라이트 처리
   useHighlightMaterial({ scene: clonedScene, isSelected });
@@ -76,7 +71,18 @@ export default function FurnitureModel({
   });
 
   // baseSize 계산
-  const baseSize = useGetBaseSize(clonedScene);
+  const { baseSizeWithScale, baseSizeRaw } = useGetBaseSize(clonedScene);
+
+  // 가구 크기(반폭, 반깊이) 계산 
+  const halfWidth = baseSizeRaw ? (baseSizeRaw[0] * currentScale[0]) / 2 : 0;
+  const halfDepth = baseSizeRaw ? (baseSizeRaw[2] * currentScale[2]) / 2 : 0;
+
+  const { onPointerDown } = useDragPosition(
+    meshRef,
+    roomBoundary,
+    setIsDragging,
+    { halfWidth, halfDepth },
+  );
 
   // 드래그 커서 관리
   useCursorOnDrag(isDragging, setIsDragging);
@@ -99,14 +105,14 @@ export default function FurnitureModel({
     document.body.style.cursor = 'grabbing';
 
     const pos = meshRef.current?.position;
-    if (pos && baseSize) {
+    if (pos && baseSizeWithScale) {
       const scaleX = currentScale[0];
       const scaleY = currentScale[1];
       const scaleZ = currentScale[2];
 
-      const baseX = Math.round(baseSize[0] * (scaleX / scale[0]));
-      const baseY = Math.round(baseSize[1] * (scaleY / scale[1]));
-      const baseZ = Math.round(baseSize[2] * (scaleZ / scale[2]));
+      const baseX = Math.round(baseSizeWithScale[0] * (scaleX / scale[0]));
+      const baseY = Math.round(baseSizeWithScale[1] * (scaleY / scale[1]));
+      const baseZ = Math.round(baseSizeWithScale[2] * (scaleZ / scale[2]));
 
       selectFurniture({
         id,
@@ -122,9 +128,9 @@ export default function FurnitureModel({
         baseX,
         baseY,
         baseZ,
-        originalBaseX: baseSize[0],
-        originalBaseY: baseSize[1],
-        originalBaseZ: baseSize[2],
+        originalBaseX: baseSizeWithScale[0],
+        originalBaseY: baseSizeWithScale[1],
+        originalBaseZ: baseSizeWithScale[2],
         originalScale: scale[0],
       });
     }
@@ -139,8 +145,8 @@ export default function FurnitureModel({
       onPointerOver={handlePointerOver}
       onPointerOut={handlePointerOut}
       onPointerDown={(e: any) => {
-        onPointerDown(e.nativeEvent); 
-        handlePointerDown(); 
+        onPointerDown(e.nativeEvent);
+        handlePointerDown();
       }}
     />
   );

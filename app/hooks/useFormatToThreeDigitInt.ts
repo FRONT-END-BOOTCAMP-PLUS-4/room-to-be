@@ -1,12 +1,13 @@
-export default function formatToThreeDigitInt(value: number): number {
-  const abs = Math.abs(value);
-  let scaled = abs;
+export default function useFormatToThreeDigitInt(scale: number, size: number): number {
+  // scale이 0.01 ~ 1 사이로 가정
+  const clampedScale = Math.min(Math.max(scale, 0.01), 1); // 0.01 ~ 1 제한
 
-  if (abs < 1) {
-    scaled = abs * 1000;
-  } else if (abs < 100) {
-    scaled = abs * 10;
-  }
+  // scale=0.01 => multiplier=10
+  // scale=1 => multiplier=1000
+  
+  // 선형 보간 계산
+  const multiplier = 10 + (clampedScale - 0.01) * ((1000 - 10) / (1 - 0.01));
 
-  return Math.min(999, Math.round(scaled));
+  const result = Math.min(3000, Math.round(size * multiplier));
+  return result;
 }

@@ -10,11 +10,17 @@ interface RoomBoundary {
   yFloor: number;
 }
 
+interface DragOptions {
+  halfWidth?: number; // 가구 반폭 (가로 절반 길이)
+  halfDepth?: number; // 가구 반깊이 (세로 절반 길이)
+}
+
 // 마우스 이벤트에 따라 가구 position 변경하는 훅
 export default function useDragPosition(
   meshRef: React.RefObject<Object3D>,
   roomBoundary: RoomBoundary,
   setDragging?: (value: boolean) => void,
+  options?: DragOptions,
 ) {
   const { gl, camera } = useThree();
   const raycaster = useRef(new Raycaster());
@@ -24,6 +30,8 @@ export default function useDragPosition(
   const intersectPoint = new Vector3();
 
   const [isDragging, setInternalDragging] = useState(false);
+
+  const { halfWidth = 0, halfDepth = 0 } = options || {};
 
   const getPlaneIntersection = useCallback(
     (event: PointerEvent | MouseEvent) => {
@@ -68,13 +76,18 @@ export default function useDragPosition(
       if (intersect) {
         // 새로운 가구 위치 계산
         const newPos = new Vector3().addVectors(intersect, offset.current);
-        newPos.x = Math.min(roomBoundary.xMax, Math.max(roomBoundary.xMin, newPos.x));
-        newPos.z = Math.min(roomBoundary.zMax, Math.max(roomBoundary.zMin, newPos.z));
+
+        // 가구 크기(반폭, 반깊이)를 고려해 방 밖으로 나가지 않도록 제한
+        newPos.x = Math.min(roomBoundary.xMax - halfWidth, Math.max(roomBoundary.xMin + halfWidth, newPos.x));
+        newPos.z = Math.min(roomBoundary.zMax - halfDepth, Math.max(roomBoundary.zMin + halfDepth, newPos.z));
+
+        // 바닥 높이 고정
         newPos.y = roomBoundary.yFloor;
+
         meshRef.current.position.copy(newPos);
       }
     },
-    [getPlaneIntersection, meshRef, roomBoundary, isDragging],
+    [getPlaneIntersection, meshRef, roomBoundary, isDragging, halfWidth, halfDepth],
   );
 
   // 마우스를 뗐을 때,
