@@ -54,7 +54,7 @@ export default function SimulatorPage() {
             name='f_이케아 트롤리'
             thumbnailUrl='/assets/models/ikea.png'
             modelUrl={'/assets/models/ikea_cart.glb'}
-            position={[2, 0.5, 2]}
+            position={[2, 0, 2]}
             rotationY={0}
             scale={[0.01,0.01,0.01]}
           />
@@ -64,7 +64,7 @@ export default function SimulatorPage() {
             name='f_이케아 트롤리2'
             thumbnailUrl='/assets/models/ikea.png'
             modelUrl={'/assets/models/ikea_cart.glb'}
-            position={[3, 0.5, 3]}
+            position={[3, 0, 3]}
             rotationY={0}
             scale={[0.01,0.01,0.01]}
           />
@@ -74,7 +74,7 @@ export default function SimulatorPage() {
             name='f_테이블'
             thumbnailUrl='/assets/models/ikea.png'
             modelUrl={'/assets/models/table.glb'}
-            position={[4, 0.5, 1]}
+            position={[3, 0, 1]}
             rotationY={0}
             scale={[0.01,0.01,0.01]}
           />
