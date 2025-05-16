@@ -20,10 +20,10 @@ export default function StartModalItem({ alt, src, contentText, btnText, onClick
         alt={alt}
         src={src}
       />
-      <span className='text-[16px] text-white mt-[42px] mb-4'>
+      <span className='text-[16px] text-white mt-[38px] mb-5'>
         {contentText}
       </span>
-      <BoxTextButton showImg onClick={onClick}>{btnText}</BoxTextButton>
+      <BoxTextButton className="rounded-xl px-[30px]" showImg onClick={onClick}>{btnText}</BoxTextButton>
     </div>
   );
 }

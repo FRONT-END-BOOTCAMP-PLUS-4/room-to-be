@@ -69,7 +69,7 @@ export default function RoomSizeModal({onBack}:RoomSizeModalProps) {
         <BoxTextButton
           showImg
           onClick={() => '입력 정보 가지고 인테리어 페이지로 이동 로직 추가'}
-          className='mt-[26px]'
+          className='mt-[26px] rounded-lg w-[230px] text-sm py-[10px] h-10'
         >
           3D 인테리어 하러가기
         </BoxTextButton>

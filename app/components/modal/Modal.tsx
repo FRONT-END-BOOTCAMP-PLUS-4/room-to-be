@@ -26,7 +26,7 @@ export default function Modal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-lg">
+    <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-2xl">
       <div
         className="bg-white/30 backdrop-blur-lg rounded-[30px] py-[30px] px-[36px] flex flex-col"
         style={{ width, height }}
@@ -37,7 +37,7 @@ export default function Modal({
               <>
                 <IconButton imageSrc='/assets/icons/left.svg' width={23} height={36} onClick={onBack} />
                 {!showBackIconOnly && (
-                  <span className="ml-[26px] text-white text-[36px] font-semibold">
+                  <span className="ml-[26px] text-white text-[30px] font-semibold">
                     Template
                   </span>
                 )}

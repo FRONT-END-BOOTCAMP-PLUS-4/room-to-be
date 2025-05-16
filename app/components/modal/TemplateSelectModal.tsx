@@ -8,7 +8,9 @@ interface TemplateSelectModalProps {
   onBack: () => void;
 }
 
-export default function TemplateSelectModal({onBack}:TemplateSelectModalProps) {
+export default function TemplateSelectModal({
+  onBack,
+}: TemplateSelectModalProps) {
   const templates = [
     {
       id: 1,
@@ -45,11 +47,19 @@ export default function TemplateSelectModal({onBack}:TemplateSelectModalProps) {
     <Modal width='1280px' height='773px' onBack={onBack}>
       <div className='flex flex-wrap justify-center'>
         {templates.map(({ id, imageUrl, tags }) => (
-          <div key={id} className='flex flex-col w-[360px] h-[290px] mb-[50px] mx-[13px]'>
+          <div
+            key={id}
+            className='flex flex-col w-[360px] h-[290px] mb-[50px] mx-[13px]'
+          >
             <TemplateList imageUrl={imageUrl} alt={'템플릿' + id} />
             <div className='flex gap-2 mt-3'>
               {tags.map((tag, idx) => (
-                <BoxTextButton key={idx}>{tag}</BoxTextButton>
+                <div
+                  key={idx}
+                  className='flex items-center justify-center py-[6px] px-[12px] text-[12px] h-[26px] rounded-[6px] bg-white/20 text-white border border-white'
+                >
+                  {tag}
+                </div>
               ))}
             </div>
           </div>
