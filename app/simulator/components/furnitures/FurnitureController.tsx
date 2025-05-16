@@ -7,6 +7,7 @@ import FurnitureThumbnailInfo from './FurnitureThumbnailInfo';
 import ScaleLockToggle from './ScaleLockToggle';
 import LockedScaleSlider from './LockedScaleSlider';
 import UnlockedScaleInputs from './UnlockedScaleInputs';
+
 import LightButton from '@/app/components/buttons/LightButton';
 import DarkButton from '@/app/components/buttons/DarkButton';
 
@@ -51,6 +52,29 @@ export default function FurnitureController() {
               onChange={updateSelectedFurniture}
             />
           )}
+
+          <div className="flex gap-2">
+            <button
+              className="px-3 py-1 rounded bg-white/30 hover:bg-white/50 transition"
+              onClick={() => {
+                updateSelectedFurniture({
+                  rotationY: selectedFurniture.rotationY + Math.PI / 4, // 반시계 방향으로 회전
+                });
+              }}
+            >
+              ⟲
+            </button>
+            <button
+              className="px-3 py-1 rounded bg-white/30 hover:bg-white/50 transition"
+              onClick={() => {
+                updateSelectedFurniture({
+                  rotationY: selectedFurniture.rotationY - Math.PI / 4, // 시계 방향으로 회전
+                });
+              }}
+            >
+              ⟳
+            </button>
+          </div>
         </>
       )}
     </div>

@@ -10,8 +10,6 @@ import useSyncScaleFromStore from '@/app/hooks/useSyncScaleFromStore';
 import useGetBaseSize from '@/app/hooks/useGetBaseSize';
 import useCursorOnDrag from '@/app/hooks/useCursorOnDrag';
 
-
-
 interface FurnitureModelProps {
   id: string;
   name: string;
@@ -46,6 +44,7 @@ export default function FurnitureModel({
 
   const { selectFurniture, selectedFurniture } = useFurnitureStore();
   const isSelected = selectedFurniture?.id === id;
+  const currentRotationY = isSelected ? selectedFurniture.rotationY : rotationY;
 
   const [currentScale, setCurrentScale] = useState(scale);
   const [isDragging, setIsDragging] = useState(false);
@@ -73,11 +72,13 @@ export default function FurnitureModel({
       document.body.style.cursor = 'pointer';
     }
   };
+
   const handlePointerOut = () => {
     if (!isDragging) {
       document.body.style.cursor = 'auto';
     }
   };
+
   const handlePointerDown = () => {
     setIsDragging(true);
     document.body.style.cursor = 'grabbing';
@@ -99,7 +100,7 @@ export default function FurnitureModel({
         positionX: pos.x,
         positionY: pos.y,
         positionZ: pos.z,
-        rotationY,
+        rotationY: currentRotationY,
         scaleX,
         scaleY,
         scaleZ,
@@ -119,7 +120,7 @@ export default function FurnitureModel({
       ref={meshRef}
       object={clonedScene}
       scale={currentScale}
-      rotation-y={rotationY}
+      rotation-y={currentRotationY}
       position={position}
       onPointerOver={handlePointerOver}
       onPointerOut={handlePointerOut}
