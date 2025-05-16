@@ -1,7 +1,7 @@
 import { useLoader } from '@react-three/fiber';
 import { TextureLoader } from 'three';
 import { useViewStore } from '@/stores/useViewStore';
-import WallMarker from './WallMaker';
+
 interface WallProps {
   width: number;
   height: number;
@@ -69,10 +69,6 @@ export default function Wall({ width, height, texture }: WallProps) {
           <meshStandardMaterial map={map} />
         </mesh>
       )}
-      <WallMarker
-        position={[width / 2, wallHeight / 2, height + wallThickness / 2]} // Z=height → front wall
-        normal={[0, 0, 0.06]} // 살짝 앞으로 튀어나오게
-      />
     </>
   );
 }
