@@ -20,7 +20,12 @@ export class PrismaRoomRepository implements RoomRepository {
     const data = await prisma.room.findMany({
       where: { user_id: userId },
     });
-    
+
     return data.map(toDomainRoom);
+  }
+  async deleteById(id: string): Promise<void> {
+    await prisma.room.delete({
+      where: { id },
+    });
   }
 }

@@ -7,7 +7,7 @@ interface RoomResponse {
   userId: string;
   createdAt: string;
 }
-
+//방 저장
 export async function saveRoom(formData: FormData): Promise<RoomResponse> {
   const res = await fetch('/api/rooms', {
     method: 'POST',
@@ -20,7 +20,21 @@ export async function saveRoom(formData: FormData): Promise<RoomResponse> {
 
   return await res.json();
 }
+//방 삭제
+export async function deleteRoomById(roomId: string): Promise<void> {
+  const res = await fetch(`/api/rooms/${roomId}`, {
+    method: 'DELETE',
+  });
 
+  if (!res.ok) {
+    if (res.status === 404) {
+      throw new Error('존재하지 않는 방입니다.');
+    } else {
+      throw new Error(`방 삭제 실패: ${res.status}`);
+    }
+  }
+}
+// 유저 아이디로 방 목록 가져오기
 export async function getRoomsByUserId(
   userId: string,
 ): Promise<RoomResponse[]> {
