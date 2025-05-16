@@ -9,6 +9,7 @@ import useHighlightMaterial from '@/app/hooks/useHighlightMaterial';
 import useSyncScaleFromStore from '@/app/hooks/useSyncScaleFromStore';
 import useGetBaseSize from '@/app/hooks/useGetBaseSize';
 import useCursorOnDrag from '@/app/hooks/useCursorOnDrag';
+import useSyncRotationFromStore from '@/app/hooks/useSyncRotationFromStore';
 
 interface FurnitureModelProps {
   id: string;
@@ -44,9 +45,9 @@ export default function FurnitureModel({
 
   const { selectFurniture, selectedFurniture } = useFurnitureStore();
   const isSelected = selectedFurniture?.id === id;
-  const currentRotationY = isSelected ? selectedFurniture.rotationY : rotationY;
 
   const [currentScale, setCurrentScale] = useState(scale);
+  const [currentRotationY, setCurrentRotationY] = useState(rotationY);
   const [isDragging, setIsDragging] = useState(false);
 
   // 선택 가구 하이라이트 처리
@@ -58,6 +59,14 @@ export default function FurnitureModel({
     selected: selectedFurniture,
     current: currentScale,
     set: setCurrentScale,
+  });
+
+  // 회전 동기화
+  useSyncRotationFromStore({
+    isSelected,
+    selected: selectedFurniture,
+    set: setCurrentRotationY,
+    meshRef,
   });
 
   // baseSize 계산
@@ -120,7 +129,6 @@ export default function FurnitureModel({
       ref={meshRef}
       object={clonedScene}
       scale={currentScale}
-      rotation-y={currentRotationY}
       position={position}
       onPointerOver={handlePointerOver}
       onPointerOut={handlePointerOut}
