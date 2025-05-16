@@ -10,6 +10,7 @@ import useSyncScaleFromStore from '@/app/hooks/useSyncScaleFromStore';
 import useGetBaseSize from '@/app/hooks/useGetBaseSize';
 import useCursorOnDrag from '@/app/hooks/useCursorOnDrag';
 import useSyncRotationFromStore from '@/app/hooks/useSyncRotationFromStore';
+import useDragPosition from '@/app/hooks/useDragPosition';
 
 interface FurnitureModelProps {
   id: string;
@@ -49,6 +50,11 @@ export default function FurnitureModel({
   const [currentScale, setCurrentScale] = useState(scale);
   const [currentRotationY, setCurrentRotationY] = useState(rotationY);
   const [isDragging, setIsDragging] = useState(false);
+  const { onPointerDown } = useDragPosition(
+    meshRef,
+    roomBoundary,
+    setIsDragging,
+  );
 
   // 선택 가구 하이라이트 처리
   useHighlightMaterial({ scene: clonedScene, isSelected });
@@ -132,7 +138,10 @@ export default function FurnitureModel({
       position={position}
       onPointerOver={handlePointerOver}
       onPointerOut={handlePointerOut}
-      onPointerDown={handlePointerDown}
+      onPointerDown={(e: any) => {
+        onPointerDown(e.nativeEvent); 
+        handlePointerDown(); 
+      }}
     />
   );
 }
