@@ -59,7 +59,7 @@ export default function UnlockedScaleInputs({
               max={3000}
               step={1}
               onValueChange={([val]) => handleChange(val)}
-              className='mt-2'
+              className='mt-2 mb-2'
             />
           </div>
         );

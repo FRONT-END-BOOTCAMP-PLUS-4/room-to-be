@@ -30,14 +30,15 @@ export default function LockedScaleSlider({
 
   return (
     <>
-      <div className='flex h-[39px]'>
-        <label className='text-[12px] text-white/70 pt-[6px]'>스케일</label>
+      <div className='flex'>
+        <label className='text-[12px] text-white/70 pt-[6px] text-left w-full'>스케일</label>
       </div>
       <Slider
         value={[Math.round(baseX)]}
         min={minBaseX}
         max={maxBaseX}
-        step={1}
+        step={1} 
+        className='mb-2'
         onValueChange={([val]) => {
           const scaleRatio = val / originalBaseX;
           const newBaseX = Math.round(val);
