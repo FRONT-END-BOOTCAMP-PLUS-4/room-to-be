@@ -35,11 +35,29 @@ export default function useHighlightMaterial({
         return;
       }
 
-      // 선택 시, 하늘색으로 emissive 처리
-      const mat = child.material as THREE.MeshStandardMaterial;
-      if (mat) {
-        mat.emissive = new THREE.Color(isSelected ? 0x00ffff : 0x000000);
-        mat.emissiveIntensity = isSelected ? 0.8 : 0;
+      // 재질 한 번만 클론하기 (중복 clone 방지)
+      if (!child.userData._cloned) {
+        child.material = child.material.clone();
+        child.userData._cloned = true;
+
+        // 원래 색 저장
+        if ('emissive' in child.material) {
+          child.userData._originalEmissive = child.material.emissive.clone();
+          child.userData._originalIntensity = child.material.emissiveIntensity ?? 0;
+        }
+      }
+
+      const mat = child.material;
+
+      // 안전하게 emissive 적용 (MeshStandardMaterial, PhysicalMaterial 등에서만)
+      if ('emissive' in mat && 'emissiveIntensity' in mat) {
+        if (isSelected) {
+          mat.emissive = new THREE.Color(0x00ffff);
+          mat.emissiveIntensity = 0.8;
+        } else {
+          mat.emissive.copy(child.userData._originalEmissive);
+          mat.emissiveIntensity = child.userData._originalIntensity ?? 0;
+        }
       }
     });
   }, [scene, isSelected]);

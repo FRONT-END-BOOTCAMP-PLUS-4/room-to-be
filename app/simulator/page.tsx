@@ -61,12 +61,12 @@ export default function SimulatorPage() {
           <FurnitureModel
             roomBoundary={roomBoundary}
             id='아이디3'
-            name='f_이케아 트롤리2'
+            name='램프'
             thumbnailUrl='/assets/models/ikea.png'
-            modelUrl={'/assets/models/ikea_cart.glb'}
+            modelUrl={'/assets/models/banker_lamp.glb'}
             position={[3, 0, 3]}
             rotationY={0}
-            scale={[0.01,0.01,0.01]}
+            scale={[1,1,1]}
           />
           <FurnitureModel
             roomBoundary={roomBoundary}
