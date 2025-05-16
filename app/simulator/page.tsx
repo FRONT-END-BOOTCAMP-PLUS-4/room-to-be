@@ -7,7 +7,6 @@ import Room from './components/room/Room';
 import Lighting from './components/room/Lighting';
 import CameraController from './components/room/CameraController';
 import CameraButtons from './components/room/CameraButtons';
-import CenterMarker from './components/room/CenterMaker';
 
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
 import FurnitureModel from './components/furnitures/FurnitureModel';
@@ -77,7 +76,6 @@ export default function SimulatorPage() {
           />
           <Lighting />
           <CameraController width={roomWidth} height={roomHeight} />
-          <CenterMarker x={roomHeight / 2} z={roomHeight / 2} />
         </Suspense>
       </Canvas>
     </div>
