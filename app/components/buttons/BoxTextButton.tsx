@@ -10,6 +10,7 @@ type BoxTextButtonProps = {
   height?: number;
   children: ReactNode;
   className?: string;
+  borderColorClass?: string;
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
 export default function BoxTextButton({
@@ -18,6 +19,7 @@ export default function BoxTextButton({
   width = 19,
   height = 4.5,
   className,
+  borderColorClass,
   type,
   ...props
 }: BoxTextButtonProps) {
@@ -29,6 +31,7 @@ export default function BoxTextButton({
         showImg
           ? 'py-4 h-[58px] font-normal rounded-[20px]'
           : 'py-2 h-[34px] text-sm rounded-[10px]',
+        borderColorClass,
         className,
       )}
       {...props}
