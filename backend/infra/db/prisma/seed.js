@@ -11,10 +11,10 @@ async function main() {
     where: { email: 'test@example.com' },
     update: {},
     create: {
-      id: '1',
-      name: '안농',
-      email: 'sj@gmail.com',
-      image: 'https://via.placeholder.com/150',
+      id: '2',
+      name: '방없슈',
+      email: 'byul@gmail.com',
+      image: '',
     },
   });
 
