@@ -42,7 +42,7 @@ export default function CameraController({
       camera.position.z = z;
     }
 
-    camera.lookAt(centerX, 0, centerZ); // ✅ 항상 방의 중심 바라봄
+    camera.lookAt(centerX, 0.5, centerZ); // ✅ 항상 방의 중심 바라봄
     camera.updateProjectionMatrix();
   }, [angle, isTopView, width, height]);
 
