@@ -2,9 +2,21 @@
 'use client';
 
 import { useLightingStore } from '@/stores/useLightingStore';
+import { useBackgroundStore } from '@/stores/useBackgroundStore';
 
 export default function Lighting() {
   const isDay = useLightingStore((s) => s.isDay);
+  const getCurrentBackground = useBackgroundStore(
+    (s) => s.getCurrentBackground,
+  );
+  const Background = getCurrentBackground();
+
+  const lightColor = isDay
+    ? Background.dayLightColor
+    : Background.nightLightColor;
+  const lightIntensity = isDay
+    ? Background.dayLightIntensity
+    : Background.nightLightIntensity;
 
   return (
     <>
@@ -16,8 +28,8 @@ export default function Lighting() {
           {/* 태양광 */}
           <directionalLight
             position={[5, 5, 5]}
-            intensity={1.2}
-            color='fff6e6'
+            intensity={lightIntensity}
+            color={lightColor}
             castShadow
             shadow-mapSize-width={1024}
             shadow-mapSize-height={1024}
@@ -37,11 +49,9 @@ export default function Lighting() {
 
           {/* 전체적으로 방을 밝히는 주 조명 */}
           <pointLight
-            position={[2, 2.3, 2]}
-            intensity={1.2}
-            color='#ffe0bd'
-            distance={10}
-            decay={1.5}
+            position={[5, 5, 5]}
+            intensity={0.15}
+            color={lightColor}
             castShadow
           />
         </>

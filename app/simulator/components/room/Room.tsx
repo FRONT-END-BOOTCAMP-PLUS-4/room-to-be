@@ -11,7 +11,12 @@ interface RoomProps {
   floorTexture: string;
 }
 
-export default function Room({ width, height, wallTexture, floorTexture }: RoomProps) {
+export default function Room({
+  width,
+  height,
+  wallTexture,
+  floorTexture,
+}: RoomProps) {
   return (
     <>
       <Floor width={width} height={height} texture={floorTexture} />

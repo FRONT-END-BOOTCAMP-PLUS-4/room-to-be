@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import * as THREE from 'three';
 import { useLightingStore } from '@/stores/useLightingStore';
+import { useBackgroundStore } from '@/stores/useBackgroundStore';
 
 interface UseLampEmissiveMaterialProps {
   scene: THREE.Object3D;
@@ -15,12 +16,22 @@ export default function useLampEmissiveMaterial({
   scene,
   name,
 }: UseLampEmissiveMaterialProps) {
-  const isDay = useLightingStore((state) => state.isDay);
+  const isDay = useLightingStore((s) => s.isDay);
+  const getCurrentBackground = useBackgroundStore(
+    (s) => s.getCurrentBackground,
+  );
+  const currentBackgroundId = useBackgroundStore((s) => s.currentBackgroundId);
+
   const isLamp =
     name.toLowerCase().includes('램프') || name.toLowerCase().includes('lamp');
 
   useEffect(() => {
     if (!isLamp || isDay) return;
+
+    // 현재 테마 가져오기
+    const Background = getCurrentBackground();
+    const emissiveColor = isDay ? '#000000' : Background.nightLightColor;
+    const emissiveIntensity = isDay ? 0 : 2.0;
 
     scene.traverse((child: any) => {
       // 메시가 아니거나 발광 속성이 없으면 무시
@@ -48,7 +59,6 @@ export default function useLampEmissiveMaterial({
         'LAMPSHADE',
       ];
 
-      // 대소문자 구분 없이 이름에 특정 단어가 포함되어 있는지 확인
       const isLampPart = lampParts.some(
         (part) =>
           childName.includes(part) ||
@@ -66,28 +76,20 @@ export default function useLampEmissiveMaterial({
             child.material.color.b > 0.7)); // 흰색/밝은색
 
       if (isLampPart || hasEmissiveColor) {
-        // 빛나는 효과 부여
-        child.material.emissive.set('#ffe3c1'); // 따뜻한 빛 색상
-        child.material.emissiveIntensity = 2.0; // 강한 발광 효과
+        // 낮/밤에 따라 빛나는 효과 조정
+        if (!isDay) {
+          // 빛나는 효과 부여
+          child.material.emissive.set(emissiveColor);
+          child.material.emissiveIntensity = emissiveIntensity;
+        } else {
+          // 낮에는 원래 상태로 복원
+          if (child.userData._originalEmissive) {
+            child.material.emissive.copy(child.userData._originalEmissive);
+            child.material.emissiveIntensity =
+              child.userData._originalIntensity ?? 0;
+          }
+        }
       }
     });
-
-    return () => {
-      // 컴포넌트 언마운트 시 원래 재질로 복원
-      scene.traverse((child: any) => {
-        if (
-          !child.isMesh ||
-          !('emissive' in child.material) ||
-          !child.userData._emissiveCloned
-        )
-          return;
-
-        if (child.userData._originalEmissive) {
-          child.material.emissive.copy(child.userData._originalEmissive);
-          child.material.emissiveIntensity =
-            child.userData._originalIntensity ?? 0;
-        }
-      });
-    };
-  }, [scene, isLamp, isDay]);
+  }, [scene, isLamp, isDay, getCurrentBackground, currentBackgroundId]);
 }

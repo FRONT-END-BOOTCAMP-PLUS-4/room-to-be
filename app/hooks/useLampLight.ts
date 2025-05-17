@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import * as THREE from 'three';
 import { useLightingStore } from '@/stores/useLightingStore';
+import { useBackgroundStore } from '@/stores/useBackgroundStore';
 
 interface UseLampLightProps {
   meshRef: React.RefObject<THREE.Group>;
@@ -13,8 +14,11 @@ interface UseLampLightProps {
  * 밤 모드일 때만 조명 활성화
  */
 export default function useLampLight({ meshRef, name }: UseLampLightProps) {
-  const isDay = useLightingStore((state) => state.isDay);
-  const lightRef = useRef<THREE.PointLight | null>(null);
+  const isDay = useLightingStore((s) => s.isDay);
+  const getCurrentBackground = useBackgroundStore(
+    (s) => s.getCurrentBackground,
+  );
+  const currentBackgroundId = useBackgroundStore((s) => s.currentBackgroundId);
 
   // 조명 가구인지 여부 확인
   const isLamp =
@@ -23,29 +27,31 @@ export default function useLampLight({ meshRef, name }: UseLampLightProps) {
   useEffect(() => {
     if (!isLamp || !meshRef.current) return;
 
+    // 현재 테마 가져오기
+    const Background = getCurrentBackground();
+    const lightColor = Background.nightLightColor;
+    const lightIntensity = Background.nightLightIntensity * 1.5;
+
     // 기존에 추가된 조명이 있으면 제거
-    if (lightRef.current) {
-      meshRef.current.remove(lightRef.current);
-      lightRef.current = null;
-    }
+    meshRef.current.traverse((child) => {
+      if (child instanceof THREE.PointLight) {
+        meshRef.current?.remove(child);
+      }
+    });
 
     // 낮/밤 모드에 따라 조명 설정
     if (!isDay) {
-      // 밤 모드일 때만 조명 켜기
       const light = new THREE.PointLight(
-        '#ffe3c1',
-        1.2, // 밝기
+        lightColor,
+        lightIntensity,
         5, // 도달 거리
         1.5, // 감쇠율
       );
 
-      // 램프 모델에 맞게 조명 위치 조정
-      light.position.set(0, 0.8, 0); // y축으로 약간 위로 조정
+      light.position.set(0, 0.8, 0);
 
       meshRef.current.add(light);
-      lightRef.current = light;
 
-      // 램프 조명 그림자 설정
       light.castShadow = true;
       light.shadow.mapSize.width = 512;
       light.shadow.mapSize.height = 512;
@@ -54,13 +60,15 @@ export default function useLampLight({ meshRef, name }: UseLampLightProps) {
     }
 
     return () => {
-      // 컴포넌트 언마운트 시 조명 제거
-      if (lightRef.current && meshRef.current) {
-        meshRef.current.remove(lightRef.current);
-        lightRef.current = null;
+      if (meshRef.current) {
+        meshRef.current.traverse((child) => {
+          if (child instanceof THREE.PointLight) {
+            meshRef.current?.remove(child);
+          }
+        });
       }
     };
-  }, [isLamp, isDay, meshRef]);
+  }, [isLamp, isDay, meshRef, getCurrentBackground, currentBackgroundId]);
 
   return { isLamp };
 }

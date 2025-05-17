@@ -6,6 +6,8 @@ import { Suspense } from 'react';
 import Room from './components/room/Room';
 import Lighting from './components/room/Lighting';
 import CameraController from './components/room/CameraController';
+import BackgroundController from './components/room/BackgroundController';
+import BackgroundSelector from './components/room/BackgroundSelector';
 
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
 import FurnitureModel from './components/furnitures/FurnitureModel';
@@ -27,7 +29,11 @@ export default function SimulatorPage() {
 
   return (
     <div className='w-full h-screen relative'>
-      <div className='absolute top-[100px] right-[70px] z-30'>
+      <div className='absolute top-[50px] right-[70px] z-30'>
+        <BackgroundSelector />
+      </div>
+
+      <div className='absolute top-[140px] right-[70px] z-30'>
         <FurnitureController />
       </div>
 
@@ -40,6 +46,7 @@ export default function SimulatorPage() {
         }}
       >
         <Suspense fallback={null}>
+          <BackgroundController />
           <Room
             width={roomWidth}
             height={roomHeight}
