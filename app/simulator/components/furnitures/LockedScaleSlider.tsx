@@ -11,7 +11,7 @@ export default function LockedScaleSlider({
   furniture,
   onChange,
 }: LockedScaleSliderProps) {
-  const { originalBaseX, originalBaseY, originalBaseZ, originalScale, baseX } =
+  const { originalBaseX, originalBaseY, originalBaseZ, originalScaleX, originalScaleY, originalScaleZ, baseX } =
     furniture;
 
   const minRatio = Math.max(
@@ -55,15 +55,17 @@ export default function LockedScaleSlider({
 
           if (!isValid) return;
 
-          const newScale = scaleRatio * originalScale;
+          const newScaleX = scaleRatio * originalScaleX;
+          const newScaleY = scaleRatio * originalScaleX;
+          const newScaleZ = scaleRatio * originalScaleX;
 
           onChange({
             baseX: newBaseX,
             baseY: newBaseY,
             baseZ: newBaseZ,
-            scaleX: newScale,
-            scaleY: newScale,
-            scaleZ: newScale,
+            scaleX: newScaleX,
+            scaleY: newScaleY,
+            scaleZ: newScaleZ,
           });
         }}
       />

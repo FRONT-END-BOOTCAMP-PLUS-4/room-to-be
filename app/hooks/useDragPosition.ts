@@ -1,14 +1,7 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
 import { useThree } from '@react-three/fiber';
 import { Vector2, Vector3, Raycaster, Plane, Object3D } from 'three';
-
-interface RoomBoundary {
-  xMin: number;
-  xMax: number;
-  zMin: number;
-  zMax: number;
-  yFloor: number;
-}
+import { RoomBoundary } from '../types/furniture';
 
 interface DragOptions {
   halfWidth?: number; // 가구 반폭 (가로 절반 길이)
@@ -82,7 +75,7 @@ export default function useDragPosition(
         newPos.z = Math.min(roomBoundary.zMax - halfDepth, Math.max(roomBoundary.zMin + halfDepth, newPos.z));
 
         // 바닥 높이 고정
-        newPos.y = roomBoundary.yFloor;
+        newPos.y = roomBoundary.yMin;
 
         meshRef.current.position.copy(newPos);
       }

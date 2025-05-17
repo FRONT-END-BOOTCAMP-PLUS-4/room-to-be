@@ -7,13 +7,15 @@ interface FurnitureInfo {
   scaleX: number;
   scaleY: number;
   scaleZ: number;
-  originalScale: number;
   positionX: number;
   positionY: number;
   positionZ: number;
   baseX: number;
   baseY: number;
   baseZ: number;
+  originalScaleX: number;
+  originalScaleY: number;
+  originalScaleZ: number;
   originalBaseX: number;
   originalBaseY: number;
   originalBaseZ: number;

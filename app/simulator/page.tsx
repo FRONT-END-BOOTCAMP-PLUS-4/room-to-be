@@ -11,6 +11,7 @@ import CameraButtons from './components/room/CameraButtons';
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
 import FurnitureModel from './components/furnitures/FurnitureModel';
 import FurnitureController from './components/furnitures/FurnitureController';
+import { Furnitures } from '../types/furniture';
 
 export default function SimulatorPage() {
   const roomWidth = 4;
@@ -22,9 +23,62 @@ export default function SimulatorPage() {
     xMax: roomWidth,
     zMin: 0,
     zMax: roomHeight,
-    yFloor: 0,
-    yWall: 2.5,
+    yMin: 0,
+    yMax: 2.5,
   };
+
+  // 가구 정보 배열
+  const furnitures: Furnitures[] = [
+    {
+      id: '아이디1',
+      furnitureId: '아이디1',
+      name: 'f_이케아 트롤리',
+      thumbnailUrl: '/assets/models/ikea.png',
+      modelUrl: '/assets/models/ikea_cart.glb',
+      positionX: 2,
+      positionY: 0,
+      positionZ: 2,
+      rotationY: 0,
+      scaleX: 0.01,
+      scaleY: 0.01,
+      scaleZ: 0.01,
+      placementType: 'floor',
+      type: 'cart',
+    },
+    {
+      id: '아이디2',
+      furnitureId: '아이디2',
+      name: '램프',
+      thumbnailUrl: '/assets/models/ikea.png',
+      modelUrl: '/assets/models/banker_lamp.glb',
+      positionX: 3,
+      positionY: 0,
+      positionZ: 3,
+      rotationY: 0,
+      scaleX: 1,
+      scaleY: 1,
+      scaleZ: 1,
+      placementType: 'floor',
+      type: 'lamp',
+    },
+    {
+      id: '아이디3',
+      furnitureId: '아이디3',
+      name: 'f_테이블',
+      thumbnailUrl: '/assets/models/ikea.png',
+      modelUrl: '/assets/models/table.glb',
+      positionX: 3,
+      positionY: 0,
+      positionZ: 1,
+      rotationY: 0,
+      scaleX: 0.01,
+      scaleY: 0.01,
+      scaleZ: 0.01,
+      placementType: 'floor',
+      type: 'table',
+    },
+  ];
+
   return (
     <div className='w-full h-screen relative'>
       <div className="absolute top-[100px] right-[70px] z-30">
@@ -42,42 +96,19 @@ export default function SimulatorPage() {
       >
         <Suspense fallback={null}>
           <Room
-            // 여기서 width, height는 미터단위고 처음 입력값 받아서 넘겨오기
             width={roomWidth}
             height={roomHeight}
             wallTexture='/assets/images/testwall.jpg'
             floorTexture='/assets/images/woodfloor.png'
           />
-          <FurnitureModel
-            roomBoundary={roomBoundary}
-            id='아아디'
-            name='f_이케아 트롤리'
-            thumbnailUrl='/assets/models/ikea.png'
-            modelUrl={'/assets/models/ikea_cart.glb'}
-            position={[2, 0, 2]}
-            rotationY={0}
-            scale={[0.01,0.01,0.01]}
-          />
-          <FurnitureModel
-            roomBoundary={roomBoundary}
-            id='아이디3'
-            name='램프'
-            thumbnailUrl='/assets/models/ikea.png'
-            modelUrl={'/assets/models/banker_lamp.glb'}
-            position={[3, 0, 3]}
-            rotationY={0}
-            scale={[1,1,1]}
-          />
-          <FurnitureModel
-            roomBoundary={roomBoundary}
-            id='아아디2'
-            name='f_테이블'
-            thumbnailUrl='/assets/models/ikea.png'
-            modelUrl={'/assets/models/table.glb'}
-            position={[3, 0, 1]}
-            rotationY={0}
-            scale={[0.01,0.01,0.01]}
-          />
+          {/* 가구 배열을 map으로 렌더링 */}
+          {furnitures.map((furniture) => (
+            <FurnitureModel
+              key={furniture.id}
+              roomBoundary={roomBoundary}
+              {...furniture}
+            />
+          ))}
           <Lighting />
           <CameraController width={roomWidth} height={roomHeight} />
         </Suspense>

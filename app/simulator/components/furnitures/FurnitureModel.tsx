@@ -11,33 +11,20 @@ import useGetBaseSize from '@/app/hooks/useGetBaseSize';
 import useCursorOnDrag from '@/app/hooks/useCursorOnDrag';
 import useSyncRotationFromStore from '@/app/hooks/useSyncRotationFromStore';
 import useDragPosition from '@/app/hooks/useDragPosition';
-
-interface FurnitureModelProps {
-  id: string;
-  name: string;
-  modelUrl: string;
-  thumbnailUrl: string;
-  position?: [number, number, number];
-  rotationY?: number;
-  scale?: [number, number, number];
-  roomBoundary: {
-    xMin: number;
-    xMax: number;
-    zMin: number;
-    zMax: number;
-    yFloor: number;
-    yWall: number;
-  };
-}
+import type { FurnitureModelProps } from '@/app/types/furniture';
 
 export default function FurnitureModel({
   id,
   name,
   modelUrl,
   thumbnailUrl,
-  position = [0, 0, 0],
+  positionX,
+  positionY,
+  positionZ,
   rotationY = 0,
-  scale = [0.1, 0.1, 0.1],
+  scaleX,
+  scaleY,
+  scaleZ,
   roomBoundary,
 }: FurnitureModelProps) {
   const gltf = useGLTF(modelUrl);
@@ -47,7 +34,7 @@ export default function FurnitureModel({
   const { selectFurniture, selectedFurniture } = useFurnitureStore();
   const isSelected = selectedFurniture?.id === id;
 
-  const [currentScale, setCurrentScale] = useState(scale);
+  const [currentScale, setCurrentScale] = useState<[number, number, number]>([scaleX, scaleY, scaleZ]);
   const [currentRotationY, setCurrentRotationY] = useState(rotationY);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -73,7 +60,7 @@ export default function FurnitureModel({
   // baseSize 계산
   const { baseSizeWithScale, baseSizeRaw } = useGetBaseSize(clonedScene);
 
-  // 가구 크기(반폭, 반깊이) 계산 
+  // 가구 크기(반폭, 반깊이) 계산
   const halfWidth = baseSizeRaw ? (baseSizeRaw[0] * currentScale[0]) / 2 : 0;
   const halfDepth = baseSizeRaw ? (baseSizeRaw[2] * currentScale[2]) / 2 : 0;
 
@@ -106,13 +93,13 @@ export default function FurnitureModel({
 
     const pos = meshRef.current?.position;
     if (pos && baseSizeWithScale) {
-      const scaleX = currentScale[0];
-      const scaleY = currentScale[1];
-      const scaleZ = currentScale[2];
+      const curScaleX = currentScale[0];
+      const curScaleY = currentScale[1];
+      const curScaleZ = currentScale[2];
 
-      const baseX = Math.round(baseSizeWithScale[0] * (scaleX / scale[0]));
-      const baseY = Math.round(baseSizeWithScale[1] * (scaleY / scale[1]));
-      const baseZ = Math.round(baseSizeWithScale[2] * (scaleZ / scale[2]));
+      const baseX = Math.round(baseSizeWithScale[0] * (curScaleX / scaleX));
+      const baseY = Math.round(baseSizeWithScale[1] * (curScaleY / scaleY));
+      const baseZ = Math.round(baseSizeWithScale[2] * (curScaleZ / scaleZ));
 
       selectFurniture({
         id,
@@ -122,16 +109,18 @@ export default function FurnitureModel({
         positionY: pos.y,
         positionZ: pos.z,
         rotationY: currentRotationY,
-        scaleX,
-        scaleY,
-        scaleZ,
+        scaleX: curScaleX,
+        scaleY: curScaleY,
+        scaleZ: curScaleZ,
         baseX,
         baseY,
         baseZ,
+        originalScaleX: scaleX,
+        originalScaleY: scaleY,
+        originalScaleZ: scaleZ,
         originalBaseX: baseSizeWithScale[0],
         originalBaseY: baseSizeWithScale[1],
         originalBaseZ: baseSizeWithScale[2],
-        originalScale: scale[0],
       });
     }
   };
@@ -141,7 +130,7 @@ export default function FurnitureModel({
       ref={meshRef}
       object={clonedScene}
       scale={currentScale}
-      position={position}
+      position={[positionX, positionY, positionZ]}
       onPointerOver={handlePointerOver}
       onPointerOut={handlePointerOut}
       onPointerDown={(e: any) => {
