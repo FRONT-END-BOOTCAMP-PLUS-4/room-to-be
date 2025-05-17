@@ -8,6 +8,7 @@ import Lighting from './components/room/Lighting';
 import CameraController from './components/room/CameraController';
 import CameraButtons from './components/room/CameraButtons';
 
+import { useEffect } from 'react';
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
 import FurnitureModel from './components/furnitures/FurnitureModel';
 import FurnitureController from './components/furnitures/FurnitureController';
@@ -94,6 +95,14 @@ export default function SimulatorPage() {
       type: 'window',
     },
   ];
+
+  // 스토어 함수 가져오기 (가구 초기 세팅용)
+  const setFurnitures = useFurnitureStore((state) => state.setFurnitures);
+  
+  useEffect(() => {
+    setFurnitures(furnitures);
+  }, [setFurnitures]);
+
 
   return (
     <div className='w-full h-screen relative'>

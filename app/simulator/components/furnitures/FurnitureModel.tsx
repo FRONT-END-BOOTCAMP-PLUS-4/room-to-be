@@ -15,9 +15,7 @@ import type { FurnitureModelProps } from '@/app/types/furniture';
 
 export default function FurnitureModel({
   id,
-  name,
   modelUrl,
-  thumbnailUrl,
   placementType,
   positionX,
   positionY,
@@ -32,8 +30,15 @@ export default function FurnitureModel({
   const clonedScene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
   const meshRef = useRef<THREE.Group>(null);
 
-  const { selectFurniture, selectedFurniture } = useFurnitureStore();
-  const isSelected = selectedFurniture?.id === id;
+  const {
+    furnitures,
+    selectedFurnitureId,
+    selectFurniture,
+    updateFurniture,
+  } = useFurnitureStore();
+
+  const isSelected = selectedFurnitureId === id;
+  const selectedFurniture = furnitures.find((f) => f.id === selectedFurnitureId) || null;
 
   const [currentScale, setCurrentScale] = useState<[number, number, number]>([scaleX, scaleY, scaleZ]);
   const [currentRotationY, setCurrentRotationY] = useState(rotationY);
@@ -77,7 +82,6 @@ export default function FurnitureModel({
   // 드래그 커서 관리
   useCursorOnDrag(isDragging, setIsDragging);
 
-  // 커서 이벤트 핸들러
   const handlePointerOver = () => {
     if (!isDragging) {
       document.body.style.cursor = 'pointer';
@@ -93,6 +97,7 @@ export default function FurnitureModel({
   const handlePointerDown = () => {
     setIsDragging(true);
     document.body.style.cursor = 'grabbing';
+    selectFurniture(id);
 
     const pos = meshRef.current?.position;
     if (pos && baseSizeWithScale) {
@@ -104,10 +109,7 @@ export default function FurnitureModel({
       const baseY = Math.round(baseSizeWithScale[1] * (curScaleY / scaleY));
       const baseZ = Math.round(baseSizeWithScale[2] * (curScaleZ / scaleZ));
 
-      selectFurniture({
-        id,
-        name,
-        thumbnailUrl,
+      updateFurniture(id, {
         positionX: pos.x,
         positionY: pos.y,
         positionZ: pos.z,
@@ -127,6 +129,8 @@ export default function FurnitureModel({
       });
     }
   };
+
+  console.log('가구', id, '선택된 가구', selectedFurniture);
 
   return (
     <primitive

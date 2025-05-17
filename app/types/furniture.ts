@@ -30,6 +30,18 @@ export interface RoomBoundary {
   yMax: number;
 }
 
+export interface AdditionalInfo {
+  baseX?: number;
+  baseY?: number;
+  baseZ?: number;
+  originalScaleX?: number;
+  originalScaleY?: number;
+  originalScaleZ?: number;
+  originalBaseX?: number;
+  originalBaseY?: number;
+  originalBaseZ?: number;
+}
+
 // FurnitureInfo + PlacedFurniture를 그대로 조합한 타입
 export interface Furnitures extends FurnitureInfo, PlacedFurniture {}
 
@@ -38,3 +50,5 @@ export interface FurnitureModelProps extends Furnitures {
   roomBoundary: RoomBoundary;
 }
 
+// Furniture Store Props
+export interface FurnitureStoreProps extends Furnitures,AdditionalInfo{}
