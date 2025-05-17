@@ -10,6 +10,8 @@ import useSyncScaleFromStore from '@/app/hooks/useSyncScaleFromStore';
 import useGetBaseSize from '@/app/hooks/useGetBaseSize';
 import useCursorOnDrag from '@/app/hooks/useCursorOnDrag';
 import useSyncRotationFromStore from '@/app/hooks/useSyncRotationFromStore';
+import useLampLight from '@/app/hooks/useLampLight';
+import useLampEmissiveMaterial from '@/app/hooks/useLampEmissiveMaterial';
 
 interface FurnitureModelProps {
   id: string;
@@ -68,6 +70,9 @@ export default function FurnitureModel({
     set: setCurrentRotationY,
     meshRef,
   });
+
+  useLampLight({ meshRef, name });
+  useLampEmissiveMaterial({ scene: clonedScene, name });
 
   // baseSize 계산
   const baseSize = useGetBaseSize(clonedScene);
