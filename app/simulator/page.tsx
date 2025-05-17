@@ -77,6 +77,22 @@ export default function SimulatorPage() {
       placementType: 'floor',
       type: 'table',
     },
+    {
+      id: '아이디4',
+      furnitureId: '아이디4',
+      name: '창문',
+      thumbnailUrl: '/assets/models/ikea.png',
+      modelUrl: '/assets/models/window.glb',
+      positionX: 3,
+      positionY: 1,
+      positionZ: 1,
+      rotationY: 0,
+      scaleX: 1,
+      scaleY: 1,
+      scaleZ: 1,
+      placementType: 'wall',
+      type: 'window',
+    },
   ];
 
   return (

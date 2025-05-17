@@ -18,10 +18,11 @@ export default function FurnitureModel({
   name,
   modelUrl,
   thumbnailUrl,
+  placementType,
   positionX,
   positionY,
   positionZ,
-  rotationY = 0,
+  rotationY,
   scaleX,
   scaleY,
   scaleZ,
@@ -60,15 +61,17 @@ export default function FurnitureModel({
   // baseSize 계산
   const { baseSizeWithScale, baseSizeRaw } = useGetBaseSize(clonedScene);
 
-  // 가구 크기(반폭, 반깊이) 계산
+  // 가구 크기(반폭, 반높이, 반깊이) 계산
   const halfWidth = baseSizeRaw ? (baseSizeRaw[0] * currentScale[0]) / 2 : 0;
+  const halfHeight = baseSizeRaw ? (baseSizeRaw[1] * currentScale[1]) / 2 : 0;
   const halfDepth = baseSizeRaw ? (baseSizeRaw[2] * currentScale[2]) / 2 : 0;
 
   const { onPointerDown } = useDragPosition(
     meshRef,
     roomBoundary,
+    placementType,
     setIsDragging,
-    { halfWidth, halfDepth },
+    { halfWidth, halfDepth, halfHeight },
   );
 
   // 드래그 커서 관리

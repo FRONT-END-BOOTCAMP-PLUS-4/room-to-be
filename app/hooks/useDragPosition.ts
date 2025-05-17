@@ -4,14 +4,16 @@ import { Vector2, Vector3, Raycaster, Plane, Object3D } from 'three';
 import { RoomBoundary } from '../types/furniture';
 
 interface DragOptions {
-  halfWidth?: number; // 가구 반폭 (가로 절반 길이)
-  halfDepth?: number; // 가구 반깊이 (세로 절반 길이)
+  halfWidth?: number;
+  halfDepth?: number; 
+  halfHeight?: number;
 }
 
 // 마우스 이벤트에 따라 가구 position 변경하는 훅
 export default function useDragPosition(
   meshRef: React.RefObject<Object3D>,
   roomBoundary: RoomBoundary,
+  placementType: string,
   setDragging?: (value: boolean) => void,
   options?: DragOptions,
 ) {
@@ -24,7 +26,7 @@ export default function useDragPosition(
 
   const [isDragging, setInternalDragging] = useState(false);
 
-  const { halfWidth = 0, halfDepth = 0 } = options || {};
+  const { halfWidth = 0, halfDepth = 0 , halfHeight = 0 } = options || {};
 
   const getPlaneIntersection = useCallback(
     (event: PointerEvent | MouseEvent) => {
@@ -37,11 +39,18 @@ export default function useDragPosition(
 
       // 카메라에서 마우스 방향으로 레이
       raycaster.current.setFromCamera(mouse.current, camera);
-      // 레이와 바닥의 교차점 계산해서 반환
+
+      // placementType에 따라 평면 설정
+      if (placementType === 'floor') {
+        plane.current.set(new Vector3(0, 1, 0), -roomBoundary.yMin); // 바닥 평면
+      } else if (placementType === 'wall') {
+        plane.current.set(new Vector3(0, 0, 1), 0); // 정면 벽면 평면 (z=0 기준)
+      }
+
       const intersect = raycaster.current.ray.intersectPlane(plane.current, intersectPoint);
       return intersect ? intersect.clone() : null;
     },
-    [camera, gl.domElement],
+    [camera, gl.domElement, placementType, roomBoundary.yMin],
   );
 
   // 가구를 클릭했을 때,
@@ -64,23 +73,28 @@ export default function useDragPosition(
   const handlePointerMove = useCallback(
     (event: PointerEvent) => {
       if (!isDragging || !meshRef.current) return;
-      // 현재 마우스 위치 계산
+
       const intersect = getPlaneIntersection(event);
       if (intersect) {
         // 새로운 가구 위치 계산
         const newPos = new Vector3().addVectors(intersect, offset.current);
 
-        // 가구 크기(반폭, 반깊이)를 고려해 방 밖으로 나가지 않도록 제한
-        newPos.x = Math.min(roomBoundary.xMax - halfWidth, Math.max(roomBoundary.xMin + halfWidth, newPos.x));
-        newPos.z = Math.min(roomBoundary.zMax - halfDepth, Math.max(roomBoundary.zMin + halfDepth, newPos.z));
-
-        // 바닥 높이 고정
-        newPos.y = roomBoundary.yMin;
+        if (placementType === 'floor') {
+          // [floor] 바닥 위 이동
+          newPos.x = Math.min(roomBoundary.xMax - halfWidth, Math.max(roomBoundary.xMin + halfWidth, newPos.x));
+          newPos.z = Math.min(roomBoundary.zMax - halfDepth, Math.max(roomBoundary.zMin + halfDepth, newPos.z));
+          newPos.y = roomBoundary.yMin;
+        } else if (placementType === 'wall') {
+          // [wall] 벽 위 이동: x와 y만 조정, z는 벽에 고정
+          newPos.x = Math.min(roomBoundary.xMax - halfWidth, Math.max(roomBoundary.xMin + halfWidth, newPos.x));
+          newPos.y = Math.min(roomBoundary.yMax - (halfHeight*2), Math.max(roomBoundary.yMin, newPos.y));
+          newPos.z = 0; // 벽면에 고정 (z = 0 벽 기준)
+        }
 
         meshRef.current.position.copy(newPos);
       }
     },
-    [getPlaneIntersection, meshRef, roomBoundary, isDragging, halfWidth, halfDepth],
+    [getPlaneIntersection, meshRef, roomBoundary, isDragging, placementType, halfWidth, halfDepth],
   );
 
   // 마우스를 뗐을 때,
