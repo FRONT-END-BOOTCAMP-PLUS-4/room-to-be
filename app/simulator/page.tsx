@@ -6,7 +6,6 @@ import { Suspense } from 'react';
 import Room from './components/room/Room';
 import Lighting from './components/room/Lighting';
 import CameraController from './components/room/CameraController';
-import CameraButtons from './components/room/CameraButtons';
 
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
 import FurnitureModel from './components/furnitures/FurnitureModel';
@@ -31,7 +30,6 @@ export default function SimulatorPage() {
       <div className='absolute top-[100px] right-[70px] z-30'>
         <FurnitureController />
       </div>
-      <CameraButtons />
 
       <Canvas
         shadows

@@ -46,16 +46,17 @@ export default function FurnitureControllerBtn({
 
   const [viewMode, setViewMode] = useState(text);
 
-  const isViewToggle = text === '3D 뷰' || text === '2D 뷰';
+  const isViewToggleButton = text === '3D 뷰' || text === '2D 뷰';
+  const isRotateRoomButton = icon && !text;
 
   useEffect(() => {
-    if (isViewToggle) {
+    if (isViewToggleButton) {
       setViewMode(isTopView ? '2D 뷰' : '3D 뷰');
     }
-  }, [isTopView, isViewToggle]);
+  }, [isTopView, isViewToggleButton]);
 
   const handleClick = () => {
-    if (isViewToggle) {
+    if (isViewToggleButton) {
       if (isTopView) {
         const new3DAngle = convertFormTopTo3D(angle);
         setAngle(new3DAngle);
@@ -67,6 +68,14 @@ export default function FurnitureControllerBtn({
         setIsTopView(true);
         setViewMode('2D 뷰');
       }
+    }
+
+    if (isRotateRoomButton) {
+      const currentAngles = isTopView ? TOP_VIEW_ANGLES : VALID_ANGLES;
+      const currentIndex = currentAngles.indexOf(angle);
+      const nextIndex = (currentIndex + 1) % currentAngles.length;
+      const newAngle = currentAngles[nextIndex];
+      setAngle(newAngle);
     }
   };
 
