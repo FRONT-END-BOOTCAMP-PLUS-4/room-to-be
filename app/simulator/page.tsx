@@ -16,6 +16,7 @@ import FurnitureController from './components/furnitures/FurnitureController';
 export default function SimulatorPage() {
   const roomWidth = 4;
   const roomHeight = 4;
+  const floorExtension = 0.1;
 
   // 방 범위 계산
   const roomBoundary = {
@@ -52,6 +53,7 @@ export default function SimulatorPage() {
             height={roomHeight}
             wallTexture='/assets/images/testwall.jpg'
             floorTexture='/assets/images/woodfloor.png'
+            floorExtension={floorExtension}
           />
           <FurnitureModel
             roomBoundary={roomBoundary}
