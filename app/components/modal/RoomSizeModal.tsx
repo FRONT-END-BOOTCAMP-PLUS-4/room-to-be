@@ -1,16 +1,62 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Modal from './Modal';
 import BoxTextButton from '../buttons/BoxTextButton';
 import LabeledNumberInput from './LabeledNumberInput';
+import {
+  useRoomSizeStore,
+  pyeongToRoomDimensions,
+} from '@/stores/useRoomSizeStore';
 
 interface RoomSizeModalProps {
   onBack: () => void;
 }
 
-export default function RoomSizeModal({onBack}:RoomSizeModalProps) {
-  const [mode, setMode] = useState<'pyeong' | 'meter'>('pyeong');
+export default function RoomSizeModal({ onBack }: RoomSizeModalProps) {
+  const router = useRouter();
+
+  const {
+    mode,
+    pyeong,
+    width,
+    height,
+    wallHeight,
+    setMode,
+    setPyeong,
+    setDimensions,
+  } = useRoomSizeStore();
+
+  const [localPyeong, setLocalPyeong] = useState<number>(pyeong);
+  const [localWidth, setLocalWidth] = useState<number>(width);
+  const [localHeight, setLocalHeight] = useState<number>(height);
+  const [localWallHeight, setLocalWallHeight] = useState<number>(wallHeight);
+
+  // 모드 변경 시 로컬 상태 업데이트
+  useEffect(() => {
+    if (mode === 'pyeong') {
+      // 평수 모드로 전환 시, 현재 가로/세로 값에서 평수 계산
+      const area = localWidth * localHeight;
+      const calculatedPyeong = Math.round((area / 3.3058) * 100) / 100;
+      setLocalPyeong(calculatedPyeong);
+    } else {
+      // 미터 모드로 전환 시, 현재 평수에서 가로/세로 계산
+      const dimensions = pyeongToRoomDimensions(localPyeong);
+      setLocalWidth(dimensions.width);
+      setLocalHeight(dimensions.height);
+    }
+  }, [mode]);
+
+  const handleGoToInterior = () => {
+    if (mode === 'pyeong') {
+      setPyeong(localPyeong);
+    } else {
+      setDimensions(localWidth, localHeight, localWallHeight);
+    }
+
+    router.push('/simulator');
+  };
 
   return (
     <Modal width='340px' onBack={onBack} showBackIconOnly>
@@ -45,30 +91,41 @@ export default function RoomSizeModal({onBack}:RoomSizeModalProps) {
         </div>
 
         {mode === 'pyeong' ? (
-          <LabeledNumberInput unitLabel='평' placeholder='00' />
+          <LabeledNumberInput
+            unitLabel='평'
+            placeholder='00'
+            value={localPyeong}
+            onChange={setLocalPyeong}
+          />
         ) : (
           <div className='flex flex-col gap-[10px]'>
             <LabeledNumberInput
               leftLabel='가로'
               unitLabel='m'
               placeholder='00'
+              value={localWidth}
+              onChange={setLocalWidth}
             />
             <LabeledNumberInput
               leftLabel='세로'
               unitLabel='m'
               placeholder='00'
+              value={localHeight}
+              onChange={setLocalHeight}
             />
             <LabeledNumberInput
               leftLabel='높이'
               unitLabel='m'
               placeholder='00'
+              value={localWallHeight}
+              onChange={setLocalWallHeight}
             />
           </div>
         )}
 
         <BoxTextButton
           showImg
-          onClick={() => '입력 정보 가지고 인테리어 페이지로 이동 로직 추가'}
+          onClick={handleGoToInterior}
           className='mt-[26px] rounded-lg w-[230px] text-sm py-[10px] h-10'
         >
           3D 인테리어 하러가기

@@ -1,23 +1,30 @@
 'use client';
 
 import { Canvas } from '@react-three/fiber';
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
+import { Vector3 } from 'three';
 
 import Room from './components/room/Room';
 import Lighting from './components/room/Lighting';
 import CameraController from './components/room/CameraController';
 import BackgroundController from './components/room/BackgroundController';
 import BackgroundSelector from './components/room/BackgroundSelector';
+import { useRoomSizeStore } from '@/stores/useRoomSizeStore';
 
-import { useEffect } from 'react';
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
 import FurnitureModel from './components/furnitures/FurnitureModel';
 import FurnitureController from './components/furnitures/FurnitureController';
 import { Furnitures } from '../types/furniture';
 
 export default function SimulatorPage() {
-  const roomWidth = 4;
-  const roomHeight = 4;
+  const {
+    width: storeWidth,
+    height: storeHeight,
+    wallHeight: storeWallHeight,
+  } = useRoomSizeStore();
+
+  const roomWidth = storeWidth || 4.07;
+  const roomHeight = storeHeight || 4.07;
   const floorExtension = 0.1;
 
   // 방 범위 계산
@@ -27,7 +34,7 @@ export default function SimulatorPage() {
     zMin: 0,
     zMax: roomHeight,
     yMin: 0,
-    yMax: 2.5,
+    yMax: storeWallHeight || 2.5,
   };
 
   // 가구 정보 배열
@@ -100,11 +107,18 @@ export default function SimulatorPage() {
 
   // 스토어 함수 가져오기 (가구 초기 세팅용)
   const setFurnitures = useFurnitureStore((state) => state.setFurnitures);
-  
+
   useEffect(() => {
     setFurnitures(furnitures);
   }, [setFurnitures]);
 
+  // 방 크기에 따라 카메라 위치 조정
+  const cameraDistance = Math.max(roomWidth, roomHeight) * 1.4;
+  const cameraPosition = new Vector3(
+    cameraDistance,
+    cameraDistance,
+    cameraDistance,
+  );
 
   return (
     <div className='w-full h-screen relative'>
@@ -118,7 +132,7 @@ export default function SimulatorPage() {
 
       <Canvas
         shadows
-        camera={{ position: [5, 5, 5], fov: 50 }}
+        camera={{ position: cameraPosition, fov: 50 }}
         className='w-full h-full'
         onPointerMissed={() => {
           useFurnitureStore.getState().clearSelection();

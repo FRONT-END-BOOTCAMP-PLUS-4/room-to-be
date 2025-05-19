@@ -1,6 +1,7 @@
 import { useLoader } from '@react-three/fiber';
 import { TextureLoader } from 'three';
 import { useViewStore } from '@/stores/useViewStore';
+import { useRoomSizeStore } from '@/stores/useRoomSizeStore';
 
 interface WallProps {
   width: number;
@@ -16,7 +17,8 @@ export default function Wall({
   wallExtension = 0.1,
 }: WallProps) {
   const map = useLoader(TextureLoader, texture);
-  const wallHeight = 2.5;
+  const { wallHeight: storeWallHeight } = useRoomSizeStore();
+  const wallHeight = storeWallHeight || 2.5;
   const wallThickness = 0.1;
   const angle = useViewStore((s) => s.angle);
   const isTopView = useViewStore((s) => s.isTopView);
