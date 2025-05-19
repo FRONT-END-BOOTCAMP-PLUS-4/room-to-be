@@ -6,15 +6,17 @@ import { Suspense } from 'react';
 import Room from './components/room/Room';
 import Lighting from './components/room/Lighting';
 import CameraController from './components/room/CameraController';
-import CameraButtons from './components/room/CameraButtons';
-import CenterMarker from './components/room/CenterMaker';
+import BackgroundController from './components/room/BackgroundController';
+import BackgroundSelector from './components/room/BackgroundSelector';
 
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
 import FurnitureModel from './components/furnitures/FurnitureModel';
+import FurnitureController from './components/furnitures/FurnitureController';
 
 export default function SimulatorPage() {
   const roomWidth = 4;
   const roomHeight = 4;
+  const floorExtension = 0.1;
 
   // 방 범위 계산
   const roomBoundary = {
@@ -25,9 +27,16 @@ export default function SimulatorPage() {
     yFloor: 0,
     yWall: 2.5,
   };
+
   return (
     <div className='w-full h-screen relative'>
-      <CameraButtons />
+      <div className='absolute top-[50px] right-[70px] z-30'>
+        <BackgroundSelector />
+      </div>
+
+      <div className='absolute top-[140px] right-[70px] z-30'>
+        <FurnitureController />
+      </div>
 
       <Canvas
         shadows
@@ -38,12 +47,13 @@ export default function SimulatorPage() {
         }}
       >
         <Suspense fallback={null}>
+          <BackgroundController />
           <Room
-            // 여기서 width, height는 미터단위고 처음 입력값 받아서 넘겨오기
             width={roomWidth}
             height={roomHeight}
             wallTexture='/assets/images/testwall.jpg'
             floorTexture='/assets/images/woodfloor.png'
+            floorExtension={floorExtension}
           />
           <FurnitureModel
             roomBoundary={roomBoundary}
@@ -51,19 +61,19 @@ export default function SimulatorPage() {
             name='f_이케아 트롤리'
             thumbnailUrl='/assets/models/ikea.png'
             modelUrl={'/assets/models/ikea_cart.glb'}
-            position={[2, 0.5, 2]}
+            position={[2, 0, 2]}
             rotationY={0}
-            scale={0.01}
+            scale={[0.01, 0.01, 0.01]}
           />
           <FurnitureModel
             roomBoundary={roomBoundary}
             id='아이디3'
-            name='f_이케아 트롤리2'
+            name='램프'
             thumbnailUrl='/assets/models/ikea.png'
-            modelUrl={'/assets/models/ikea_cart.glb'}
-            position={[3, 0.5, 3]}
+            modelUrl={'/assets/models/banker_lamp.glb'}
+            position={[3, 0, 3]}
             rotationY={0}
-            scale={0.01}
+            scale={[1, 1, 1]}
           />
           <FurnitureModel
             roomBoundary={roomBoundary}
@@ -71,13 +81,12 @@ export default function SimulatorPage() {
             name='f_테이블'
             thumbnailUrl='/assets/models/ikea.png'
             modelUrl={'/assets/models/table.glb'}
-            position={[4, 0.5, 1]}
+            position={[3, 0, 1]}
             rotationY={0}
-            scale={0.01}
+            scale={[0.01, 0.01, 0.01]}
           />
           <Lighting />
           <CameraController width={roomWidth} height={roomHeight} />
-          <CenterMarker x={roomHeight / 2} z={roomHeight / 2} />
         </Suspense>
       </Canvas>
     </div>
