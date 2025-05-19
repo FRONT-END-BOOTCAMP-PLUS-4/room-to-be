@@ -1,12 +1,19 @@
 'use client';
+
 import React, { useRef } from 'react';
+import CircleIconButton from '@/app/components/buttons/CircleIconButton';
 
 interface OverflowMenuProps {
   isOpen: boolean;
   setIsOpen: (_isOpen: boolean) => void;
+  onDelete?: () => void;
 }
 
-export default function OverflowMenu({ isOpen, setIsOpen }: OverflowMenuProps) {
+export default function OverflowMenu({
+  isOpen,
+  setIsOpen,
+  onDelete,
+}: OverflowMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
 
   const handleMenuClick = (e: React.MouseEvent) => {
@@ -30,12 +37,14 @@ export default function OverflowMenu({ isOpen, setIsOpen }: OverflowMenuProps) {
             boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
           }}
         >
-          <button className='w-12 h-12 rounded-full bg-black/30 flex items-center justify-center transition-colors hover:bg-black/50 text-white text-sm'>
-            공유
-          </button>
-          <button className='w-12 h-12 rounded-full bg-black/30 flex items-center justify-center transition-colors hover:bg-black/50 text-white text-sm'>
-            삭제
-          </button>
+          <CircleIconButton imageSrc='/assets/icons/share.svg' />
+          <CircleIconButton
+            imageSrc='/assets/icons/trash.svg'
+            onClick={(e) => {
+              e.stopPropagation(); // 메뉴 닫힘 방지
+              onDelete?.();
+            }}
+          />
         </div>
       )}
     </div>
