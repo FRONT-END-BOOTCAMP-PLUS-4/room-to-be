@@ -6,11 +6,21 @@ const config: Config = {
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './test/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     extend: {
       fontFamily: {
         sans: ['var(--font-pretendard)', 'sans-serif'],
+      },
+      keyframes: {
+        'fade-right': {
+          '0%': { opacity: '0', transform: 'translateX(40px)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+      },
+      animation: {
+        'fade-right': 'fade-right 0.7s cubic-bezier(0.4,0,0.2,1)',
       },
       colors: {
         background: 'hsl(var(--background))',
