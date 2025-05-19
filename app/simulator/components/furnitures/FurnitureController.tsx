@@ -2,6 +2,8 @@
 
 import { useState, useMemo } from 'react';
 
+import { useLightingStore } from '@/stores/useLightingStore';
+
 import FurnitureThumbnailInfo from './FurnitureThumbnailInfo';
 import ScaleLockToggle from './ScaleLockToggle';
 import LockedScaleSlider from './LockedScaleSlider';
@@ -17,7 +19,9 @@ import type { FurnitureStoreInfo } from '@/app/types/furniture';
 export default function FurnitureController() {
   const { furnitures, selectedFurnitureId, updateFurniture } = useFurnitureStore();
   const [isScaleLocked, setIsScaleLocked] = useState(false);
-  const [isLight, setIsLight] = useState(true);
+
+  const isDay = useLightingStore((state) => state.isDay);
+  const setIsDay = useLightingStore((state) => state.setIsDay);
 
   const selectedFurniture = useMemo(() => {
     return furnitures.find((f) => f.id === selectedFurnitureId) || null;
@@ -43,14 +47,8 @@ export default function FurnitureController() {
 
       {/* 조명 모드 버튼 */}
       <div className='flex gap-[10px]'>
-        <LightButton
-          onClick={() => setIsLight(true)}
-          isOn={isLight ? true : false}
-        />
-        <DarkButton
-          onClick={() => setIsLight(false)}
-          isOn={isLight ? false : true}
-        />
+        <LightButton onClick={() => setIsDay(true)} isOn={isDay} />
+        <DarkButton onClick={() => setIsDay(false)} isOn={!isDay} />
       </div>
 
       {selectedFurniture && (
@@ -87,7 +85,7 @@ export default function FurnitureController() {
                 icon='/assets/icons/rotate-left.svg'
                 onClick={() => {
                   updateSelectedFurniture({
-                    rotationY: selectedFurniture.rotationY + Math.PI / 4,
+                    rotationY: selectedFurniture.rotationY + Math.PI / 4, // 반시계 방향으로 회전
                   });
                 }}
               />
@@ -97,7 +95,7 @@ export default function FurnitureController() {
                 icon='/assets/icons/rotate-right.svg'
                 onClick={() => {
                   updateSelectedFurniture({
-                    rotationY: selectedFurniture.rotationY - Math.PI / 4,
+                    rotationY: selectedFurniture.rotationY - Math.PI / 4, // 시계 방향으로 회전
                   });
                 }}
               />

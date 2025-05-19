@@ -12,9 +12,12 @@ import useCursorOnDrag from '@/app/hooks/useCursorOnDrag';
 import useSyncRotationFromStore from '@/app/hooks/useSyncRotationFromStore';
 import useDragPosition from '@/app/hooks/useDragPosition';
 import type { FurnitureModelProps } from '@/app/types/furniture';
+import useLampLight from '@/app/hooks/useLampLight';
+import useLampEmissiveMaterial from '@/app/hooks/useLampEmissiveMaterial';
 
 export default function FurnitureModel({
   id,
+  name,
   modelUrl,
   placementType,
   positionX,
@@ -62,6 +65,9 @@ export default function FurnitureModel({
     set: setCurrentRotationY,
     meshRef,
   });
+
+  useLampLight({ meshRef, name });
+  useLampEmissiveMaterial({ scene: clonedScene, name });
 
   // baseSize 계산
   const { baseSizeWithScale, baseSizeRaw } = useGetBaseSize(clonedScene);

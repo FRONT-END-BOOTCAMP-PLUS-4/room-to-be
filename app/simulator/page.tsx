@@ -6,7 +6,8 @@ import { Suspense } from 'react';
 import Room from './components/room/Room';
 import Lighting from './components/room/Lighting';
 import CameraController from './components/room/CameraController';
-import CameraButtons from './components/room/CameraButtons';
+import BackgroundController from './components/room/BackgroundController';
+import BackgroundSelector from './components/room/BackgroundSelector';
 
 import { useEffect } from 'react';
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
@@ -17,6 +18,7 @@ import { Furnitures } from '../types/furniture';
 export default function SimulatorPage() {
   const roomWidth = 4;
   const roomHeight = 4;
+  const floorExtension = 0.1;
 
   // 방 범위 계산
   const roomBoundary = {
@@ -106,10 +108,13 @@ export default function SimulatorPage() {
 
   return (
     <div className='w-full h-screen relative'>
-      <div className="absolute top-[100px] right-[70px] z-30">
+      <div className='absolute top-[50px] right-[70px] z-30'>
+        <BackgroundSelector />
+      </div>
+
+      <div className='absolute top-[140px] right-[70px] z-30'>
         <FurnitureController />
       </div>
-      <CameraButtons />
 
       <Canvas
         shadows
@@ -120,11 +125,13 @@ export default function SimulatorPage() {
         }}
       >
         <Suspense fallback={null}>
+          <BackgroundController />
           <Room
             width={roomWidth}
             height={roomHeight}
             wallTexture='/assets/images/testwall.jpg'
             floorTexture='/assets/images/woodfloor.png'
+            floorExtension={floorExtension}
           />
           {/* 가구 배열을 map으로 렌더링 */}
           {furnitures.map((furniture) => (
