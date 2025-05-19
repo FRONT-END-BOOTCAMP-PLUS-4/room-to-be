@@ -9,12 +9,24 @@ interface RoomProps {
   height: number; // meters
   wallTexture: string; // public 경로 또는 import된 이미지
   floorTexture: string;
+  floorExtension?: number;
 }
 
-export default function Room({ width, height, wallTexture, floorTexture }: RoomProps) {
+export default function Room({
+  width,
+  height,
+  wallTexture,
+  floorTexture,
+  floorExtension = 0.2,
+}: RoomProps) {
   return (
     <>
-      <Floor width={width} height={height} texture={floorTexture} />
+      <Floor
+        width={width}
+        height={height}
+        texture={floorTexture}
+        extension={floorExtension}
+      />
       <Wall width={width} height={height} texture={wallTexture} />
     </>
   );
