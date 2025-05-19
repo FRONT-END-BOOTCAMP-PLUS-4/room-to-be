@@ -130,7 +130,6 @@ export default function FurnitureModel({
     }
   };
 
-  console.log('가구', id, '선택된 가구', selectedFurniture);
 
   return (
     <primitive

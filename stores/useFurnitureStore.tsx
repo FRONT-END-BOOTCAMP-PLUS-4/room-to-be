@@ -1,19 +1,19 @@
 
-import { FurnitureStoreProps } from '@/app/types/furniture';
+import { FurnitureStoreInfo } from '@/app/types/furniture';
 import { create } from 'zustand';
 
 interface FurnitureStore {
-  furnitures: FurnitureStoreProps[];
+  furnitures: FurnitureStoreInfo[];
   selectedFurnitureId: string | null;
 
   selectFurniture: (id: string) => void;
   clearSelection: () => void;
 
-  addFurniture: (info: FurnitureStoreProps) => void;
-  updateFurniture: (id: string, updated: Partial<FurnitureStoreProps>) => void;
+  addFurniture: (info: FurnitureStoreInfo) => void;
+  updateFurniture: (id: string, updated: Partial<FurnitureStoreInfo>) => void;
   removeFurniture: (id: string) => void;
 
-  setFurnitures: (items: FurnitureStoreProps[]) => void;
+  setFurnitures: (items: FurnitureStoreInfo[]) => void;
 }
 
 export const useFurnitureStore = create<FurnitureStore>((set) => ({

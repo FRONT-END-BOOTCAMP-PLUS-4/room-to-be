@@ -12,7 +12,7 @@ import DarkButton from '@/app/components/buttons/DarkButton';
 import FurnitureControllerBtn from './FurnitureControllerBtn';
 
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
-import type { FurnitureStoreProps } from '@/app/types/furniture';
+import type { FurnitureStoreInfo } from '@/app/types/furniture';
 
 export default function FurnitureController() {
   const { furnitures, selectedFurnitureId, updateFurniture } = useFurnitureStore();
@@ -23,7 +23,7 @@ export default function FurnitureController() {
     return furnitures.find((f) => f.id === selectedFurnitureId) || null;
   }, [furnitures, selectedFurnitureId]);
 
-  const updateSelectedFurniture = (updated: Partial<FurnitureStoreProps>) => {
+  const updateSelectedFurniture = (updated: Partial<FurnitureStoreInfo>) => {
     if (selectedFurniture) {
       updateFurniture(selectedFurniture.id, updated);
     }

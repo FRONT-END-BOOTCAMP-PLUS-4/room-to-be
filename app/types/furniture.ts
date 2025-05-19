@@ -51,4 +51,4 @@ export interface FurnitureModelProps extends Furnitures {
 }
 
 // Furniture Store Props
-export interface FurnitureStoreProps extends Furnitures,AdditionalInfo{}
+export interface FurnitureStoreInfo extends Furnitures,AdditionalInfo{}
