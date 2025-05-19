@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useFurnitureStore } from '@/stores/useFurnitureStore';
+import { useState, useMemo } from 'react';
+
 import { useLightingStore } from '@/stores/useLightingStore';
 
 import FurnitureThumbnailInfo from './FurnitureThumbnailInfo';
@@ -13,12 +13,25 @@ import LightButton from '@/app/components/buttons/LightButton';
 import DarkButton from '@/app/components/buttons/DarkButton';
 import FurnitureControllerBtn from './FurnitureControllerBtn';
 
+import { useFurnitureStore } from '@/stores/useFurnitureStore';
+import type { FurnitureStoreInfo } from '@/app/types/furniture';
+
 export default function FurnitureController() {
-  const { selectedFurniture, updateSelectedFurniture } = useFurnitureStore();
+  const { furnitures, selectedFurnitureId, updateFurniture } = useFurnitureStore();
   const [isScaleLocked, setIsScaleLocked] = useState(false);
 
   const isDay = useLightingStore((state) => state.isDay);
   const setIsDay = useLightingStore((state) => state.setIsDay);
+
+  const selectedFurniture = useMemo(() => {
+    return furnitures.find((f) => f.id === selectedFurnitureId) || null;
+  }, [furnitures, selectedFurnitureId]);
+
+  const updateSelectedFurniture = (updated: Partial<FurnitureStoreInfo>) => {
+    if (selectedFurniture) {
+      updateFurniture(selectedFurniture.id, updated);
+    }
+  };
 
   return (
     <div className='w-[219px] px-[30px] py-[25px] rounded-[30px] bg-gradient-to-r from-white/10 to-black/20 backdrop-blur-md shadow-[0_0_15px_#00000026] flex flex-col items-center justify-center gap-4'>

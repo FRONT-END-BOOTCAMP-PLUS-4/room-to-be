@@ -1,44 +1,44 @@
+
+import { FurnitureStoreInfo } from '@/app/types/furniture';
 import { create } from 'zustand';
 
-interface FurnitureInfo {
-  id: string;
-  name: string;
-  thumbnailUrl: string;
-  scaleX: number;
-  scaleY: number;
-  scaleZ: number;
-  originalScale: number;
-  positionX: number;
-  positionY: number;
-  positionZ: number;
-  baseX: number;
-  baseY: number;
-  baseZ: number;
-  originalBaseX: number;
-  originalBaseY: number;
-  originalBaseZ: number;
-  rotationY: number;
-}
-
 interface FurnitureStore {
-  selectedFurniture: FurnitureInfo | null;
-  selectFurniture: (info: FurnitureInfo) => void;
+  furnitures: FurnitureStoreInfo[];
+  selectedFurnitureId: string | null;
+
+  selectFurniture: (id: string) => void;
   clearSelection: () => void;
-  updateSelectedFurniture: (updated: Partial<FurnitureInfo>) => void;
+
+  addFurniture: (info: FurnitureStoreInfo) => void;
+  updateFurniture: (id: string, updated: Partial<FurnitureStoreInfo>) => void;
+  removeFurniture: (id: string) => void;
+
+  setFurnitures: (items: FurnitureStoreInfo[]) => void;
 }
 
 export const useFurnitureStore = create<FurnitureStore>((set) => ({
-  selectedFurniture: null,
-  selectFurniture: (info) => set({ selectedFurniture: info }),
-  clearSelection: () => set({ selectedFurniture: null }),
-  updateSelectedFurniture: (updated) =>
-    set((state) => {
-      if (!state.selectedFurniture) return {};
-      return {
-        selectedFurniture: {
-          ...state.selectedFurniture,
-          ...updated,
-        },
-      };
-    }),
+  furnitures: [],
+  selectedFurnitureId: null,
+
+  selectFurniture: (id) => set({ selectedFurnitureId: id }),
+  clearSelection: () => set({ selectedFurnitureId: null }),
+
+  addFurniture: (info) =>
+    set((state) => ({
+      furnitures: [...state.furnitures, info],
+    })),
+
+  updateFurniture: (id, updated) =>
+    set((state) => ({
+      furnitures: state.furnitures.map((f) =>
+        f.id === id ? { ...f, ...updated } : f,
+      ),
+    })),
+
+  removeFurniture: (id) =>
+    set((state) => ({
+      furnitures: state.furnitures.filter((f) => f.id !== id),
+    })),
+
+  setFurnitures: (items) => set({ furnitures: items }),
 }));

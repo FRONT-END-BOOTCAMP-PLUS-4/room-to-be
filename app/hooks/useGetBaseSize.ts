@@ -1,10 +1,18 @@
 import { useEffect, useState } from 'react';
 import * as THREE from 'three';
-import formatToThreeDigitInt from './useFormatToThreeDigitInt';
+
+import useFormatToThreeDigitInt from './useFormatToThreeDigitInt';
 
 // 주어진 씬에서 무시할 메시 제외하고 박스 크기 계산하는 훅 (세 자리 정수 mm)
 export default function useGetBaseSize(scene: THREE.Object3D | null) {
-  const [baseSize, setBaseSize] = useState<[number, number, number] | null>(null);
+  // 포맷 적용 전 원본값 (scale 곱하기 전 값)
+  const [baseSizeRaw, setBaseSizeRaw] = useState<
+    [number, number, number] | null
+  >(null);
+  // 포맷 적용된 값
+  const [baseSizeWithScale, setBaseSizeWithScale] = useState<
+    [number, number, number] | null
+  >(null);
 
   useEffect(() => {
     if (!scene) return;
@@ -28,12 +36,19 @@ export default function useGetBaseSize(scene: THREE.Object3D | null) {
     const size = new THREE.Vector3();
     boundingBox.getSize(size);
 
-    setBaseSize([
-      formatToThreeDigitInt(size.x),
-      formatToThreeDigitInt(size.y),
-      formatToThreeDigitInt(size.z),
+    // 포맷 적용 전 사이즈 (scale 곱하기 전, raw 값)
+    setBaseSizeRaw([size.x, size.y, size.z]);
+
+    // scale과 size를 이용해 포맷 적용
+    setBaseSizeWithScale([
+      useFormatToThreeDigitInt(scene.scale.x, size.x),
+      useFormatToThreeDigitInt(scene.scale.y, size.y),
+      useFormatToThreeDigitInt(scene.scale.z, size.z),
     ]);
   }, [scene]);
 
-  return baseSize;
+  return {
+    baseSizeWithScale,
+    baseSizeRaw,
+  };
 }
