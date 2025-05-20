@@ -18,13 +18,16 @@ export default function SimulatorPage() {
   const roomWidth = 4;
   const roomHeight = 4;
   const floorExtension = 0.1;
+  const wallExtension = 0.1;
 
-  // 방 범위 계산
+  const extendedWidth = roomWidth + wallExtension * 2;
+  const extendedHeight = roomHeight + wallExtension * 2;
+
   const roomBoundary = {
-    xMin: 0,
-    xMax: roomWidth,
-    zMin: 0,
-    zMax: roomHeight,
+    xMin: -wallExtension,
+    xMax: extendedWidth - wallExtension,
+    zMin: -wallExtension,
+    zMax: extendedHeight - wallExtension,
     yMin: 0,
     yMax: 2.5,
   };
