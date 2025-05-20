@@ -5,10 +5,7 @@ import { useRouter } from 'next/navigation';
 import Modal from './Modal';
 import BoxTextButton from '../buttons/BoxTextButton';
 import LabeledNumberInput from './LabeledNumberInput';
-import {
-  useRoomSizeStore,
-  pyeongToRoomDimensions,
-} from '@/stores/useRoomSizeStore';
+import useRoomSizeForm from '@/app/hooks/useRoomSizeForm';
 
 interface RoomSizeModalProps {
   onBack: () => void;
@@ -16,46 +13,24 @@ interface RoomSizeModalProps {
 
 export default function RoomSizeModal({ onBack }: RoomSizeModalProps) {
   const router = useRouter();
-
   const {
     mode,
-    pyeong,
-    width,
-    height,
-    wallHeight,
+    localPyeong,
+    localWidth,
+    localHeight,
+    localWallHeight,
+    error,
     setMode,
-    setPyeong,
-    setDimensions,
-  } = useRoomSizeStore();
-
-  const [localPyeong, setLocalPyeong] = useState<number>(pyeong);
-  const [localWidth, setLocalWidth] = useState<number>(width);
-  const [localHeight, setLocalHeight] = useState<number>(height);
-  const [localWallHeight, setLocalWallHeight] = useState<number>(wallHeight);
-
-  // 모드 변경 시 로컬 상태 업데이트
-  useEffect(() => {
-    if (mode === 'pyeong') {
-      // 평수 모드로 전환 시, 현재 가로/세로 값에서 평수 계산
-      const area = localWidth * localHeight;
-      const calculatedPyeong = Math.round((area / 3.3058) * 100) / 100;
-      setLocalPyeong(calculatedPyeong);
-    } else {
-      // 미터 모드로 전환 시, 현재 평수에서 가로/세로 계산
-      const dimensions = pyeongToRoomDimensions(localPyeong);
-      setLocalWidth(dimensions.width);
-      setLocalHeight(dimensions.height);
-    }
-  }, [mode]);
+    handlePyeongChange,
+    handleDimensionChange,
+    handleWallHeightChange,
+    handleSubmit,
+  } = useRoomSizeForm();
 
   const handleGoToInterior = () => {
-    if (mode === 'pyeong') {
-      setPyeong(localPyeong);
-    } else {
-      setDimensions(localWidth, localHeight, localWallHeight);
+    if (handleSubmit()) {
+      router.push('/simulator');
     }
-
-    router.push('/simulator');
   };
 
   return (
@@ -95,7 +70,7 @@ export default function RoomSizeModal({ onBack }: RoomSizeModalProps) {
             unitLabel='평'
             placeholder='00'
             value={localPyeong}
-            onChange={setLocalPyeong}
+            onChange={handlePyeongChange}
           />
         ) : (
           <div className='flex flex-col gap-[10px]'>
@@ -104,24 +79,27 @@ export default function RoomSizeModal({ onBack }: RoomSizeModalProps) {
               unitLabel='m'
               placeholder='00'
               value={localWidth}
-              onChange={setLocalWidth}
+              onChange={(value) => handleDimensionChange('width', value)}
             />
             <LabeledNumberInput
               leftLabel='세로'
               unitLabel='m'
               placeholder='00'
               value={localHeight}
-              onChange={setLocalHeight}
+              onChange={(value) => handleDimensionChange('height', value)}
             />
             <LabeledNumberInput
               leftLabel='높이'
               unitLabel='m'
               placeholder='00'
               value={localWallHeight}
-              onChange={setLocalWallHeight}
+              onChange={handleWallHeightChange}
             />
           </div>
         )}
+
+        {/* 에러 메시지 표시 영역 */}
+        {error && <div className='mt-2 text-red-400 text-sm'>{error}</div>}
 
         <BoxTextButton
           showImg
