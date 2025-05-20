@@ -1,4 +1,3 @@
-// useRoomSizeForm.ts
 import { useState, useEffect } from 'react';
 import {
   useRoomSizeStore,
@@ -37,15 +36,13 @@ export default function useRoomSizeForm() {
     height: '',
     wallHeight: '',
   });
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
 
-  // 모드 전환 시 상태 업데이트
   useEffect(() => {
     handleModeChange();
   }, [mode]);
 
-  // 모드 변경 핸들러
   const handleModeChange = () => {
-    // 모드 전환 시 모든 에러 초기화
     setError('');
     setFieldErrors({
       pyeong: '',
@@ -53,23 +50,27 @@ export default function useRoomSizeForm() {
       height: '',
       wallHeight: '',
     });
+    setAttemptedSubmit(false);
 
+    // 모드를 바꿀 때는 기존 입력값 유지
     if (mode === 'pyeong') {
-      // 평수 모드로 전환
-      if (localWidth && localHeight) {
+      // 미터 모드에서 평수 모드로 전환
+      if (!localPyeong && localWidth && localHeight) {
         const area = localWidth * localHeight;
         const calculatedPyeong = Math.round((area / 3.3058) * 100) / 100;
-
-        // 계산된 평수가 제한 범위를 벗어나면 조정
         const validPyeong = Math.min(Math.max(calculatedPyeong, 1), 10);
         setLocalPyeong(validPyeong);
       }
     } else {
-      // 미터 모드로 전환
-      if (localPyeong) {
+      // 평수 모드에서 미터 모드로 전환
+      if (localPyeong && (!localWidth || !localHeight)) {
         const dimensions = pyeongToRoomDimensions(localPyeong);
         setLocalWidth(dimensions.width);
         setLocalHeight(dimensions.height);
+      }
+
+      if (localWallHeight === null) {
+        setLocalWallHeight(2.5);
       }
     }
   };
@@ -78,26 +79,22 @@ export default function useRoomSizeForm() {
   const handlePyeongChange = (value: number | null) => {
     setLocalPyeong(value);
 
-    if (value === null) {
-      setFieldErrors((prev) => ({
-        ...prev,
-        pyeong: '',
-      }));
-      setError('');
-      return;
-    }
-
-    const pyeongError = validatePyeong(value);
-
     setFieldErrors((prev) => ({
       ...prev,
-      pyeong: pyeongError,
+      pyeong: '',
     }));
+    setError('');
 
-    if (pyeongError) {
-      setError(pyeongError);
-    } else {
-      setError('');
+    // 이미 제출을 시도했었거나 값이 유효하지 않은 경우에만 검증
+    if (value !== null && (attemptedSubmit || value <= 0 || value > 10)) {
+      const pyeongError = validatePyeong(value);
+      if (pyeongError) {
+        setFieldErrors((prev) => ({
+          ...prev,
+          pyeong: pyeongError,
+        }));
+        setError(pyeongError);
+      }
     }
   };
 
@@ -112,106 +109,75 @@ export default function useRoomSizeForm() {
       setLocalHeight(value);
     }
 
-    // 값이 null이면 에러를 표시하지 않음
-    if (value === null) {
-      setFieldErrors((prev) => ({
-        ...prev,
-        [type]: '',
-      }));
-
-      // 다른 필드에도 에러가 없으면 전체 에러 메시지 제거
-      if (
-        (type === 'width' && !fieldErrors.height) ||
-        (type === 'height' && !fieldErrors.width)
-      ) {
-        setError('');
-      }
-      return;
-    }
-
-    const newWidth = type === 'width' ? value : localWidth;
-    const newHeight = type === 'height' ? value : localHeight;
-
-    // 둘 중 하나라도 null이면 검증하지 않음
-    if (newWidth === null || newHeight === null) {
-      return;
-    }
-
-    const dimensionError = validateDimension(newWidth, newHeight);
-
     setFieldErrors((prev) => ({
       ...prev,
-      width: type === 'width' && dimensionError ? dimensionError : prev.width,
-      height:
-        type === 'height' && dimensionError ? dimensionError : prev.height,
+      [type]: '',
     }));
+    setError('');
 
-    if (dimensionError) {
-      setError(dimensionError);
-    } else {
-      setError('');
+    // 이미 제출을 시도했었고, 값이 있는 경우에만 검증
+    if (attemptedSubmit && value !== null) {
+      const currentWidth = type === 'width' ? value : localWidth;
+      const currentHeight = type === 'height' ? value : localHeight;
+
+      const dimensionError = validateDimension(currentWidth, currentHeight);
+      if (dimensionError) {
+        setFieldErrors((prev) => ({
+          ...prev,
+          [type]: dimensionError,
+        }));
+        setError(dimensionError);
+      }
     }
   };
 
   // 벽 높이 변경 처리 함수
   const handleWallHeightChange = (value: number | null) => {
-    setLocalWallHeight(value);
-
-    if (value === null) {
-      setFieldErrors((prev) => ({
-        ...prev,
-        wallHeight: '',
-      }));
-      setError('');
+    if (mode === 'pyeong') {
       return;
     }
 
-    const wallHeightError = validateWallHeight(value);
+    setLocalWallHeight(value);
 
     setFieldErrors((prev) => ({
       ...prev,
-      wallHeight: wallHeightError,
+      wallHeight: '',
     }));
+    setError('');
 
-    if (wallHeightError) {
-      setError(wallHeightError);
-    } else {
-      setError('');
-    }
-  };
-
-  // 입력 필드 포커스 시 해당 필드의 유효성 검사 및 에러 표시
-  const handleFieldFocus = (field: keyof FieldErrors) => {
-    if (field === 'pyeong' && localPyeong !== null) {
-      const pyeongError = validatePyeong(localPyeong);
-      if (pyeongError) {
-        setError(pyeongError);
-      }
-    } else if (
-      (field === 'width' || field === 'height') &&
-      localWidth !== null &&
-      localHeight !== null
+    if (
+      value !== null &&
+      (attemptedSubmit || value <= 0 || value > 3.0 || value < 2.0)
     ) {
-      const dimensionError = validateDimension(localWidth, localHeight);
-      if (dimensionError) {
-        setError(dimensionError);
-      }
-    } else if (field === 'wallHeight' && localWallHeight !== null) {
-      const wallHeightError = validateWallHeight(localWallHeight);
+      const wallHeightError = validateWallHeight(value);
       if (wallHeightError) {
+        setFieldErrors((prev) => ({
+          ...prev,
+          wallHeight: wallHeightError,
+        }));
         setError(wallHeightError);
       }
     }
   };
 
-  // 폼 제출 처리
+  // 입력 필드 포커스 시 처리
+  const handleFieldFocus = (field: keyof FieldErrors) => {
+    // 포커스 시 별도 처리 없음 (폼 제출 시에만 검증)
+  };
+
   const handleSubmit = () => {
+    setAttemptedSubmit(true);
+
+    if (mode === 'pyeong' && localWallHeight === null) {
+      setLocalWallHeight(2.5);
+    }
+
     const validation = validateRoomSizeForm(
       mode,
       localPyeong,
       localWidth,
       localHeight,
-      localWallHeight,
+      mode === 'pyeong' ? 2.5 : localWallHeight,
     );
 
     if (!validation.isValid) {
