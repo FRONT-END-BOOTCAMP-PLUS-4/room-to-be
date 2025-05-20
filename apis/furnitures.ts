@@ -1,3 +1,4 @@
+'use client';
 export async function uploadFurniture({
   name,
   category,
@@ -18,7 +19,7 @@ export async function uploadFurniture({
   formData.append('model', modelFile);
   formData.append('thumbnail', thumbnailFile);
 
-  const res = await fetch('/api/furniture', {
+  const res = await fetch('/api/furnitures', {
     method: 'POST',
     body: formData,
   });
@@ -35,7 +36,7 @@ export async function uploadFurniture({
 export async function fetchFurnitureByPlacementType(
   placementType: 'wall' | 'floor',
 ) {
-  const res = await fetch(`/api/furniture?placementType=${placementType}`, {
+  const res = await fetch(`/api/furnitures?placementType=${placementType}`, {
     method: 'GET',
     cache: 'no-store',
   });

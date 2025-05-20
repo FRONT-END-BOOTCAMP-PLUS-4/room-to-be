@@ -5,6 +5,13 @@ import { toDomainFurniture, toPrismaFurniture } from '@/backend/utils/mapper';
 import { prisma } from '../prisma/prismaClient';
 
 export class PrismaFurnitureRepository implements FurnitureRepository {
+  async getById(id: string): Promise<Furniture | null> {
+    const raw = await prisma.furniture.findUnique({
+      where: { id },
+    });
+    return raw ? toDomainFurniture(raw) : null;
+  }
+
   async getAll(): Promise<Furniture[]> {
     const raws = await prisma.furniture.findMany();
     return raws.map(toDomainFurniture);
