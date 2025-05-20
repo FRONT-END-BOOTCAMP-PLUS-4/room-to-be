@@ -1,26 +1,26 @@
 'use client';
 
+import { Suspense, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Suspense } from 'react';
 
-import Room from './components/room/Room';
-import Lighting from './components/room/Lighting';
-import CameraController from './components/room/CameraController';
+import { fetchFurnitureByPlacementType } from '@/apis/furnitures';
+import { useFurnitureStore } from '@/stores/useFurnitureStore';
+
+import { Furnitures } from '../types/furniture';
+import FurnitureController from './components/furnitures/FurnitureController';
+import FurnitureModel from './components/furnitures/FurnitureModel';
 import BackgroundController from './components/room/BackgroundController';
 import BackgroundSelector from './components/room/BackgroundSelector';
-
-import { useEffect } from 'react';
-import { useFurnitureStore } from '@/stores/useFurnitureStore';
-import FurnitureModel from './components/furnitures/FurnitureModel';
-import FurnitureController from './components/furnitures/FurnitureController';
-import { Furnitures } from '../types/furniture';
+import CameraController from './components/room/CameraController';
+import Lighting from './components/room/Lighting';
+import Room from './components/room/Room';
+import FurnitureSidebar from './components/sidebar/FurnitureSidebar';
 
 export default function SimulatorPage() {
   const roomWidth = 4;
   const roomHeight = 4;
   const floorExtension = 0.1;
 
-  // 방 범위 계산
   const roomBoundary = {
     xMin: 0,
     xMax: roomWidth,
@@ -30,7 +30,6 @@ export default function SimulatorPage() {
     yMax: 2.5,
   };
 
-  // 가구 정보 배열
   const furnitures: Furnitures[] = [
     {
       id: '아이디1',
@@ -98,53 +97,60 @@ export default function SimulatorPage() {
     },
   ];
 
-  // 스토어 함수 가져오기 (가구 초기 세팅용)
   const setFurnitures = useFurnitureStore((state) => state.setFurnitures);
-  
+
   useEffect(() => {
     setFurnitures(furnitures);
   }, [setFurnitures]);
 
-
   return (
-    <div className='w-full h-screen relative'>
+    <div className='relative w-full h-screen overflow-hidden'>
+      {/* Canvas */}
+      <div className='absolute top-0 left-0 w-full h-full z-0'>
+        <Canvas
+          shadows
+          camera={{ position: [5, 5, 5], fov: 50 }}
+          className='w-full h-full'
+          onPointerMissed={() => {
+            useFurnitureStore.getState().clearSelection();
+          }}
+        >
+          <Suspense fallback={null}>
+            <BackgroundController />
+            <Room
+              width={roomWidth}
+              height={roomHeight}
+              wallTexture='/assets/images/testwall.jpg'
+              floorTexture='/assets/images/woodfloor.png'
+              floorExtension={floorExtension}
+            />
+            {furnitures.map((furniture) => (
+              <FurnitureModel
+                key={furniture.id}
+                roomBoundary={roomBoundary}
+                {...furniture}
+              />
+            ))}
+            <Lighting />
+            <CameraController width={roomWidth} height={roomHeight} />
+          </Suspense>
+        </Canvas>
+      </div>
+
+      {/* 사이드바 */}
+      <div className='absolute top-0 left-0 z-30 w-80 h-full'>
+        <FurnitureSidebar
+          fetchFurnitureByPlacementType={fetchFurnitureByPlacementType}
+        />
+      </div>
+
+      {/* 오른쪽 UI 버튼들 */}
       <div className='absolute top-[50px] right-[70px] z-30'>
         <BackgroundSelector />
       </div>
-
       <div className='absolute top-[140px] right-[70px] z-30'>
         <FurnitureController />
       </div>
-
-      <Canvas
-        shadows
-        camera={{ position: [5, 5, 5], fov: 50 }}
-        className='w-full h-full'
-        onPointerMissed={() => {
-          useFurnitureStore.getState().clearSelection();
-        }}
-      >
-        <Suspense fallback={null}>
-          <BackgroundController />
-          <Room
-            width={roomWidth}
-            height={roomHeight}
-            wallTexture='/assets/images/testwall.jpg'
-            floorTexture='/assets/images/woodfloor.png'
-            floorExtension={floorExtension}
-          />
-          {/* 가구 배열을 map으로 렌더링 */}
-          {furnitures.map((furniture) => (
-            <FurnitureModel
-              key={furniture.id}
-              roomBoundary={roomBoundary}
-              {...furniture}
-            />
-          ))}
-          <Lighting />
-          <CameraController width={roomWidth} height={roomHeight} />
-        </Suspense>
-      </Canvas>
     </div>
   );
 }
