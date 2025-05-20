@@ -34,7 +34,6 @@ export function toDomainFurniture(p: PrismaFurniture): Furniture {
   return new Furniture(
     p.id,
     p.name,
-    p.type,
     p.category, 
     p.model_url,
     p.thumbnail_url,
@@ -46,7 +45,6 @@ export function toDomainFurniture(p: PrismaFurniture): Furniture {
 export function toPrismaFurniture(f: Furniture): Omit<PrismaFurniture, 'id'> {
   return {
     name: f.name,
-    type: f.type,
     category: f.category,
     model_url: f.modelUrl,
     thumbnail_url: f.thumbnailUrl,

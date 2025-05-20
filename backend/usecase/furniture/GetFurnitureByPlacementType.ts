@@ -1,10 +1,10 @@
 import { FurnitureRepository } from '@/backend/domain/repositories/FurnitureRepository';
 import { Furniture } from '@/backend/domain/entities/Furniture';
 
-export class GetFurnitureByCategory {
+export class GetFurnitureByPlacementType {
   constructor(private repo: FurnitureRepository) {}
 
-  async execute(category: string): Promise<Furniture[]> {
-    return this.repo.getByCategory(category);
+  async execute(placementType: 'wall' | 'floor'): Promise<Furniture[]> {
+    return this.repo.getByPlacementType(placementType);
   }
 }

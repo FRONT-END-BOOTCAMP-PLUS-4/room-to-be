@@ -8,7 +8,6 @@ import {
 
 interface CreateFurnitureParams {
   name: string;
-  type: string;
   category: string;
   placementType: 'floor' | 'wall';
   modelBlob: Blob;
@@ -27,7 +26,6 @@ export async function createFurniture(
   const furniture = new Furniture(
     id,
     params.name,
-    params.type,
     params.category,
     modelUrl,
     thumbnailUrl,

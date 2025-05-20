@@ -33,12 +33,10 @@ model Room {
 model Furniture {
   id             String  @id @default(uuid())
   name           String
-  type           String
   category       String
   model_url      String
   thumbnail_url  String
   created_at     DateTime @default(now())
-
   placement_type String  
 
   placedFurnitures PlacedFurniture[]
