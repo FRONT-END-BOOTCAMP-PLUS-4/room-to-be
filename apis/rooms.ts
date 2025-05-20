@@ -1,3 +1,4 @@
+'use client';
 interface RoomResponse {
   id: string;
   name: string;

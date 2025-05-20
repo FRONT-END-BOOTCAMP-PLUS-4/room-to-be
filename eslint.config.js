@@ -38,7 +38,7 @@ export default [
       'react/no-unknown-property': [
         'error',
         {
-          ignore: ['position', 'args', 'rotation', 'scale', 'map'],
+          ignore: ['object', 'position', 'args', 'rotation', 'scale', 'map'],
         },
       ],
 
