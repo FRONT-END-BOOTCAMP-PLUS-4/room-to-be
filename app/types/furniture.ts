@@ -2,7 +2,7 @@
 export interface FurnitureInfo {
   furnitureId: string;
   name: string;
-  type: string;
+  category: string;
   modelUrl: string;
   thumbnailUrl: string;
   placementType: string;
@@ -31,15 +31,19 @@ export interface RoomBoundary {
 }
 
 export interface AdditionalInfo {
-  baseX?: number;
-  baseY?: number;
-  baseZ?: number;
-  originalScaleX?: number;
-  originalScaleY?: number;
-  originalScaleZ?: number;
-  originalBaseX?: number;
-  originalBaseY?: number;
-  originalBaseZ?: number;
+  baseX: number;
+  baseY: number;
+  baseZ: number;
+  originalPositionX: number;
+  originalPositionY: number;
+  originalPositionZ: number;
+  originalScaleX: number;
+  originalScaleY: number;
+  originalScaleZ: number;
+  originalRotationY: number;
+  originalBaseX: number;
+  originalBaseY: number;
+  originalBaseZ: number;
 }
 
 // FurnitureInfo + PlacedFurniture를 그대로 조합한 타입
@@ -51,4 +55,4 @@ export interface FurnitureModelProps extends Furnitures {
 }
 
 // Furniture Store Props
-export interface FurnitureStoreInfo extends Furnitures,AdditionalInfo{}
+export type FurnitureStoreInfo = Furnitures & Partial<AdditionalInfo>;

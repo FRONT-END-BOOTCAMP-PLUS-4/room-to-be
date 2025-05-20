@@ -33,17 +33,18 @@ export default function FurnitureModel({
   const clonedScene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
   const meshRef = useRef<THREE.Group>(null);
 
-  const {
-    furnitures,
-    selectedFurnitureId,
-    selectFurniture,
-    updateFurniture,
-  } = useFurnitureStore();
+  const { furnitures, selectedFurnitureId, selectFurniture, updateFurniture } =
+    useFurnitureStore();
 
   const isSelected = selectedFurnitureId === id;
-  const selectedFurniture = furnitures.find((f) => f.id === selectedFurnitureId) || null;
+  const selectedFurniture =
+    furnitures.find((f) => f.id === selectedFurnitureId) || null;
 
-  const [currentScale, setCurrentScale] = useState<[number, number, number]>([scaleX, scaleY, scaleZ]);
+  const [currentScale, setCurrentScale] = useState<[number, number, number]>([
+    scaleX,
+    scaleY,
+    scaleZ,
+  ]);
   const [currentRotationY, setCurrentRotationY] = useState(rotationY);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -62,6 +63,7 @@ export default function FurnitureModel({
   useSyncRotationFromStore({
     isSelected,
     selected: selectedFurniture,
+    current: currentRotationY,
     set: setCurrentRotationY,
     meshRef,
   });
@@ -69,7 +71,7 @@ export default function FurnitureModel({
   useLampLight({ meshRef, name });
   useLampEmissiveMaterial({ scene: clonedScene, name });
 
-  // baseSize 계산
+  // baseSize 계산 (baseSizeWithScale는 mm 단위, baseSizeRaw는 가구 기본 단위 )
   const { baseSizeWithScale, baseSizeRaw } = useGetBaseSize(clonedScene);
 
   // 가구 크기(반폭, 반높이, 반깊이) 계산
@@ -126,16 +128,19 @@ export default function FurnitureModel({
         baseX,
         baseY,
         baseZ,
+        originalPositionX: positionX,
+        originalPositionY: positionY,
+        originalPositionZ: positionZ,
         originalScaleX: scaleX,
         originalScaleY: scaleY,
         originalScaleZ: scaleZ,
+        originalRotationY: rotationY,
         originalBaseX: baseSizeWithScale[0],
         originalBaseY: baseSizeWithScale[1],
         originalBaseZ: baseSizeWithScale[2],
       });
     }
   };
-
 
   return (
     <primitive

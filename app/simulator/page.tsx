@@ -46,7 +46,7 @@ export default function SimulatorPage() {
       scaleY: 0.01,
       scaleZ: 0.01,
       placementType: 'floor',
-      type: 'cart',
+      category: 'cart',
     },
     {
       id: '아이디2',
@@ -62,7 +62,7 @@ export default function SimulatorPage() {
       scaleY: 1,
       scaleZ: 1,
       placementType: 'floor',
-      type: 'lamp',
+      category: 'lamp',
     },
     {
       id: '아이디3',
@@ -78,7 +78,7 @@ export default function SimulatorPage() {
       scaleY: 0.01,
       scaleZ: 0.01,
       placementType: 'floor',
-      type: 'table',
+      category: 'table',
     },
     {
       id: '아이디4',
@@ -94,7 +94,7 @@ export default function SimulatorPage() {
       scaleY: 1,
       scaleZ: 1,
       placementType: 'wall',
-      type: 'window',
+      category: 'window',
     },
   ];
 
