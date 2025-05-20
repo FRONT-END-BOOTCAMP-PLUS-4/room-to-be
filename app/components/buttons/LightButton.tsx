@@ -1,8 +1,8 @@
 'use client';
 
-import Image from 'next/image';
 import { ButtonHTMLAttributes } from 'react';
 import clsx from 'clsx';
+import Image from 'next/image';
 
 type LightButtonProps = {
   isOn: boolean;

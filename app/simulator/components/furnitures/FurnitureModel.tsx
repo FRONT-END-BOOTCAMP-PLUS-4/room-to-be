@@ -2,18 +2,19 @@
 
 import { useMemo, useRef, useState } from 'react';
 import { useGLTF } from '@react-three/drei';
-import { useFurnitureStore } from '@/stores/useFurnitureStore';
 import * as THREE from 'three';
 
-import useHighlightMaterial from '@/app/hooks/useHighlightMaterial';
-import useSyncScaleFromStore from '@/app/hooks/useSyncScaleFromStore';
-import useGetBaseSize from '@/app/hooks/useGetBaseSize';
 import useCursorOnDrag from '@/app/hooks/useCursorOnDrag';
-import useSyncRotationFromStore from '@/app/hooks/useSyncRotationFromStore';
 import useDragPosition from '@/app/hooks/useDragPosition';
-import type { FurnitureModelProps } from '@/app/types/furniture';
-import useLampLight from '@/app/hooks/useLampLight';
+import useGetBaseSize from '@/app/hooks/useGetBaseSize';
+import useHighlightMaterial from '@/app/hooks/useHighlightMaterial';
 import useLampEmissiveMaterial from '@/app/hooks/useLampEmissiveMaterial';
+import useLampLight from '@/app/hooks/useLampLight';
+import useSyncRotationFromStore from '@/app/hooks/useSyncRotationFromStore';
+import useSyncScaleFromStore from '@/app/hooks/useSyncScaleFromStore';
+import type { FurnitureModelProps } from '@/app/types/furniture';
+
+import { useFurnitureStore } from '@/stores/useFurnitureStore';
 
 export default function FurnitureModel({
   id,
@@ -33,17 +34,18 @@ export default function FurnitureModel({
   const clonedScene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
   const meshRef = useRef<THREE.Group>(null);
 
-  const {
-    furnitures,
-    selectedFurnitureId,
-    selectFurniture,
-    updateFurniture,
-  } = useFurnitureStore();
+  const { furnitures, selectedFurnitureId, selectFurniture, updateFurniture } =
+    useFurnitureStore();
 
   const isSelected = selectedFurnitureId === id;
-  const selectedFurniture = furnitures.find((f) => f.id === selectedFurnitureId) || null;
+  const selectedFurniture =
+    furnitures.find((f) => f.id === selectedFurnitureId) || null;
 
-  const [currentScale, setCurrentScale] = useState<[number, number, number]>([scaleX, scaleY, scaleZ]);
+  const [currentScale, setCurrentScale] = useState<[number, number, number]>([
+    scaleX,
+    scaleY,
+    scaleZ,
+  ]);
   const [currentRotationY, setCurrentRotationY] = useState(rotationY);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -135,7 +137,6 @@ export default function FurnitureModel({
       });
     }
   };
-
 
   return (
     <primitive

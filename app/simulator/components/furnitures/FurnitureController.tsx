@@ -1,21 +1,20 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
+import DarkButton from '@/app/components/buttons/DarkButton';
+import LightButton from '@/app/components/buttons/LightButton';
+import type { FurnitureStoreInfo } from '@/app/types/furniture';
+
+import { useFurnitureStore } from '@/stores/useFurnitureStore';
 import { useLightingStore } from '@/stores/useLightingStore';
 import { useViewStore } from '@/stores/useViewStore';
 
-import FurnitureThumbnailInfo from './FurnitureThumbnailInfo';
-import ScaleLockToggle from './ScaleLockToggle';
-import LockedScaleSlider from './LockedScaleSlider';
-import UnlockedScaleInputs from './UnlockedScaleInputs';
-
-import LightButton from '@/app/components/buttons/LightButton';
-import DarkButton from '@/app/components/buttons/DarkButton';
 import FurnitureControllerBtn from './FurnitureControllerBtn';
-
-import { useFurnitureStore } from '@/stores/useFurnitureStore';
-import type { FurnitureStoreInfo } from '@/app/types/furniture';
+import FurnitureThumbnailInfo from './FurnitureThumbnailInfo';
+import LockedScaleSlider from './LockedScaleSlider';
+import ScaleLockToggle from './ScaleLockToggle';
+import UnlockedScaleInputs from './UnlockedScaleInputs';
 
 const VALID_ANGLES = [45, 135, 225, 315];
 const TOP_VIEW_ANGLES = [0, 90, 180, 270];

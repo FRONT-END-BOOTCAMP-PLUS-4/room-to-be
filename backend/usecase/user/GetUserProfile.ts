@@ -1,5 +1,5 @@
-import { GetUserProfileDto } from '@/backend/dto/GetUserProfileDto';
 import { UserRepository } from '@/backend/domain/repositories/UserRepository';
+import { GetUserProfileDto } from '@/backend/dto/GetUserProfileDto';
 
 export class GetUserProfile {
   constructor(private userRepository: UserRepository) {}

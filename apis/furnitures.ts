@@ -29,11 +29,11 @@ export async function uploadFurniture({
   }
 
   const data = await res.json();
-  return data; 
+  return data;
 }
 
 export async function fetchFurnitureByPlacementType(
-  placementType: 'wall' | 'floor'
+  placementType: 'wall' | 'floor',
 ) {
   const res = await fetch(`/api/furniture?placementType=${placementType}`, {
     method: 'GET',
@@ -46,7 +46,5 @@ export async function fetchFurnitureByPlacementType(
   }
 
   const data = await res.json();
-  return data; 
+  return data;
 }
-
-

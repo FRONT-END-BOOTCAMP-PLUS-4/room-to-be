@@ -1,6 +1,7 @@
 'use client';
 
 import { Slider } from '@/components/ui/slider';
+
 import FurnitureSizeInput from './FurnitureSizeInput';
 
 const scaleInputs = [
@@ -38,42 +39,44 @@ export default function UnlockedScaleInputs({
 }: UnlockedScaleInputsProps) {
   return (
     <>
-      {scaleInputs.map(({ label, key, scaleKey, originalBaseKey, originalScaleKey }) => {
-        const baseValue = furniture[key];
-        const originalBaseValue = furniture[originalBaseKey];
-        const originalScaleValue = furniture[originalScaleKey];
+      {scaleInputs.map(
+        ({ label, key, scaleKey, originalBaseKey, originalScaleKey }) => {
+          const baseValue = furniture[key];
+          const originalBaseValue = furniture[originalBaseKey];
+          const originalScaleValue = furniture[originalScaleKey];
 
-        const isModified = baseValue !== originalBaseValue;
-        const displayValue = isModified ? baseValue : originalBaseValue;
+          const isModified = baseValue !== originalBaseValue;
+          const displayValue = isModified ? baseValue : originalBaseValue;
 
-        const handleChange = (val: number) => {
-          const newBase = Math.round(val);
-          const newScale = (val / originalBaseValue) * originalScaleValue;
+          const handleChange = (val: number) => {
+            const newBase = Math.round(val);
+            const newScale = (val / originalBaseValue) * originalScaleValue;
 
-          onChange({
-            [key]: newBase,
-            [scaleKey]: newScale,
-          });
-        };
+            onChange({
+              [key]: newBase,
+              [scaleKey]: newScale,
+            });
+          };
 
-        return (
-          <div key={key} className='w-full'>
-            <FurnitureSizeInput
-              label={label}
-              value={Math.round(displayValue)}
-              onChange={handleChange}
-            />
-            <Slider
-              value={[Math.round(displayValue)]}
-              min={10}
-              max={3000}
-              step={1}
-              onValueChange={([val]) => handleChange(val)}
-              className='mt-2 mb-2'
-            />
-          </div>
-        );
-      })}
+          return (
+            <div key={key} className='w-full'>
+              <FurnitureSizeInput
+                label={label}
+                value={Math.round(displayValue)}
+                onChange={handleChange}
+              />
+              <Slider
+                value={[Math.round(displayValue)]}
+                min={10}
+                max={3000}
+                step={1}
+                onValueChange={([val]) => handleChange(val)}
+                className='mt-2 mb-2'
+              />
+            </div>
+          );
+        },
+      )}
     </>
   );
 }

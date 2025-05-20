@@ -21,7 +21,7 @@ export default function useSyncRotationFromStore({
 
       if (Math.abs(currentY - newY) > 0.001) {
         meshRef.current.rotation.y = newY;
-        set(newY); 
+        set(newY);
       }
     }
   }, [isSelected, selected, meshRef, set]);

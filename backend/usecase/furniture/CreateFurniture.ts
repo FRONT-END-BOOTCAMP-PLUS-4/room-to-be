@@ -1,6 +1,6 @@
 // backend/usecases/furniture/createFurniture.ts
-import { FurnitureRepository } from '@/backend/domain/repositories/FurnitureRepository';
 import { Furniture } from '@/backend/domain/entities/Furniture';
+import { FurnitureRepository } from '@/backend/domain/repositories/FurnitureRepository';
 import {
   uploadFurnitureModel,
   uploadFurnitureThumbnail,
@@ -16,7 +16,7 @@ interface CreateFurnitureParams {
 
 export async function createFurniture(
   repo: FurnitureRepository,
-  params: CreateFurnitureParams
+  params: CreateFurnitureParams,
 ): Promise<Furniture> {
   const id = crypto.randomUUID();
 

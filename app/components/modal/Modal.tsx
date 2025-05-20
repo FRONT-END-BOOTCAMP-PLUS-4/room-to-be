@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
+
 import IconButton from '../buttons/IconButton';
 
 interface ModalProps {
@@ -19,25 +20,29 @@ export default function Modal({
   showBackIconOnly = false,
   children,
 }: ModalProps) {
-  
   const router = useRouter();
   const onClose = () => {
     router.push('/');
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-2xl">
+    <div className='fixed inset-0 z-50 flex items-center justify-center backdrop-blur-2xl'>
       <div
-        className="bg-white/30 backdrop-blur-lg rounded-[30px] py-[30px] px-[36px] flex flex-col"
+        className='bg-white/30 backdrop-blur-lg rounded-[30px] py-[30px] px-[36px] flex flex-col'
         style={{ width, height }}
       >
-        <div className="flex items-center justify-between w-full">
-          <div className="flex items-center">
+        <div className='flex items-center justify-between w-full'>
+          <div className='flex items-center'>
             {onBack && (
               <>
-                <IconButton imageSrc='/assets/icons/left.svg' width={23} height={36} onClick={onBack} />
+                <IconButton
+                  imageSrc='/assets/icons/left.svg'
+                  width={23}
+                  height={36}
+                  onClick={onBack}
+                />
                 {!showBackIconOnly && (
-                  <span className="ml-[26px] text-white text-[30px] font-semibold">
+                  <span className='ml-[26px] text-white text-[30px] font-semibold'>
                     Template
                   </span>
                 )}
@@ -45,10 +50,15 @@ export default function Modal({
             )}
           </div>
 
-          <IconButton imageSrc='/assets/icons/cross.svg' width={28} height={28} onClick={onClose} />
+          <IconButton
+            imageSrc='/assets/icons/cross.svg'
+            width={28}
+            height={28}
+            onClick={onClose}
+          />
         </div>
 
-        <div className="mt-4 flex flex-1 items-center justify-center">
+        <div className='mt-4 flex flex-1 items-center justify-center'>
           {children}
         </div>
       </div>

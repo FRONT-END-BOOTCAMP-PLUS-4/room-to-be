@@ -1,5 +1,5 @@
-import { FurnitureRepository } from '@/backend/domain/repositories/FurnitureRepository';
 import { Furniture } from '@/backend/domain/entities/Furniture';
+import { FurnitureRepository } from '@/backend/domain/repositories/FurnitureRepository';
 
 export class GetFurnitureByPlacementType {
   constructor(private repo: FurnitureRepository) {}

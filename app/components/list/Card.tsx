@@ -1,4 +1,4 @@
-import React, { ElementType, ReactNode, forwardRef } from 'react';
+import React, { ElementType, forwardRef, ReactNode } from 'react';
 
 interface ListItemProps {
   as?: ElementType;
@@ -6,7 +6,6 @@ interface ListItemProps {
   children: ReactNode;
   [key: string]: any;
 }
-
 
 const Card = forwardRef<HTMLElement, ListItemProps>(
   ({ as: Component = 'li', className = '', children, ...props }, ref) => {
@@ -19,7 +18,7 @@ const Card = forwardRef<HTMLElement, ListItemProps>(
         {children}
       </Component>
     );
-  }
+  },
 );
 
 // 디버깅용 이름 설정

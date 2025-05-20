@@ -1,22 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 import { PrismaFurnitureRepository } from '@/backend/infra/db/models/PrismaFurnitureRepository';
-import { GetFurnitureByPlacementType } from '@/backend/usecase/furniture/GetFurnitureByPlacementType';
-import { createFurniture } from '@/backend/usecase/furniture/CreateFurniture';
 import { FurnitureDto } from '@/backend/dto/FurnitureDto';
+import { createFurniture } from '@/backend/usecase/furniture/CreateFurniture';
+import { GetFurnitureByPlacementType } from '@/backend/usecase/furniture/GetFurnitureByPlacementType';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const placementType = searchParams.get('placementType') as 'wall' | 'floor';
 
   if (!placementType || !['wall', 'floor'].includes(placementType)) {
-    return NextResponse.json({ error: 'Invalid placementType' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Invalid placementType' },
+      { status: 400 },
+    );
   }
 
   const repo = new PrismaFurnitureRepository();
   const usecase = new GetFurnitureByPlacementType(repo);
   const furnitureList = await usecase.execute(placementType);
 
-  const dtoList: FurnitureDto[] = furnitureList.map(f => ({
+  const dtoList: FurnitureDto[] = furnitureList.map((f) => ({
     id: f.id,
     name: f.name,
     category: f.category,
@@ -45,7 +49,10 @@ export async function POST(req: NextRequest) {
       !modelFile ||
       !thumbnailFile
     ) {
-      return NextResponse.json({ error: 'Invalid input data' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid input data' },
+        { status: 400 },
+      );
     }
 
     const repo = new PrismaFurnitureRepository();
@@ -69,6 +76,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(dto, { status: 201 });
   } catch (error) {
     console.error('가구 생성 실패:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 },
+    );
   }
 }

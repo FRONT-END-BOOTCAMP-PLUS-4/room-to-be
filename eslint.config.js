@@ -1,3 +1,9 @@
+import tseslint from '@typescript-eslint/eslint-plugin';
+import tsParser from '@typescript-eslint/parser';
+import react from 'eslint-plugin-react';
+import simpleImportSort from 'eslint-plugin-simple-import-sort';
+import * as globals from 'globals';
+
 export default [
   {
     ignores: ['dist', 'node_modules'],
@@ -5,11 +11,10 @@ export default [
   {
     files: ['**/*.{ts,tsx,js,jsx}'],
     languageOptions: {
-      parser: tseslint.parser,
+      parser: tsParser,
       parserOptions: {
-        sourceType: 'module',
         ecmaVersion: 'latest',
-        project: false,
+        sourceType: 'module',
       },
       globals: {
         ...globals.browser,
@@ -17,29 +22,26 @@ export default [
       },
     },
     plugins: {
-      '@typescript-eslint': tseslint.plugin,
+      '@typescript-eslint': tseslint,
       'simple-import-sort': simpleImportSort,
-      react: react,
+      react,
     },
     rules: {
-      ...js.configs.recommended.rules,
-      ...tseslint.configs.recommended.rules,
-      ...react.configs.recommended.rules,
-
-      'react/react-in-jsx-scope': 'off',
-      'no-unused-vars': [
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-unused-vars': [
         'warn',
-        {
-          varsIgnorePattern: '^_',
-          argsIgnorePattern: '^_',
-        },
+        { argsIgnorePattern: '^_' },
       ],
+
+      ...react.configs.recommended.rules,
+      'react/react-in-jsx-scope': 'off',
       'react/no-unknown-property': [
         'error',
         {
           ignore: ['position', 'args', 'rotation', 'scale', 'map'],
         },
       ],
+
       'simple-import-sort/imports': [
         'error',
         {
@@ -57,8 +59,7 @@ export default [
             ['^@/utils'],
             ['^@/assets'],
             ['^@/'],
-            ['^\\.\\.(?!/?$)', '^\\.\\./?$'],
-            ['^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
+            ['^\\.\\.(?!/?$)', '^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
             ['^.+\\.?(types|interfaces)$'],
           ],
         },

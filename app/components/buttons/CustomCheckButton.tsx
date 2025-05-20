@@ -1,7 +1,8 @@
 'use client';
 
-import { Checkbox } from '@/components/ui/checkbox';
 import clsx from 'clsx';
+
+import { Checkbox } from '@/components/ui/checkbox';
 
 type CustomCheckButtonProps = {
   id?: string;
