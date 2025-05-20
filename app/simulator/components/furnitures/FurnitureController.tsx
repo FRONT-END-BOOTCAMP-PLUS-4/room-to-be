@@ -39,7 +39,7 @@ function convertFormTopTo3D(angleTop: number): number {
 }
 
 export default function FurnitureController() {
-  const { furnitures, selectedFurnitureId, updateFurniture } =
+  const { furnitures, selectedFurnitureId, updateFurniture, removeFurniture } =
     useFurnitureStore();
   const [isScaleLocked, setIsScaleLocked] = useState(false);
 
@@ -158,7 +158,7 @@ export default function FurnitureController() {
             </div>
             <FurnitureControllerBtn text='이전 상태로 되돌리기' />
             <div className='w-full flex gap-[10px]'>
-              <FurnitureControllerBtn text='삭제' />
+              <FurnitureControllerBtn text='삭제' onClick={()=>removeFurniture(selectedFurnitureId!)}/>
               <FurnitureControllerBtn text='초기화' onClick={resetFurniture} disabled={!isResettable} />
             </div>
           </div>
