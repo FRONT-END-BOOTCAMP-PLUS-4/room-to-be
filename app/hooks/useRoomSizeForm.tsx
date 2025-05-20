@@ -42,6 +42,15 @@ export default function useRoomSizeForm() {
   });
 
   useEffect(() => {
+    // 모드 전환 시 모든 에러 초기화
+    setError('');
+    setFieldErrors({
+      pyeong: '',
+      width: '',
+      height: '',
+      wallHeight: '',
+    });
+
     if (mode === 'pyeong') {
       // 평수 모드로 전환
       const area = localWidth * localHeight;
