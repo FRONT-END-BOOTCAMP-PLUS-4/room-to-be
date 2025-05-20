@@ -41,7 +41,7 @@ export default function FurnitureControllerBtn({
         w-full py-[7px] h-7 flex justify-center items-center rounded-md select-none
         cursor-pointer transition-colors duration-300 ease-in-out
         ${disabled
-          ? 'bg-white/10 text-white/50 cursor-not-allowed' 
+          ? 'bg-white/10 text-white/50 cursor-default' 
           : 'bg-white/30 hover:bg-white/40 text-white'
         }
       `}
