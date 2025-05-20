@@ -25,6 +25,7 @@ export default function RoomSizeModal({ onBack }: RoomSizeModalProps) {
     handleDimensionChange,
     handleWallHeightChange,
     handleSubmit,
+    handleFieldFocus,
   } = useRoomSizeForm();
 
   const handleGoToInterior = () => {
@@ -71,6 +72,7 @@ export default function RoomSizeModal({ onBack }: RoomSizeModalProps) {
             placeholder='00'
             value={localPyeong}
             onChange={handlePyeongChange}
+            onFocus={() => handleFieldFocus('pyeong')}
           />
         ) : (
           <div className='flex flex-col gap-[10px]'>
@@ -80,6 +82,7 @@ export default function RoomSizeModal({ onBack }: RoomSizeModalProps) {
               placeholder='00'
               value={localWidth}
               onChange={(value) => handleDimensionChange('width', value)}
+              onFocus={() => handleFieldFocus('width')}
             />
             <LabeledNumberInput
               leftLabel='세로'
@@ -87,6 +90,7 @@ export default function RoomSizeModal({ onBack }: RoomSizeModalProps) {
               placeholder='00'
               value={localHeight}
               onChange={(value) => handleDimensionChange('height', value)}
+              onFocus={() => handleFieldFocus('height')}
             />
             <LabeledNumberInput
               leftLabel='높이'
@@ -94,11 +98,11 @@ export default function RoomSizeModal({ onBack }: RoomSizeModalProps) {
               placeholder='00'
               value={localWallHeight}
               onChange={handleWallHeightChange}
+              onFocus={() => handleFieldFocus('wallHeight')}
             />
           </div>
         )}
 
-        {/* 에러 메시지 표시 영역 */}
         {error && <div className='mt-2 text-red-400 text-sm'>{error}</div>}
 
         <BoxTextButton
