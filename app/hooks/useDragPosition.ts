@@ -7,6 +7,7 @@ interface DragOptions {
   halfWidth?: number;
   halfDepth?: number; 
   halfHeight?: number;
+  onDragEnd?: (position: { x: number; y: number; z: number }) => void;
 }
 
 // 마우스 이벤트에 따라 가구 position 변경하는 훅
@@ -26,7 +27,7 @@ export default function useDragPosition(
 
   const [isDragging, setInternalDragging] = useState(false);
 
-  const { halfWidth = 0, halfDepth = 0 , halfHeight = 0 } = options || {};
+  const { halfWidth = 0, halfDepth = 0 , halfHeight = 0, onDragEnd } = options || {};
 
   const getPlaneIntersection = useCallback(
     (event: PointerEvent | MouseEvent) => {
@@ -102,8 +103,13 @@ export default function useDragPosition(
     if (isDragging) {
       setInternalDragging(false);
       setDragging?.(false);
+
+      if (meshRef.current && options?.onDragEnd) {
+      const { x, y, z } = meshRef.current.position;
+      options.onDragEnd({ x, y, z });
     }
-  }, [isDragging, setDragging]);
+    }
+  }, [isDragging, setDragging, options, meshRef]);
 
   useEffect(() => {
     // 마우스를 캔버스 밖에서 조작했을 경우 대비

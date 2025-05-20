@@ -14,6 +14,7 @@ import useDragPosition from '@/app/hooks/useDragPosition';
 import type { FurnitureModelProps } from '@/app/types/furniture';
 import useLampLight from '@/app/hooks/useLampLight';
 import useLampEmissiveMaterial from '@/app/hooks/useLampEmissiveMaterial';
+import useSyncPositionFromStore from '@/app/hooks/useSyncPositionFromStore';
 
 export default function FurnitureModel({
   id,
@@ -40,6 +41,9 @@ export default function FurnitureModel({
   const selectedFurniture =
     furnitures.find((f) => f.id === selectedFurnitureId) || null;
 
+  const [currentPosition, setCurrentPosition] = useState<
+    [number, number, number]
+  >([positionX, positionY, positionZ]);
   const [currentScale, setCurrentScale] = useState<[number, number, number]>([
     scaleX,
     scaleY,
@@ -51,7 +55,15 @@ export default function FurnitureModel({
   // 선택 가구 하이라이트 처리
   useHighlightMaterial({ scene: clonedScene, isSelected });
 
-  // 외부 스토어 스케일 동기화
+  // 스토어 포지션 동기화
+  useSyncPositionFromStore({
+    isSelected,
+    selected: selectedFurniture,
+    current: currentPosition,
+    set: setCurrentPosition,
+  });
+
+  // 스토어 스케일 동기화
   useSyncScaleFromStore({
     isSelected,
     selected: selectedFurniture,
@@ -84,7 +96,19 @@ export default function FurnitureModel({
     roomBoundary,
     placementType,
     setIsDragging,
-    { halfWidth, halfDepth, halfHeight },
+    {
+      halfWidth,
+      halfDepth,
+      halfHeight,
+      onDragEnd: (pos) => {
+        setCurrentPosition([pos.x, pos.y, pos.z]);
+        updateFurniture(id, {
+          positionX: pos.x,
+          positionY: pos.y,
+          positionZ: pos.z,
+        });
+      },
+    },
   );
 
   // 드래그 커서 관리
@@ -107,8 +131,7 @@ export default function FurnitureModel({
     document.body.style.cursor = 'grabbing';
     selectFurniture(id);
 
-    const pos = meshRef.current?.position;
-    if (pos && baseSizeWithScale) {
+    if (baseSizeWithScale) {
       const curScaleX = currentScale[0];
       const curScaleY = currentScale[1];
       const curScaleZ = currentScale[2];
@@ -118,9 +141,9 @@ export default function FurnitureModel({
       const baseZ = Math.round(baseSizeWithScale[2] * (curScaleZ / scaleZ));
 
       updateFurniture(id, {
-        positionX: pos.x,
-        positionY: pos.y,
-        positionZ: pos.z,
+        positionX: currentPosition[0],
+        positionY: currentPosition[1],
+        positionZ: currentPosition[2],
         rotationY: currentRotationY,
         scaleX: curScaleX,
         scaleY: curScaleY,
@@ -147,7 +170,7 @@ export default function FurnitureModel({
       ref={meshRef}
       object={clonedScene}
       scale={currentScale}
-      position={[positionX, positionY, positionZ]}
+      position={currentPosition}
       onPointerOver={handlePointerOver}
       onPointerOut={handlePointerOut}
       onPointerDown={(e: any) => {

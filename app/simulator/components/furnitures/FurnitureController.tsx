@@ -16,6 +16,7 @@ import FurnitureControllerBtn from './FurnitureControllerBtn';
 
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
 import type { FurnitureStoreInfo } from '@/app/types/furniture';
+import { useResettableFurniture } from '@/app/hooks/useResettableFurniture';
 
 const VALID_ANGLES = [45, 135, 225, 315];
 const TOP_VIEW_ANGLES = [0, 90, 180, 270];
@@ -59,6 +60,8 @@ export default function FurnitureController() {
       updateFurniture(selectedFurniture.id, updated);
     }
   };
+
+  const { isResettable, resetFurniture } = useResettableFurniture(selectedFurniture, updateSelectedFurniture);
 
   // 방 회전
   const handleRoomRotate = () => {
@@ -156,7 +159,7 @@ export default function FurnitureController() {
             <FurnitureControllerBtn text='이전 상태로 되돌리기' />
             <div className='w-full flex gap-[10px]'>
               <FurnitureControllerBtn text='삭제' />
-              <FurnitureControllerBtn text='초기화' />
+              <FurnitureControllerBtn text='초기화' onClick={resetFurniture} disabled={!isResettable} />
             </div>
           </div>
         </>
