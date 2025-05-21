@@ -1,10 +1,12 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import Modal from './Modal';
+
+import useRoomSizeForm from '@/app/hooks/useRoomSizeForm';
+
 import BoxTextButton from '../buttons/BoxTextButton';
 import LabeledNumberInput from './LabeledNumberInput';
-import useRoomSizeForm from '@/app/hooks/useRoomSizeForm';
+import Modal from './Modal';
 
 interface RoomSizeModalProps {
   onBack: () => void;

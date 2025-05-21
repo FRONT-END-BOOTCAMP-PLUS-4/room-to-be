@@ -8,8 +8,4 @@ export class Room {
     public userId: string,
     public createdAt: Date,
   ) {}
-
-  get area(): number {
-    return this.width * this.height;
-  }
 }

@@ -1,10 +1,11 @@
-import {
-  MIN_PYEONG,
-  MAX_PYEONG,
-  MIN_WALL_HEIGHT,
-  MAX_WALL_HEIGHT,
-} from './roomSizeConstants';
 import { squareMeterToPyeong } from '@/stores/useRoomSizeStore';
+
+import {
+  MAX_PYEONG,
+  MAX_WALL_HEIGHT,
+  MIN_PYEONG,
+  MIN_WALL_HEIGHT,
+} from './roomSizeConstants';
 
 // 평수 유효성 검사
 export const validatePyeong = (value: number | null): string => {

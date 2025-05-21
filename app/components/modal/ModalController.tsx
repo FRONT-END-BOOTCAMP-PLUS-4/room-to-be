@@ -3,8 +3,8 @@
 import { useState } from 'react';
 
 import InteriorStartModal from './InteriorStartModal';
-import TemplateSelectModal from './TemplateSelectModal';
 import RoomSizeModal from './RoomSizeModal';
+import TemplateSelectModal from './TemplateSelectModal';
 
 type ModalType = 'start' | 'template' | 'roomSize';
 

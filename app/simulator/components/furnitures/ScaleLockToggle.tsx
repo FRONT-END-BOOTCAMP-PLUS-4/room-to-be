@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { CustomCheckButton } from '@/app/components/buttons/CustomCheckButton';
 
@@ -7,7 +7,10 @@ interface ScaleLockToggleProps {
   onChange: (val: boolean) => void;
 }
 
-export default function ScaleLockToggle({ checked, onChange }: ScaleLockToggleProps) {
+export default function ScaleLockToggle({
+  checked,
+  onChange,
+}: ScaleLockToggleProps) {
   return (
     <div className='w-[159px] h-[28px] px-[10px] rounded-[8px] bg-white/30 flex items-center justify-between'>
       <CustomCheckButton

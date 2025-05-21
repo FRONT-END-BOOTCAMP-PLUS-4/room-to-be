@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import ProfileButton from '@/app/components/buttons/ProfileButton';
+
 import BoxTextButton from '@/app/components/buttons/BoxTextButton';
+import ProfileButton from '@/app/components/buttons/ProfileButton';
+
 import { getUserProfile } from '@/apis/users';
 
 const DEFAULT_PROFILE_IMAGE = '/assets/icons/profile-rogo.svg';

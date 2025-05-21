@@ -14,7 +14,6 @@ export default function useHighlightMaterial({
   useEffect(() => {
     // 씬의 모든 자식 객체 순회
     scene.traverse((child: any) => {
-
       // 메시가 아니면 무시
       if (!child.isMesh) return;
 
@@ -43,7 +42,8 @@ export default function useHighlightMaterial({
         // 원래 색 저장
         if ('emissive' in child.material) {
           child.userData._originalEmissive = child.material.emissive.clone();
-          child.userData._originalIntensity = child.material.emissiveIntensity ?? 0;
+          child.userData._originalIntensity =
+            child.material.emissiveIntensity ?? 0;
         }
       }
 

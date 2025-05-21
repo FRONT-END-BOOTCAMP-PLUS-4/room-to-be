@@ -1,8 +1,8 @@
 // app/simulator/components/room/Lighting.tsx
 'use client';
 
-import { useLightingStore } from '@/stores/useLightingStore';
 import { useBackgroundStore } from '@/stores/useBackgroundStore';
+import { useLightingStore } from '@/stores/useLightingStore';
 
 export default function Lighting() {
   const isDay = useLightingStore((s) => s.isDay);

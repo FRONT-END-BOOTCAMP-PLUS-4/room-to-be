@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 import { PrismaRoomRepository } from '@/backend/infra/db/models/PrismaRoomRepository';
 import { DeleteRoomUseCase } from '@/backend/usecase/room/DeleteRoom';
 

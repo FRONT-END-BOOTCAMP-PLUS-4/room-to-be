@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 import { PrismaUserRepository } from '@/backend/infra/db/models/PrismaUserRepository';
 import { GetUserProfile } from '@/backend/usecase/user/GetUserProfile';
 
