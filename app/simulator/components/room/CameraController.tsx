@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useThree } from '@react-three/fiber';
+import { PerspectiveCamera } from 'three';
 
 import { useViewStore } from '@/stores/useViewStore';
 
@@ -22,8 +23,20 @@ export default function CameraController({
     const centerX = width / 2;
     const centerZ = height / 2;
 
+    const baseRoomSize = 4.07;
+
+    // 방 크기에 따른 비율 계산
+    const scaleFactor = Math.max(width, height) / baseRoomSize;
+
+    // 방 크기에 따라 카메라 거리 동적 계산
+    const roomDiagonal = Math.sqrt(width * width + height * height);
+
+    // 방 크기가 커져도 보이는 크기가 비슷하게 유지되도록 조정
+    const cameraDistance = isTopView ? roomDiagonal * 0.8 : roomDiagonal * 1.2;
+
     if (isTopView) {
-      camera.position.y = 12;
+      const topViewHeight = Math.max(width, height) * 2;
+      camera.position.y = topViewHeight;
 
       const rad = (angle * Math.PI) / 180;
       const r = 0.001;
@@ -33,19 +46,25 @@ export default function CameraController({
       camera.position.x = x;
       camera.position.z = z;
     } else {
-      const r = 7;
       const rad = (angle * Math.PI) / 180;
+      const r = cameraDistance;
       const x = centerX + r * Math.sin(rad);
       const z = centerZ + r * Math.cos(rad);
 
       camera.position.x = x;
-      camera.position.y = 5;
+      camera.position.y = cameraDistance * 0.7;
       camera.position.z = z;
     }
 
-    camera.lookAt(centerX, 0.5, centerZ); // ✅ 항상 방의 중심 바라봄
+    // FOV 조정 (방이 커질수록 FOV는 좁아짐 - 망원경 효과)
+    if (camera instanceof PerspectiveCamera) {
+      // 기본 FOV는 50도, 방 크기에 따라 조정
+      camera.fov = Math.max(50 / Math.pow(scaleFactor, 0.6), 25);
+    }
+
+    camera.lookAt(centerX, 0.5, centerZ);
     camera.updateProjectionMatrix();
-  }, [angle, isTopView, width, height]);
+  }, [angle, isTopView, width, height, camera]);
 
   return null;
 }

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+
 import OnlyTextButton from './components/buttons/OnlyTextButton';
 
 export default function NotFound() {

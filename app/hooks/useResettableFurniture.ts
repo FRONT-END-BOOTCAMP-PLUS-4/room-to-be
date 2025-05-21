@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+
 import { FurnitureStoreInfo } from '../types/furniture';
 interface UseResettableFurnitureReturn {
   isResettable: boolean;
