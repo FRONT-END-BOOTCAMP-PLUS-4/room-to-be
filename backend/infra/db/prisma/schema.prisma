@@ -37,8 +37,10 @@ model Furniture {
   model_url      String
   thumbnail_url  String
   created_at     DateTime @default(now())
-  placement_type String  
-
+  placement_type String
+  scale_x        Float    @default(1.0)
+  scale_y        Float    @default(1.0)
+  scale_z        Float    @default(1.0)  
   placedFurnitures PlacedFurniture[]
 }
 

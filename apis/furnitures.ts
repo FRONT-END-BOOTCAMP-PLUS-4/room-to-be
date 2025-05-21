@@ -5,12 +5,18 @@ export async function uploadFurniture({
   placementType,
   modelFile,
   thumbnailFile,
+  scaleX,
+  scaleY,
+  scaleZ,
 }: {
   name: string;
   category: string;
   placementType: 'wall' | 'floor';
   modelFile: File;
   thumbnailFile: File;
+  scaleX: number;
+  scaleY: number;
+  scaleZ: number;
 }) {
   const formData = new FormData();
   formData.append('name', name);
@@ -18,7 +24,9 @@ export async function uploadFurniture({
   formData.append('placementType', placementType);
   formData.append('model', modelFile);
   formData.append('thumbnail', thumbnailFile);
-
+  formData.append('scaleX', scaleX.toString());
+  formData.append('scaleY', scaleY.toString());
+  formData.append('scaleZ', scaleZ.toString());
   const res = await fetch('/api/furnitures', {
     method: 'POST',
     body: formData,

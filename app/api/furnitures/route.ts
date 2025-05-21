@@ -27,6 +27,9 @@ export async function GET(req: NextRequest) {
     modelUrl: f.modelUrl,
     thumbnailUrl: f.thumbnailUrl,
     placementType: f.placementType,
+    scaleX: f.scaleX,
+    scaleY: f.scaleY,
+    scaleZ: f.scaleZ,
   }));
 
   return NextResponse.json(dtoList);
@@ -41,13 +44,19 @@ export async function POST(req: NextRequest) {
     const placementType = formData.get('placementType');
     const modelFile = formData.get('model') as File | null;
     const thumbnailFile = formData.get('thumbnail') as File | null;
-
+    const scaleX = formData.get('scaleX');
+    const scaleY = formData.get('scaleY');
+    const scaleZ = formData.get('scaleZ');
+    if (!modelFile || !thumbnailFile) {
+      return NextResponse.json(
+        { error: '파일 문제 발생 ex)파일명 한글인지 확인해봐' },
+        { status: 400 },
+      );
+    }
     if (
       typeof name !== 'string' ||
       typeof category !== 'string' ||
-      (placementType !== 'wall' && placementType !== 'floor') ||
-      !modelFile ||
-      !thumbnailFile
+      (placementType !== 'wall' && placementType !== 'floor')
     ) {
       return NextResponse.json(
         { error: 'Invalid input data' },
@@ -62,6 +71,9 @@ export async function POST(req: NextRequest) {
       placementType,
       modelBlob: modelFile,
       thumbnailBlob: thumbnailFile,
+      scaleX: scaleX ? parseFloat(scaleX.toString()) : 1,
+      scaleY: scaleY ? parseFloat(scaleY.toString()) : 1,
+      scaleZ: scaleZ ? parseFloat(scaleZ.toString()) : 1,
     });
 
     const dto: FurnitureDto = {
@@ -71,6 +83,9 @@ export async function POST(req: NextRequest) {
       modelUrl: furniture.modelUrl,
       thumbnailUrl: furniture.thumbnailUrl,
       placementType: furniture.placementType,
+      scaleX: furniture.scaleX,
+      scaleY: furniture.scaleY,
+      scaleZ: furniture.scaleZ,
     };
 
     return NextResponse.json(dto, { status: 201 });

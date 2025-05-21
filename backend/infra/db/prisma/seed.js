@@ -12,8 +12,8 @@ async function main() {
     update: {},
     create: {
       id: '2',
-      name: '방없슈',
-      email: 'byul@gmail.com',
+      name: '방업슈',
+      email: 'rlatkdwn3379@gmail.com',
       image: '',
     },
   });
