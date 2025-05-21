@@ -23,7 +23,8 @@ export default function RoomSizeModal({ onBack }: RoomSizeModalProps) {
     error,
     setMode,
     handlePyeongChange,
-    handleDimensionChange,
+    handleWidthChange,
+    handleHeightChange,
     handleWallHeightChange,
     handleSubmit,
     handleFieldFocus,
@@ -82,7 +83,7 @@ export default function RoomSizeModal({ onBack }: RoomSizeModalProps) {
               unitLabel='m'
               placeholder='00'
               value={localWidth}
-              onChange={(value) => handleDimensionChange('width', value)}
+              onChange={handleWidthChange}
               onFocus={() => handleFieldFocus('width')}
             />
             <LabeledNumberInput
@@ -90,7 +91,7 @@ export default function RoomSizeModal({ onBack }: RoomSizeModalProps) {
               unitLabel='m'
               placeholder='00'
               value={localHeight}
-              onChange={(value) => handleDimensionChange('height', value)}
+              onChange={handleHeightChange}
               onFocus={() => handleFieldFocus('height')}
             />
             <LabeledNumberInput

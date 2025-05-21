@@ -1,4 +1,4 @@
-import { useEffect,useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { FieldErrors } from '@/utils/roomSizeConstants';
 import {
@@ -40,9 +40,29 @@ export default function useRoomSizeForm() {
   });
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
 
+  // 가로/세로 값을 동시에 설정하는 함수
+  const setSameWidthHeight = useCallback((value: number | null) => {
+    setLocalWidth(value);
+    setLocalHeight(value);
+  }, []);
+
   useEffect(() => {
     handleModeChange();
   }, [mode]);
+
+  // 세로 값이 변경될 때 가로 값도 변경
+  useEffect(() => {
+    if (mode === 'meter' && localHeight !== null) {
+      setLocalHeight(localHeight);
+    }
+  }, [localHeight, mode]);
+
+  // 가로 값이 변경될 때 세로 값도 변경
+  useEffect(() => {
+    if (mode === 'meter' && localWidth !== null) {
+      setLocalHeight(localWidth);
+    }
+  }, [localWidth, mode]);
 
   const handleModeChange = () => {
     setError('');
@@ -67,7 +87,6 @@ export default function useRoomSizeForm() {
       // 평수 모드에서 미터 모드로 전환
       if (localPyeong && (!localWidth || !localHeight)) {
         const dimensions = pyeongToRoomDimensions(localPyeong);
-        setLocalWidth(dimensions.width);
         setLocalHeight(dimensions.height);
       }
 
@@ -100,33 +119,52 @@ export default function useRoomSizeForm() {
     }
   };
 
-  // 가로, 세로 변경 처리 함수
-  const handleDimensionChange = (
-    type: 'width' | 'height',
-    value: number | null,
-  ) => {
-    if (type === 'width') {
-      setLocalWidth(value);
-    } else {
-      setLocalHeight(value);
-    }
+  // 가로 변경 처리 함수
+  const handleWidthChange = (value: number | null) => {
+    setSameWidthHeight(value);
 
     setFieldErrors((prev) => ({
       ...prev,
-      [type]: '',
+      width: '',
+      height: '',
     }));
+
     setError('');
 
-    // 이미 제출을 시도했었고, 값이 있는 경우에만 검증
+    // 값 검증
     if (attemptedSubmit && value !== null) {
-      const currentWidth = type === 'width' ? value : localWidth;
-      const currentHeight = type === 'height' ? value : localHeight;
-
-      const dimensionError = validateDimension(currentWidth, currentHeight);
+      const dimensionError = validateDimension(value, value);
       if (dimensionError) {
         setFieldErrors((prev) => ({
           ...prev,
-          [type]: dimensionError,
+          width: dimensionError,
+          height: dimensionError,
+        }));
+        setError(dimensionError);
+      }
+    }
+  };
+
+  // 세로 변경 처리 함수
+  const handleHeightChange = (value: number | null) => {
+    setSameWidthHeight(value);
+
+    setFieldErrors((prev) => ({
+      ...prev,
+      width: '',
+      height: '',
+    }));
+
+    setError('');
+
+    // 값 검증
+    if (attemptedSubmit && value !== null) {
+      const dimensionError = validateDimension(value, value);
+      if (dimensionError) {
+        setFieldErrors((prev) => ({
+          ...prev,
+          width: dimensionError,
+          height: dimensionError,
         }));
         setError(dimensionError);
       }
@@ -163,7 +201,7 @@ export default function useRoomSizeForm() {
   };
 
   // 입력 필드 포커스 시 처리
-  const handleFieldFocus = (field: keyof FieldErrors) => {
+  const handleFieldFocus = (_field: keyof FieldErrors) => {
     // 포커스 시 별도 처리 없음 (폼 제출 시에만 검증)
   };
 
@@ -216,7 +254,8 @@ export default function useRoomSizeForm() {
     fieldErrors,
     setMode,
     handlePyeongChange,
-    handleDimensionChange,
+    handleWidthChange,
+    handleHeightChange,
     handleWallHeightChange,
     handleFieldFocus,
     handleSubmit,
