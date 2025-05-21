@@ -9,6 +9,7 @@ interface FurnitureControllerBtnProps {
   width?: number;
   height?: number;
   onClick?: () => void;
+  disabled?: boolean;
 }
 
 export default function FurnitureControllerBtn({
@@ -17,6 +18,7 @@ export default function FurnitureControllerBtn({
   width,
   height,
   onClick,
+  disabled = false, 
 }: FurnitureControllerBtnProps) {
   const [viewMode, setViewMode] = useState(text);
 
@@ -25,6 +27,7 @@ export default function FurnitureControllerBtn({
   }, [text]);
 
   const handleClick = () => {
+    if (disabled) return;  // disabled면 클릭 무시
     if (onClick) {
       onClick();
       return;
@@ -35,14 +38,16 @@ export default function FurnitureControllerBtn({
     <div
       onClick={handleClick}
       className={`
-        w-full bg-white/30 py-[7px] h-7
-        flex justify-center items-center
-        rounded-md cursor-pointer hover:bg-white/40
-        transition-colors duration-300 ease-in-out select-none
+        w-full py-[7px] h-7 flex justify-center items-center rounded-md select-none
+        cursor-pointer transition-colors duration-300 ease-in-out
+        ${disabled
+          ? 'bg-white/10 text-white/50 cursor-default' 
+          : 'bg-white/30 hover:bg-white/40 text-white'
+        }
       `}
     >
       {icon && <Image src={icon} alt='icon' width={width} height={height} />}
-      {viewMode && <span className='text-[12px] text-white'>{viewMode}</span>}
+      {viewMode && <span className='text-[12px]'>{viewMode}</span>}
     </div>
   );
 }
