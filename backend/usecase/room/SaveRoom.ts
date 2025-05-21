@@ -1,8 +1,9 @@
+import { randomUUID } from 'crypto';
+
 import { Room } from '@/backend/domain/entities/Room';
 import { PrismaRoomRepository } from '@/backend/infra/db/models/PrismaRoomRepository';
-import { SaveRoomDto } from '@/backend/dto/SaveRoomDto';
 import { uploadRoomThumbnail } from '@/backend/infra/db/supabase/SupabaseStorageUploader';
-import { randomUUID } from 'crypto';
+import { SaveRoomDto } from '@/backend/dto/SaveRoomDto';
 
 export async function SaveRoom(input: SaveRoomDto): Promise<Room> {
   const roomRepository = new PrismaRoomRepository();

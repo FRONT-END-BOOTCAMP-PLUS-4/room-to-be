@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import SavedRoomCard from '@/app/components/list/SavedRoomCard';
 import { Player } from '@lottiefiles/react-lottie-player';
+
+import SavedRoomCard from '@/app/components/list/SavedRoomCard';
 
 interface Room {
   id: string;
@@ -15,7 +16,7 @@ interface Room {
 }
 
 export default function RoomList({ rooms }: { rooms: Room[] }) {
-  const [roomList, setRoomList] = useState<Room[]>(rooms); // ✅ 상태로 관리
+  const [roomList, setRoomList] = useState<Room[]>(rooms);
 
   if (roomList.length === 0) {
     return (
@@ -49,7 +50,7 @@ export default function RoomList({ rooms }: { rooms: Room[] }) {
           imageUrl={room.thumbnailUrl}
           title={room.name}
           onDelete={() =>
-            setRoomList((prev) => prev.filter((r) => r.id !== room.id)) // ✅ 삭제 후 즉시 반영
+            setRoomList((prev) => prev.filter((r) => r.id !== room.id))
           }
         />
       ))}

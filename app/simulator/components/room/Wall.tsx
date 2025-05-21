@@ -1,5 +1,6 @@
 import { useLoader } from '@react-three/fiber';
 import { TextureLoader } from 'three';
+
 import { useViewStore } from '@/stores/useViewStore';
 
 interface WallProps {

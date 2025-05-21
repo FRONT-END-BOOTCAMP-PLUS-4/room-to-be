@@ -2,19 +2,20 @@
 
 import { useMemo, useRef, useState } from 'react';
 import { useGLTF } from '@react-three/drei';
-import { useFurnitureStore } from '@/stores/useFurnitureStore';
 import * as THREE from 'three';
 
-import useHighlightMaterial from '@/app/hooks/useHighlightMaterial';
-import useSyncScaleFromStore from '@/app/hooks/useSyncScaleFromStore';
-import useGetBaseSize from '@/app/hooks/useGetBaseSize';
 import useCursorOnDrag from '@/app/hooks/useCursorOnDrag';
-import useSyncRotationFromStore from '@/app/hooks/useSyncRotationFromStore';
 import useDragPosition from '@/app/hooks/useDragPosition';
-import type { FurnitureModelProps } from '@/app/types/furniture';
-import useLampLight from '@/app/hooks/useLampLight';
+import useGetBaseSize from '@/app/hooks/useGetBaseSize';
+import useHighlightMaterial from '@/app/hooks/useHighlightMaterial';
 import useLampEmissiveMaterial from '@/app/hooks/useLampEmissiveMaterial';
+import useLampLight from '@/app/hooks/useLampLight';
 import useSyncPositionFromStore from '@/app/hooks/useSyncPositionFromStore';
+import useSyncRotationFromStore from '@/app/hooks/useSyncRotationFromStore';
+import useSyncScaleFromStore from '@/app/hooks/useSyncScaleFromStore';
+import type { FurnitureModelProps } from '@/app/types/furniture';
+
+import { useFurnitureStore } from '@/stores/useFurnitureStore';
 
 export default function FurnitureModel({
   id,
@@ -127,48 +128,48 @@ export default function FurnitureModel({
   };
 
   const handlePointerDown = () => {
-  setIsDragging(true);
-  document.body.style.cursor = 'grabbing';
-  selectFurniture(id);
+    setIsDragging(true);
+    document.body.style.cursor = 'grabbing';
+    selectFurniture(id);
 
-  if (baseSizeWithScale) {
-    const curScaleX = currentScale[0];
-    const curScaleY = currentScale[1];
-    const curScaleZ = currentScale[2];
+    if (baseSizeWithScale) {
+      const curScaleX = currentScale[0];
+      const curScaleY = currentScale[1];
+      const curScaleZ = currentScale[2];
 
-    const baseX = Math.round(baseSizeWithScale[0] * (curScaleX / scaleX));
-    const baseY = Math.round(baseSizeWithScale[1] * (curScaleY / scaleY));
-    const baseZ = Math.round(baseSizeWithScale[2] * (curScaleZ / scaleZ));
+      const baseX = Math.round(baseSizeWithScale[0] * (curScaleX / scaleX));
+      const baseY = Math.round(baseSizeWithScale[1] * (curScaleY / scaleY));
+      const baseZ = Math.round(baseSizeWithScale[2] * (curScaleZ / scaleZ));
 
-    // 기존 가구 정보 가져오기 (원본 값 존재 여부 확인용)
-    const furniture = furnitures.find((f) => f.id === id);
+      // 기존 가구 정보 가져오기 (원본 값 존재 여부 확인용)
+      const furniture = furnitures.find((f) => f.id === id);
 
-    updateFurniture(id, {
-      positionX: currentPosition[0],
-      positionY: currentPosition[1],
-      positionZ: currentPosition[2],
-      rotationY: currentRotationY,
-      scaleX: curScaleX,
-      scaleY: curScaleY,
-      scaleZ: curScaleZ,
-      baseX,
-      baseY,
-      baseZ,
+      updateFurniture(id, {
+        positionX: currentPosition[0],
+        positionY: currentPosition[1],
+        positionZ: currentPosition[2],
+        rotationY: currentRotationY,
+        scaleX: curScaleX,
+        scaleY: curScaleY,
+        scaleZ: curScaleZ,
+        baseX,
+        baseY,
+        baseZ,
 
-      // originalXXX 값은 기존에 없을 때만 설정해서 한번만 저장되도록
-      originalPositionX: furniture?.originalPositionX ?? positionX,
-      originalPositionY: furniture?.originalPositionY ?? positionY,
-      originalPositionZ: furniture?.originalPositionZ ?? positionZ,
-      originalScaleX: furniture?.originalScaleX ?? scaleX,
-      originalScaleY: furniture?.originalScaleY ?? scaleY,
-      originalScaleZ: furniture?.originalScaleZ ?? scaleZ,
-      originalRotationY: furniture?.originalRotationY ?? rotationY,
-      originalBaseX: furniture?.originalBaseX ?? baseSizeWithScale[0],
-      originalBaseY: furniture?.originalBaseY ?? baseSizeWithScale[1],
-      originalBaseZ: furniture?.originalBaseZ ?? baseSizeWithScale[2],
-    });
-  }
-};
+        // originalXXX 값은 기존에 없을 때만 설정해서 한번만 저장되도록
+        originalPositionX: furniture?.originalPositionX ?? positionX,
+        originalPositionY: furniture?.originalPositionY ?? positionY,
+        originalPositionZ: furniture?.originalPositionZ ?? positionZ,
+        originalScaleX: furniture?.originalScaleX ?? scaleX,
+        originalScaleY: furniture?.originalScaleY ?? scaleY,
+        originalScaleZ: furniture?.originalScaleZ ?? scaleZ,
+        originalRotationY: furniture?.originalRotationY ?? rotationY,
+        originalBaseX: furniture?.originalBaseX ?? baseSizeWithScale[0],
+        originalBaseY: furniture?.originalBaseY ?? baseSizeWithScale[1],
+        originalBaseZ: furniture?.originalBaseZ ?? baseSizeWithScale[2],
+      });
+    }
+  };
 
   return (
     <primitive

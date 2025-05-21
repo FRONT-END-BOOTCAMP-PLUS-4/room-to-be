@@ -1,15 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import Modal from './Modal';
+
 import BoxTextButton from '../buttons/BoxTextButton';
 import LabeledNumberInput from './LabeledNumberInput';
+import Modal from './Modal';
 
 interface RoomSizeModalProps {
   onBack: () => void;
 }
 
-export default function RoomSizeModal({onBack}:RoomSizeModalProps) {
+export default function RoomSizeModal({ onBack }: RoomSizeModalProps) {
   const [mode, setMode] = useState<'pyeong' | 'meter'>('pyeong');
 
   return (

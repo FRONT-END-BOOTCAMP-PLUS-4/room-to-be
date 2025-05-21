@@ -1,6 +1,7 @@
-import { prisma } from '../prisma/prismaClient';
-import { UserRepository } from '@/backend/domain/repositories/UserRepository';
 import { User } from '@/backend/domain/entities/User';
+import { UserRepository } from '@/backend/domain/repositories/UserRepository';
+
+import { prisma } from '../prisma/prismaClient';
 
 export class PrismaUserRepository implements UserRepository {
   async findProfileById(

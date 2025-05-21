@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface FurnitureSizeInputProps {
   label: string;
@@ -14,7 +14,9 @@ export default function FurnitureSizeInput({
   onChange,
 }: FurnitureSizeInputProps) {
   const [inputValue, setInputValue] = useState(value);
-  const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(
+    null,
+  );
 
   // 외부 값이 바뀌면 동기화
   useEffect(() => {
@@ -50,7 +52,9 @@ export default function FurnitureSizeInput({
 
   return (
     <div className='flex items-center w-full justify-between'>
-      <label className='text-[12px] mr-2 whitespace-nowrap text-white/70'>{label}</label>
+      <label className='text-[12px] mr-2 whitespace-nowrap text-white/70'>
+        {label}
+      </label>
       <input
         type='number'
         min={10}

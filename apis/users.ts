@@ -1,3 +1,4 @@
+'use client';
 export interface GetUserProfileDto {
   userId: string;
 }

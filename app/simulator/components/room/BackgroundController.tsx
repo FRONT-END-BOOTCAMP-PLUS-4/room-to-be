@@ -1,10 +1,11 @@
 'use client';
 
-import { useThree } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
+import { useThree } from '@react-three/fiber';
 import { Color } from 'three';
-import { useLightingStore } from '@/stores/useLightingStore';
+
 import { useBackgroundStore } from '@/stores/useBackgroundStore';
+import { useLightingStore } from '@/stores/useLightingStore';
 
 export default function BackgroundBackground() {
   const { scene } = useThree();
