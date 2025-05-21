@@ -1,5 +1,6 @@
-import { FurnitureStoreInfo } from '@/app/types/furniture';
 import { create } from 'zustand';
+
+import { FurnitureStoreInfo } from '@/app/types/furniture';
 
 interface FurnitureStore {
   furnitures: FurnitureStoreInfo[];

@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
+import useRoomSizeForm from '@/app/hooks/useRoomSizeForm';
 
 import BoxTextButton from '../buttons/BoxTextButton';
 import LabeledNumberInput from './LabeledNumberInput';
@@ -11,7 +13,27 @@ interface RoomSizeModalProps {
 }
 
 export default function RoomSizeModal({ onBack }: RoomSizeModalProps) {
-  const [mode, setMode] = useState<'pyeong' | 'meter'>('pyeong');
+  const router = useRouter();
+  const {
+    mode,
+    localPyeong,
+    localWidth,
+    localHeight,
+    localWallHeight,
+    error,
+    setMode,
+    handlePyeongChange,
+    handleDimensionChange,
+    handleWallHeightChange,
+    handleSubmit,
+    handleFieldFocus,
+  } = useRoomSizeForm();
+
+  const handleGoToInterior = () => {
+    if (handleSubmit()) {
+      router.push('/simulator');
+    }
+  };
 
   return (
     <Modal width='340px' onBack={onBack} showBackIconOnly>
@@ -46,30 +68,47 @@ export default function RoomSizeModal({ onBack }: RoomSizeModalProps) {
         </div>
 
         {mode === 'pyeong' ? (
-          <LabeledNumberInput unitLabel='평' placeholder='00' />
+          <LabeledNumberInput
+            unitLabel='평'
+            placeholder='00'
+            value={localPyeong}
+            onChange={handlePyeongChange}
+            onFocus={() => handleFieldFocus('pyeong')}
+          />
         ) : (
           <div className='flex flex-col gap-[10px]'>
             <LabeledNumberInput
               leftLabel='가로'
               unitLabel='m'
               placeholder='00'
+              value={localWidth}
+              onChange={(value) => handleDimensionChange('width', value)}
+              onFocus={() => handleFieldFocus('width')}
             />
             <LabeledNumberInput
               leftLabel='세로'
               unitLabel='m'
               placeholder='00'
+              value={localHeight}
+              onChange={(value) => handleDimensionChange('height', value)}
+              onFocus={() => handleFieldFocus('height')}
             />
             <LabeledNumberInput
               leftLabel='높이'
               unitLabel='m'
               placeholder='00'
+              value={localWallHeight}
+              onChange={handleWallHeightChange}
+              onFocus={() => handleFieldFocus('wallHeight')}
             />
           </div>
         )}
 
+        {error && <div className='mt-2 text-red-400 text-sm'>{error}</div>}
+
         <BoxTextButton
           showImg
-          onClick={() => '입력 정보 가지고 인테리어 페이지로 이동 로직 추가'}
+          onClick={handleGoToInterior}
           className='mt-[26px] rounded-lg w-[230px] text-sm py-[10px] h-10'
         >
           3D 인테리어 하러가기

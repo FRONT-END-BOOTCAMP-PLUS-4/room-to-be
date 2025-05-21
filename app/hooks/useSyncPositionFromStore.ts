@@ -1,4 +1,4 @@
-import { useEffect, Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction,useEffect } from 'react';
 
 export interface SyncPositionOptions {
   isSelected: boolean;

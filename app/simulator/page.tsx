@@ -2,9 +2,11 @@
 
 import { Suspense, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
+import { Vector3 } from 'three';
 
 import { fetchFurnitureByPlacementType } from '@/apis/furnitures';
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
+import { useRoomSizeStore } from '@/stores/useRoomSizeStore';
 
 import { Furnitures } from '../types/furniture';
 import FurnitureController from './components/furnitures/FurnitureController';
@@ -17,8 +19,14 @@ import Room from './components/room/Room';
 import FurnitureSidebar from './components/sidebar/FurnitureSidebar';
 
 export default function SimulatorPage() {
-  const roomWidth = 4;
-  const roomHeight = 4;
+  const {
+    width: storeWidth,
+    height: storeHeight,
+    wallHeight: storeWallHeight,
+  } = useRoomSizeStore();
+
+  const roomWidth = storeWidth || 4.07;
+  const roomHeight = storeHeight || 4.07;
   const floorExtension = 0.1;
   const wallExtension = 0.1;
 
@@ -31,7 +39,7 @@ export default function SimulatorPage() {
     zMin: -wallExtension,
     zMax: extendedHeight - wallExtension,
     yMin: 0,
-    yMax: 2.5,
+    yMax: storeWallHeight || 2.5,
   };
 
   // Zustand에서 상태 가져오기
@@ -109,6 +117,14 @@ export default function SimulatorPage() {
 
     setFurnitures(initialFurnitures);
   }, [setFurnitures]);
+
+  // 방 크기에 따라 카메라 위치 조정
+  const cameraDistance = Math.max(roomWidth, roomHeight) * 1.4;
+  const cameraPosition = new Vector3(
+    cameraDistance,
+    cameraDistance,
+    cameraDistance,
+  );
 
   return (
     <div className='relative w-full h-screen overflow-hidden'>
