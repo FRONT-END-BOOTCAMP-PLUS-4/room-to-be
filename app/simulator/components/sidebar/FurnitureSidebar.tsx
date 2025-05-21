@@ -2,17 +2,23 @@
 
 import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
 
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
+import { useFurnitureStore } from '@/stores/useFurnitureStore';
 interface Furniture {
   id: string;
   name: string;
   category: string;
   thumbnailUrl: string;
+  modelUrl: string;
   placementType: 'wall' | 'floor';
+  scaleX: number;
+  scaleY: number;
+  scaleZ: number;
 }
 
 interface Props {
@@ -28,7 +34,7 @@ export default function FurnitureSidebar({
   const [search, setSearch] = useState('');
   const [furniture, setFurniture] = useState<Furniture[]>([]);
   const [isOpen, setIsOpen] = useState(true);
-
+  const addFurniture = useFurnitureStore((state) => state.addFurniture);
   useEffect(() => {
     const fetch = async () => {
       const data = await fetchFurnitureByPlacementType(placementType);
@@ -119,7 +125,25 @@ export default function FurnitureSidebar({
                 {items.slice(0, 3).map((item) => (
                   <div
                     key={item.id}
-                    className='bg-white rounded-md overflow-hidden aspect-square'
+                    className='bg-white rounded-md overflow-hidden aspect-square cursor-pointer'
+                    onClick={() =>
+                      addFurniture({
+                        id: uuidv4(),
+                        furnitureId: item.id,
+                        name: item.name,
+                        category: item.category,
+                        thumbnailUrl: item.thumbnailUrl,
+                        modelUrl: item.modelUrl,
+                        positionX: Math.random() * 2 + 1,
+                        positionY: 0,
+                        positionZ: Math.random() * 2 + 1,
+                        rotationY: 0,
+                        scaleX: item.scaleX,
+                        scaleY: item.scaleY,
+                        scaleZ: item.scaleZ,
+                        placementType: item.placementType,
+                      })
+                    }
                   >
                     <img
                       src={item.thumbnailUrl}
