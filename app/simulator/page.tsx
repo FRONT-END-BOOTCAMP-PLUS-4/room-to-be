@@ -2,7 +2,6 @@
 
 import { Suspense, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Vector3 } from 'three';
 
 import { fetchFurnitureByPlacementType } from '@/apis/furnitures';
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
@@ -120,11 +119,6 @@ export default function SimulatorPage() {
 
   // 방 크기에 따라 카메라 위치 조정
   const cameraDistance = Math.max(roomWidth, roomHeight) * 1.4;
-  const cameraPosition = new Vector3(
-    cameraDistance,
-    cameraDistance,
-    cameraDistance,
-  );
 
   return (
     <div className='relative w-full h-screen overflow-hidden'>
@@ -132,7 +126,10 @@ export default function SimulatorPage() {
       <div className='absolute top-0 left-0 w-full h-full z-0'>
         <Canvas
           shadows
-          camera={{ position: [5, 5, 5], fov: 50 }}
+          camera={{
+            position: [cameraDistance, cameraDistance, cameraDistance],
+            fov: 50,
+          }}
           className='w-full h-full'
           onPointerMissed={() => {
             useFurnitureStore.getState().clearSelection();
