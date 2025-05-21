@@ -16,6 +16,7 @@ import FurnitureControllerBtn from './FurnitureControllerBtn';
 
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
 import type { FurnitureStoreInfo } from '@/app/types/furniture';
+import { useResettableFurniture } from '@/app/hooks/useResettableFurniture';
 
 const VALID_ANGLES = [45, 135, 225, 315];
 const TOP_VIEW_ANGLES = [0, 90, 180, 270];
@@ -38,8 +39,14 @@ function convertFormTopTo3D(angleTop: number): number {
 }
 
 export default function FurnitureController() {
-  const { furnitures, selectedFurnitureId, updateFurniture } =
-    useFurnitureStore();
+  const {
+    furnitures,
+    selectedFurnitureId,
+    updateFurniture,
+    removeFurniture,
+    undoFurniture,
+    prevFurnitureStates,
+  } = useFurnitureStore();
   const [isScaleLocked, setIsScaleLocked] = useState(false);
 
   const angle = useViewStore((s) => s.angle);
@@ -59,6 +66,24 @@ export default function FurnitureController() {
       updateFurniture(selectedFurniture.id, updated);
     }
   };
+
+  // undo 가능한 상태인지 확인 (명확하게 null이 아닌 이전 상태가 존재할 경우만 true)
+  const isUndoAvailable = useMemo(() => {
+    if (!selectedFurnitureId) return false;
+
+    const prev = prevFurnitureStates[selectedFurnitureId];
+    const current = furnitures.find((f) => f.id === selectedFurnitureId);
+
+    if (!prev || !current) return false;
+
+    // 이전 상태와 현재 상태가 다를 때만 undo 가능
+    return JSON.stringify(prev) !== JSON.stringify(current);
+  }, [selectedFurnitureId, furnitures, prevFurnitureStates]);
+
+  const { isResettable, resetFurniture } = useResettableFurniture(
+    selectedFurniture,
+    updateSelectedFurniture,
+  );
 
   // 방 회전
   const handleRoomRotate = () => {
@@ -153,10 +178,25 @@ export default function FurnitureController() {
                 }}
               />
             </div>
-            <FurnitureControllerBtn text='이전 상태로 되돌리기' />
+            <FurnitureControllerBtn
+              text='이전 상태로 되돌리기'
+              onClick={() => {
+                if (selectedFurnitureId) {
+                  undoFurniture(selectedFurnitureId);
+                }
+              }}
+              disabled={!isUndoAvailable}
+            />
             <div className='w-full flex gap-[10px]'>
-              <FurnitureControllerBtn text='삭제' />
-              <FurnitureControllerBtn text='초기화' />
+              <FurnitureControllerBtn
+                text='삭제'
+                onClick={() => removeFurniture(selectedFurnitureId!)}
+              />
+              <FurnitureControllerBtn
+                text='초기화'
+                onClick={resetFurniture}
+                disabled={!isResettable}
+              />
             </div>
           </div>
         </>
