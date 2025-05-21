@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 import useRoomSizeForm from '@/app/hooks/useRoomSizeForm';
@@ -40,6 +41,20 @@ export default function RoomSizeModal({ onBack }: RoomSizeModalProps) {
   const handleBackgroundClick = () => {
     clearErrors();
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        handleGoToInterior();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleGoToInterior]);
 
   return (
     <Modal
