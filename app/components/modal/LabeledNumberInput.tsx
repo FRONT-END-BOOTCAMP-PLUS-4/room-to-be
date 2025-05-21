@@ -53,8 +53,6 @@ export default function LabeledNumberInput({
     }
   };
 
-  const isValueEmpty = inputValue === '' || inputValue === '0';
-
   return (
     <div className='w-[230px] h-[42px] bg-white/30 rounded-[10px] px-[14px] py-[10px] text-white text-[12px] flex justify-between items-center'>
       {leftLabel && (
