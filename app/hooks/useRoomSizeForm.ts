@@ -202,6 +202,16 @@ export default function useRoomSizeForm() {
     // 포커스 시 별도 처리 없음 (폼 제출 시에만 검증)
   };
 
+  const clearErrors = () => {
+    setError('');
+    setFieldErrors({
+      pyeong: '',
+      width: '',
+      height: '',
+      wallHeight: '',
+    });
+  };
+
   const handleSubmit = () => {
     setAttemptedSubmit(true);
 
@@ -256,5 +266,6 @@ export default function useRoomSizeForm() {
     handleWallHeightChange,
     handleFieldFocus,
     handleSubmit,
+    clearErrors,
   };
 }
