@@ -128,9 +128,9 @@ export default function useDragPosition(
       setInternalDragging(false);
       setDragging?.(false);
 
-      if (meshRef.current && options?.onDragEnd) {
+      if (meshRef.current && onDragEnd) {
       const { x, y, z } = meshRef.current.position;
-      options.onDragEnd({ x, y, z });
+      onDragEnd({ x, y, z });
     }
     }
   }, [isDragging, setDragging, options, meshRef]);
