@@ -6,6 +6,7 @@ const config: Config = {
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './test/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     extend: {
@@ -63,6 +64,8 @@ const config: Config = {
         'gradient-x': 'gradient-x 8s ease infinite',
         'gradient-y': 'gradient-y 8s ease infinite',
         'gradient-xy': 'gradient-xy 8s ease infinite',
+        'fade-right': 'fade-right 0.7s cubic-bezier(0.4,0,0.2,1)',
+        'fade-left': 'fade-left 0.7s cubic-bezier(0.4,0,0.2,1)',
       },
       keyframes: {
         'gradient-x': {
@@ -76,6 +79,14 @@ const config: Config = {
         'gradient-xy': {
           '0%, 100%': { backgroundPosition: '0% 0%' },
           '50%': { backgroundPosition: '100% 100%' },
+        },
+        'fade-right': {
+          '0%': { opacity: '0', transform: 'translateX(40px)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+        'fade-left': {
+          '0%': { opacity: '0', transform: 'translateX(-40px)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
         },
       },
     },
