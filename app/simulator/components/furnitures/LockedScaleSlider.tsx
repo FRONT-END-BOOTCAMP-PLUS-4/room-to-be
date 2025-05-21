@@ -11,8 +11,15 @@ export default function LockedScaleSlider({
   furniture,
   onChange,
 }: LockedScaleSliderProps) {
-  const { originalBaseX, originalBaseY, originalBaseZ, originalScale, baseX } =
-    furniture;
+  const {
+    originalBaseX,
+    originalBaseY,
+    originalBaseZ,
+    originalScaleX,
+    originalScaleY,
+    originalScaleZ,
+    baseX,
+  } = furniture;
 
   const minRatio = Math.max(
     10 / originalBaseX,
@@ -31,13 +38,15 @@ export default function LockedScaleSlider({
   return (
     <>
       <div className='flex'>
-        <label className='text-[12px] text-white/70 pt-[6px] text-left w-full'>스케일</label>
+        <label className='text-[12px] text-white/70 pt-[6px] text-left w-full'>
+          스케일
+        </label>
       </div>
       <Slider
         value={[Math.round(baseX)]}
         min={minBaseX}
         max={maxBaseX}
-        step={1} 
+        step={1}
         className='mb-2'
         onValueChange={([val]) => {
           const scaleRatio = val / originalBaseX;
@@ -55,15 +64,17 @@ export default function LockedScaleSlider({
 
           if (!isValid) return;
 
-          const newScale = scaleRatio * originalScale;
+          const newScaleX = scaleRatio * originalScaleX;
+          const newScaleY = scaleRatio * originalScaleX;
+          const newScaleZ = scaleRatio * originalScaleX;
 
           onChange({
             baseX: newBaseX,
             baseY: newBaseY,
             baseZ: newBaseZ,
-            scaleX: newScale,
-            scaleY: newScale,
-            scaleZ: newScale,
+            scaleX: newScaleX,
+            scaleY: newScaleY,
+            scaleZ: newScaleZ,
           });
         }}
       />

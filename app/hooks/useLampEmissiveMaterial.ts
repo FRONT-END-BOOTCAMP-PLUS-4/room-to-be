@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import * as THREE from 'three';
-import { useLightingStore } from '@/stores/useLightingStore';
+
 import { useBackgroundStore } from '@/stores/useBackgroundStore';
+import { useLightingStore } from '@/stores/useLightingStore';
 
 interface UseLampEmissiveMaterialProps {
   scene: THREE.Object3D;

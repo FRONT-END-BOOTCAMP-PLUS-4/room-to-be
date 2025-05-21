@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { useBackgroundStore, Backgrounds } from '@/stores/useBackgroundStore';
+import { useEffect, useRef, useState } from 'react';
+
+import { Backgrounds, useBackgroundStore } from '@/stores/useBackgroundStore';
 
 export default function BackgroundSelector() {
   const [isExpanded, setIsExpanded] = useState(false);

@@ -1,14 +1,12 @@
-import { useEffect, Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 
 export interface SyncScaleOptions {
   isSelected: boolean;
-  selected:
-    | {
-        scaleX: number;
-        scaleY: number;
-        scaleZ: number;
-      }
-    | null;
+  selected: {
+    scaleX: number;
+    scaleY: number;
+    scaleZ: number;
+  } | null;
   current: [number, number, number];
   set: Dispatch<SetStateAction<[number, number, number]>>;
 }

@@ -1,4 +1,5 @@
 import Image from 'next/image';
+
 import BoxTextButton from '../buttons/BoxTextButton';
 import IconButton from '../buttons/IconButton';
 

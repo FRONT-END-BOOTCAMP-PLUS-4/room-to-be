@@ -1,10 +1,14 @@
-'use client'
+'use client';
 
 interface FurnitureThumbnailInfoProps {
-  name: string; thumbnailUrl: string
-};
+  name: string;
+  thumbnailUrl: string;
+}
 
-export default function FurnitureThumbnailInfo({ name, thumbnailUrl }:FurnitureThumbnailInfoProps ) {
+export default function FurnitureThumbnailInfo({
+  name,
+  thumbnailUrl,
+}: FurnitureThumbnailInfoProps) {
   return (
     <div className='w-full flex flex-col items-center'>
       <div
