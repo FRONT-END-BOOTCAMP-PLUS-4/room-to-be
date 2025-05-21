@@ -88,6 +88,7 @@ export default function useRoomSizeForm() {
       if (localPyeong && (!localWidth || !localHeight)) {
         const dimensions = pyeongToRoomDimensions(localPyeong);
         setLocalHeight(dimensions.height);
+        setLocalWidth(dimensions.width);
       }
 
       if (localWallHeight === null) {
@@ -131,8 +132,8 @@ export default function useRoomSizeForm() {
 
     setError('');
 
-    // 값 검증
-    if (attemptedSubmit && value !== null) {
+    // 이미 제출을 시도했었거나 값이 명백히 유효하지 않은 경우에만 검증
+    if (value !== null && (attemptedSubmit || value <= 0 || value > 10)) {
       const dimensionError = validateDimension(value, value);
       if (dimensionError) {
         setFieldErrors((prev) => ({
@@ -157,8 +158,7 @@ export default function useRoomSizeForm() {
 
     setError('');
 
-    // 값 검증
-    if (attemptedSubmit && value !== null) {
+    if (value !== null && (attemptedSubmit || value <= 0 || value > 10)) {
       const dimensionError = validateDimension(value, value);
       if (dimensionError) {
         setFieldErrors((prev) => ({
@@ -185,10 +185,7 @@ export default function useRoomSizeForm() {
     }));
     setError('');
 
-    if (
-      value !== null &&
-      (attemptedSubmit || value <= 0 || value > 3.0 || value < 2.0)
-    ) {
+    if (value !== null) {
       const wallHeightError = validateWallHeight(value);
       if (wallHeightError) {
         setFieldErrors((prev) => ({
