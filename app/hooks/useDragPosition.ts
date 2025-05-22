@@ -2,7 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useThree } from '@react-three/fiber';
 import { Object3D, Plane, Raycaster, Vector2, Vector3 } from 'three';
 
+import { useFurnitureStore } from '@/stores/useFurnitureStore';
+
 import { RoomBoundary } from '../types/furniture';
+import useFurnitureCollision from './useFurnitureCollision';
 
 interface DragOptions {
   halfWidth?: number;
@@ -28,7 +31,25 @@ export default function useDragPosition(
 
   const [isDragging, setInternalDragging] = useState(false);
 
-  const { halfWidth = 0, halfDepth = 0 , halfHeight = 0, onDragEnd } = options || {};
+  const {
+    halfWidth = 0,
+    halfDepth = 0,
+    halfHeight = 0,
+    onDragEnd,
+  } = options || {};
+
+  const selectedFurnitureId = useFurnitureStore.getState().selectedFurnitureId;
+
+  // 충돌 처리 훅 사용
+  const { handleCollision, checkFinalPosition } = useFurnitureCollision({
+    currentFurnitureId: selectedFurnitureId!,
+    meshRef,
+    placementType,
+    roomBoundary,
+    halfWidth,
+    halfDepth,
+    halfHeight,
+  });
 
   const getPlaneIntersection = useCallback(
     (event: PointerEvent | MouseEvent) => {
@@ -95,6 +116,11 @@ export default function useDragPosition(
             Math.max(roomBoundary.zMin + halfDepth, newPos.z),
           );
           newPos.y = roomBoundary.yMin;
+
+          // 충돌 처리 및 슬라이딩 위치 적용
+          const prevPos = meshRef.current.position.clone();
+          const adjusted = handleCollision(newPos, prevPos);
+          meshRef.current.position.copy(adjusted);
         } else if (placementType === 'wall') {
           // [wall] 벽 위 이동: x와 y만 조정, z는 벽에 고정
           newPos.x = Math.min(
@@ -106,9 +132,9 @@ export default function useDragPosition(
             Math.max(roomBoundary.yMin, newPos.y),
           );
           newPos.z = 0; // 벽면에 고정 (z = 0 벽 기준)
-        }
 
-        meshRef.current.position.copy(newPos);
+          meshRef.current.position.copy(newPos);
+        }
       }
     },
     [
@@ -119,6 +145,8 @@ export default function useDragPosition(
       placementType,
       halfWidth,
       halfDepth,
+      halfHeight,
+      handleCollision,
     ],
   );
 
@@ -128,12 +156,16 @@ export default function useDragPosition(
       setInternalDragging(false);
       setDragging?.(false);
 
-      if (meshRef.current && options?.onDragEnd) {
-      const { x, y, z } = meshRef.current.position;
-      options.onDragEnd({ x, y, z });
+      if (meshRef.current && onDragEnd) {
+        // 마우스 놓을 때 충돌 정리 후 최종 위치 확정
+        const rawPos = meshRef.current.position;
+        const final = checkFinalPosition(rawPos.clone());
+        meshRef.current.position.copy(final);
+
+        onDragEnd({ x: final.x, y: final.y, z: final.z });
+      }
     }
-    }
-  }, [isDragging, setDragging, options, meshRef]);
+  }, [isDragging, setDragging, onDragEnd, meshRef, checkFinalPosition]);
 
   useEffect(() => {
     // 마우스를 캔버스 밖에서 조작했을 경우 대비
