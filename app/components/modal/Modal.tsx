@@ -10,6 +10,7 @@ interface ModalProps {
   height?: string;
   onBack?: () => void;
   showBackIconOnly?: boolean;
+  onBackdropClick?: () => void;
   children: React.ReactNode;
 }
 
@@ -18,6 +19,7 @@ export default function Modal({
   height,
   onBack,
   showBackIconOnly = false,
+  onBackdropClick,
   children,
 }: ModalProps) {
   const router = useRouter();
@@ -25,8 +27,17 @@ export default function Modal({
     router.push('/');
   };
 
+  const handleBackgroundClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget && onBackdropClick) {
+      onBackdropClick();
+    }
+  };
+
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center backdrop-blur-2xl'>
+    <div
+      className='fixed inset-0 z-50 flex items-center justify-center backdrop-blur-2xl'
+      onClick={handleBackgroundClick}
+    >
       <div
         className='bg-white/30 backdrop-blur-lg rounded-[30px] py-[30px] px-[36px] flex flex-col'
         style={{ width, height }}

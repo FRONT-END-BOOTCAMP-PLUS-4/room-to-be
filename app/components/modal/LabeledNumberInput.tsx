@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface LabeledNumberInputProps {
   leftLabel?: string; // 왼쪽 라벨 (선택사항)
@@ -21,20 +21,25 @@ export default function LabeledNumberInput({
   onFocus,
   onBlur,
 }: LabeledNumberInputProps) {
-  const [isFocused, setIsFocused] = useState(false);
   const [inputValue, setInputValue] = useState<string>(
     value !== null && value !== undefined && value !== 0
       ? value.toString()
       : '',
   );
 
+  useEffect(() => {
+    if (value !== null && value !== undefined) {
+      setInputValue(value.toString());
+    } else {
+      setInputValue('');
+    }
+  }, [value]);
+
   const handleFocus = () => {
-    setIsFocused(true);
     onFocus?.();
   };
 
   const handleBlur = () => {
-    setIsFocused(false);
     onBlur?.();
 
     if (inputValue === '') {
