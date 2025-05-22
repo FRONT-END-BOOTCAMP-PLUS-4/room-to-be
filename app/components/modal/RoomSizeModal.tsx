@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 import useRoomSizeForm from '@/app/hooks/useRoomSizeForm';
@@ -23,10 +24,12 @@ export default function RoomSizeModal({ onBack }: RoomSizeModalProps) {
     error,
     setMode,
     handlePyeongChange,
-    handleDimensionChange,
+    handleWidthChange,
+    handleHeightChange,
     handleWallHeightChange,
     handleSubmit,
     handleFieldFocus,
+    clearErrors,
   } = useRoomSizeForm();
 
   const handleGoToInterior = () => {
@@ -35,8 +38,31 @@ export default function RoomSizeModal({ onBack }: RoomSizeModalProps) {
     }
   };
 
+  const handleBackgroundClick = () => {
+    clearErrors();
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        handleGoToInterior();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleGoToInterior]);
+
   return (
-    <Modal width='340px' onBack={onBack} showBackIconOnly>
+    <Modal
+      width='340px'
+      onBack={onBack}
+      showBackIconOnly
+      onBackdropClick={handleBackgroundClick}
+    >
       <div className='flex flex-col w-full justify-center text-center items-center pb-[15px]'>
         <span className='text-white text-[16px] mb-5'>
           방 크기를 입력해 주세요.
@@ -82,7 +108,7 @@ export default function RoomSizeModal({ onBack }: RoomSizeModalProps) {
               unitLabel='m'
               placeholder='00'
               value={localWidth}
-              onChange={(value) => handleDimensionChange('width', value)}
+              onChange={handleWidthChange}
               onFocus={() => handleFieldFocus('width')}
             />
             <LabeledNumberInput
@@ -90,7 +116,7 @@ export default function RoomSizeModal({ onBack }: RoomSizeModalProps) {
               unitLabel='m'
               placeholder='00'
               value={localHeight}
-              onChange={(value) => handleDimensionChange('height', value)}
+              onChange={handleHeightChange}
               onFocus={() => handleFieldFocus('height')}
             />
             <LabeledNumberInput
