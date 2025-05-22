@@ -12,6 +12,9 @@ interface CreateFurnitureParams {
   placementType: 'floor' | 'wall';
   modelBlob: Blob;
   thumbnailBlob: Blob;
+  scaleX: number;
+  scaleY: number;
+  scaleZ: number;
 }
 
 export async function createFurniture(
@@ -31,6 +34,9 @@ export async function createFurniture(
     thumbnailUrl,
     params.placementType,
     new Date(),
+    params.scaleX,
+    params.scaleY,
+    params.scaleZ,
   );
 
   return await repo.create(furniture);

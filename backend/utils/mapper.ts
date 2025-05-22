@@ -40,6 +40,9 @@ export function toDomainFurniture(p: PrismaFurniture): Furniture {
     p.thumbnail_url,
     p.placement_type as 'floor' | 'wall',
     p.created_at,
+    p.scale_x,
+    p.scale_y,
+    p.scale_z,
   );
 }
 
@@ -51,5 +54,8 @@ export function toPrismaFurniture(f: Furniture): Omit<PrismaFurniture, 'id'> {
     thumbnail_url: f.thumbnailUrl,
     placement_type: f.placementType,
     created_at: f.createdAt,
+    scale_x: f.scaleX,
+    scale_y: f.scaleY,
+    scale_z: f.scaleZ,
   };
 }
