@@ -18,16 +18,15 @@ model User {
 }
 
 model Room {
-  id            String   @id @default(uuid())
+  id            String            @id @default(uuid())
   name          String
   width         Int
   height        Int
   thumbnail_url String
   user_id       String
-  created_at    DateTime @default(now())
-
-  user          User     @relation(fields: [user_id], references: [id])
+  created_at    DateTime          @default(now())
   furnitures    PlacedFurniture[]
+  user          User              @relation(fields: [user_id], references: [id])
 }
 
 model Furniture {
@@ -45,19 +44,17 @@ model Furniture {
 }
 
 model PlacedFurniture {
-  id           String   @id @default(uuid())
+  id           String    @id @default(uuid())
   room_id      String
   furniture_id String
   position_x   Float
   position_y   Float
   position_z   Float
   rotation_y   Float
+  created_at   DateTime  @default(now())
   scale_x      Float
   scale_y      Float
   scale_z      Float
-  created_at   DateTime @default(now())
-
-  room         Room      @relation(fields: [room_id], references: [id])
   furniture    Furniture @relation(fields: [furniture_id], references: [id])
+  room         Room      @relation(fields: [room_id], references: [id])
 }
-

@@ -25,8 +25,8 @@ export default function SimulatorPage() {
     wallHeight: storeWallHeight,
   } = useRoomSizeStore();
 
-  const roomWidth = storeWidth || 4.07;
-  const roomHeight = storeHeight || 4.07;
+  const roomWidth = storeWidth;
+  const roomHeight = storeHeight;
   const floorExtension = 0.1;
   const wallExtension = 0.1;
 
@@ -34,9 +34,9 @@ export default function SimulatorPage() {
   const extendedHeight = roomHeight + wallExtension * 2;
 
   const roomBoundary = {
-    xMin: -wallExtension,
+    xMin: wallExtension,
     xMax: extendedWidth - wallExtension,
-    zMin: -wallExtension,
+    zMin: wallExtension,
     zMax: extendedHeight - wallExtension,
     yMin: 0,
     yMax: storeWallHeight || 2.5,
