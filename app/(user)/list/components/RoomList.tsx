@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Player } from '@lottiefiles/react-lottie-player';
+import Link from 'next/link';
 
 import SavedRoomCard from '@/app/components/list/SavedRoomCard';
 
@@ -31,11 +32,13 @@ export default function RoomList({ rooms }: { rooms: Room[] }) {
           아직 아무 방도 없어요. 당신만의 공간을 채워보세요!
         </p>
         <div className='p-[2px] rounded-[10px] bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 inline-block'>
-          <button className='w-full h-full bg-white rounded-[8px] px-8 py-3 text-sm flex items-center justify-center gap-2'>
-            <span className='text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500'>
-              3D 인테리어 하러가기
-            </span>
-          </button>
+          <Link href='/simulator'>
+            <button className='w-full h-full bg-white rounded-[8px] px-8 py-3 text-sm flex items-center justify-center gap-2'>
+              <span className='text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500'>
+                3D 인테리어 하러가기
+              </span>
+            </button>
+          </Link>
         </div>
       </div>
     );
