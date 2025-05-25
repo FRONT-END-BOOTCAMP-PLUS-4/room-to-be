@@ -51,10 +51,28 @@ export default function Lighting() {
 
           {/* 전체적으로 방을 밝히는 주 조명 */}
           <pointLight
-            position={[5, 5, 5]}
-            intensity={0.15}
+            position={[2, 3, 2]}
+            intensity={1.2}
             color={lightColor}
             castShadow
+            distance={10}
+            decay={1}
+          />
+
+          {/* 보조 조명 */}
+          <pointLight
+            position={[-2, 2, -2]}
+            intensity={0.4}
+            color={lightColor}
+            distance={8}
+            decay={1.5}
+          />
+
+          {/* 전체 조명*/}
+          <directionalLight
+            position={[1, 4, 1]}
+            intensity={0.4}
+            color={lightColor}
           />
         </>
       )}
