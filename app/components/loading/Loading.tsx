@@ -40,12 +40,8 @@ export default function Loading() {
 
   return (
     <div className='fixed inset-0 z-50 overflow-hidden bg-black'>
-      <div className='absolute inset-0'>
-        <div className='absolute inset-0'>
-          <div className='absolute inset-0 bg-gradient-to-br from-[#FF9600] to-[#A20FD2] opacity-20' />
-          <div className='absolute inset-0 bg-gradient-to-tl from-[#FF9600] to-[#A20FD2] opacity-30' />
-        </div>
-      </div>
+      <div className='absolute inset-0 bg-gradient-to-br from-[#FF9600] to-[#A20FD2] opacity-20' />
+      <div className='absolute inset-0 bg-gradient-to-tl from-[#FF9600] to-[#A20FD2] opacity-30' />
 
       <div className='relative z-10 flex flex-col items-center justify-center h-full'>
         <div className='flex flex-col items-center'>
