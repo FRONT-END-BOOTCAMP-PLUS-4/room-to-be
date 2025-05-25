@@ -4,6 +4,8 @@ import React from 'react';
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 
+import GlobalLoadingProvider from './components/loading/GlobalLoadingProvider';
+
 // 폰트 설정
 const pretendard = localFont({
   src: [
@@ -58,7 +60,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='ko' className={pretendard.variable}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <GlobalLoadingProvider />
+      </body>
     </html>
   );
 }

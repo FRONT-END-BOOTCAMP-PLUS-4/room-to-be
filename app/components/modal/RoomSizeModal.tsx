@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+import { useLoading } from '@/app/hooks/useLoading';
 import useRoomSizeForm from '@/app/hooks/useRoomSizeForm';
 
 import BoxTextButton from '../buttons/BoxTextButton';
@@ -15,6 +16,7 @@ interface RoomSizeModalProps {
 
 export default function RoomSizeModal({ onBack }: RoomSizeModalProps) {
   const router = useRouter();
+  const { loading } = useLoading();
   const {
     mode,
     localPyeong,
@@ -34,7 +36,9 @@ export default function RoomSizeModal({ onBack }: RoomSizeModalProps) {
 
   const handleGoToInterior = () => {
     if (handleSubmit()) {
-      router.push('/simulator');
+      loading(async () => {
+        router.push('/simulator');
+      }, '3D 공간을 준비하고 있습니다...');
     }
   };
 
