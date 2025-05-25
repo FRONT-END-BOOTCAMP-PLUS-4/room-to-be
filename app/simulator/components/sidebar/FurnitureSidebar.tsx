@@ -18,16 +18,18 @@ interface Props {
   fetchFurnitureByPlacementType: (
     type: 'wall' | 'floor',
   ) => Promise<Furnitures[]>;
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function FurnitureSidebar({
   fetchFurnitureByPlacementType,
+  isOpen,
+  setIsOpen,
 }: Props) {
   const [placementType, setPlacementType] = useState<'wall' | 'floor'>('floor');
   const [search, setSearch] = useState('');
   const [furniture, setFurniture] = useState<Furnitures[]>([]);
-  const [isOpen, setIsOpen] = useState(true);
-
   const addFurniture = useFurnitureStore((state) => state.addFurniture);
 
   useEffect(() => {
@@ -52,46 +54,28 @@ export default function FurnitureSidebar({
   );
 
   return (
-    <div className='relative h-full'>
-      {/* 사이드바 본체 */}
-      <div
-        className={`h-full bg-gradient-to-r from-white/10 to-black/20 backdrop-blur-md shadow-[0_0_15px_#00000026] p-4 text-white transition-transform duration-300
-        rounded-tr-2xl rounded-br-2xl w-80 absolute left-0 top-0 z-20 ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-      >
-        {/* 로고 */}
-        <div className='mb-3'>
-          <img
-            src='/assets/icons/roomtobe-logo.svg'
-            alt='RoomToBe Logo'
-            className='w-20 h-auto ml-1'
-          />
-        </div>
-
-        <FurnitureSearchInput value={search} onChange={setSearch} />
-        <PlacementToggle value={placementType} onChange={setPlacementType} />
-
-        <ScrollArea className='h-[calc(100vh-180px)] pr-2'>
-          <FurnitureGroupList grouped={grouped} onSelect={addFurniture} />
-        </ScrollArea>
+    <div
+      className={`
+        h-full bg-gradient-to-r from-white/10 to-black/20 backdrop-blur-md shadow-[0_0_15px_#00000026] p-4 text-white transition-transform duration-300
+        rounded-tr-2xl rounded-br-2xl w-80 absolute left-0 top-0 z-20
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}
+    >
+      {/* 로고 */}
+      <div className='mb-3'>
+        <img
+          src='/assets/icons/roomtobe-logo.svg'
+          alt='RoomToBe Logo'
+          className='w-20 h-auto ml-1'
+        />
       </div>
 
-      {/* 열고닫기 토글 버튼 */}
-      <Button
-        onClick={() => setIsOpen(!isOpen)}
-        variant='ghost'
-        size='icon'
-        className={`
-          absolute top-1/2 left-80 -translate-y-1/2 z-30
-          bg-white/20 backdrop-blur-sm text-white
-          border border-white/30 shadow-md hover:bg-white/30
-          transition-all rounded-full w-8 h-8
-          ${isOpen ? '' : '-translate-x-80'}
-        `}
-      >
-        {isOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-      </Button>
+      <FurnitureSearchInput value={search} onChange={setSearch} />
+      <PlacementToggle value={placementType} onChange={setPlacementType} />
+
+      <ScrollArea className='h-[calc(100vh-180px)] pr-2'>
+        <FurnitureGroupList grouped={grouped} onSelect={addFurniture} />
+      </ScrollArea>
     </div>
   );
 }
