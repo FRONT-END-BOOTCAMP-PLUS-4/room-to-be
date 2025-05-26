@@ -3,6 +3,8 @@
 import { ButtonHTMLAttributes } from 'react';
 import { useRouter } from 'next/navigation';
 
+import { useLoading } from '@/app/hooks/useLoading';
+
 import BoxTextButton from '../buttons/BoxTextButton';
 
 type Preview3DButtonProps = {
@@ -16,11 +18,19 @@ export default function Preview3DButton({
   ...props
 }: Preview3DButtonProps) {
   const router = useRouter();
+  const { loading } = useLoading();
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    router.push(href);
-    // 혹시 onClick prop이 들어오면 실행
+
+    loading(
+      async () => {
+        router.push(href);
+      },
+      '3D 공간을 준비하고 있습니다...',
+      1500,
+    );
+
     if (props.onClick) props.onClick(e);
   };
 
