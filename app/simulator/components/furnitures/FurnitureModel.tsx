@@ -35,8 +35,6 @@ export default function FurnitureModel({
   const gltf = useGLTF(modelUrl);
   const clonedScene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
   const meshRef = useRef<THREE.Group>(null);
-  const isDay = useLightingStore((state) => state.isDay);
-  const glassMaterialRef = useRef<THREE.MeshStandardMaterial | null>(null);
 
   const { furnitures, selectedFurnitureId, selectFurniture, updateFurniture } =
     useFurnitureStore();
@@ -55,6 +53,9 @@ export default function FurnitureModel({
   ]);
   const [currentRotationY, setCurrentRotationY] = useState(rotationY);
   const [isDragging, setIsDragging] = useState(false);
+
+  const isDay = useLightingStore((state) => state.isDay);
+  const glassMaterialRef = useRef<THREE.MeshStandardMaterial | null>(null);
 
   // 선택 가구 하이라이트 처리
   useHighlightMaterial({ scene: clonedScene, isSelected });
@@ -200,6 +201,8 @@ export default function FurnitureModel({
 
       const glassMesh = new THREE.Mesh(glassGeometry, glassMaterial);
 
+      glassMesh.userData._isWindowGlass = true;
+
       glassMesh.position.set(
         center.x - clonedScene.position.x,
         center.y - clonedScene.position.y,
@@ -207,17 +210,19 @@ export default function FurnitureModel({
       );
 
       clonedScene.add(glassMesh);
+
+      updateGlassMaterial(isDay);
     }
   }, [clonedScene, name]);
 
   // 낮/밤 모드 변경 시 창문 배경(유리) 색상 업데이트
-  useEffect(() => {
+  const updateGlassMaterial = (isDay: boolean) => {
     if (glassMaterialRef.current) {
       if (isDay) {
         // 낮: 밝은 흰색
         glassMaterialRef.current.color.setHex(0xffffff);
-        glassMaterialRef.current.emissive.setHex(0xffffff);
-        glassMaterialRef.current.emissiveIntensity = 0.3;
+        glassMaterialRef.current.emissive.setHex(0xfff8e1);
+        glassMaterialRef.current.emissiveIntensity = 0.8;
       } else {
         // 밤: 어두운 남색
         glassMaterialRef.current.color.setHex(0x1a237e);
@@ -225,6 +230,11 @@ export default function FurnitureModel({
         glassMaterialRef.current.emissiveIntensity = 0.1;
       }
     }
+  };
+
+  // 낮/밤 모드 변경 시 창문 배경(유리) 색상 업데이트
+  useEffect(() => {
+    updateGlassMaterial(isDay);
   }, [isDay]);
 
   return (
