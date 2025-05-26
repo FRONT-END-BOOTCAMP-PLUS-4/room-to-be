@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 import { FurnitureStoreInfo } from '@/app/types/furniture';
 
@@ -19,56 +20,66 @@ interface FurnitureStore {
   undoFurniture: (id: string) => void;
 }
 
-export const useFurnitureStore = create<FurnitureStore>((set) => ({
-  furnitures: [],
-  selectedFurnitureId: null,
-  prevFurnitureStates: {},
+export const useFurnitureStore = create<FurnitureStore>()(
+  persist(
+    (set) => ({
+      furnitures: [],
+      selectedFurnitureId: null,
+      prevFurnitureStates: {},
 
-  selectFurniture: (id) => set({ selectedFurnitureId: id }),
-  clearSelection: () => set({ selectedFurnitureId: null }),
+      selectFurniture: (id) => set({ selectedFurnitureId: id }),
+      clearSelection: () => set({ selectedFurnitureId: null }),
 
-  addFurniture: (info) =>
-    set((state) => ({
-      furnitures: [...state.furnitures, info],
-    })),
+      addFurniture: (info) =>
+        set((state) => ({
+          furnitures: [...state.furnitures, info],
+        })),
 
-  updateFurniture: (id, updated) =>
-    set((state) => {
-      const current = state.furnitures.find((f) => f.id === id);
-      if (!current) return {};
+      updateFurniture: (id, updated) =>
+        set((state) => {
+          const current = state.furnitures.find((f) => f.id === id);
+          if (!current) return {};
 
-      return {
-        prevFurnitureStates: {
-          ...state.prevFurnitureStates,
-          [id]: { ...current }, 
-        },
-        furnitures: state.furnitures.map((f) =>
-          f.id === id ? { ...f, ...updated } : f,
-        ),
-      };
+          return {
+            prevFurnitureStates: {
+              ...state.prevFurnitureStates,
+              [id]: { ...current },
+            },
+            furnitures: state.furnitures.map((f) =>
+              f.id === id ? { ...f, ...updated } : f,
+            ),
+          };
+        }),
+
+      removeFurniture: (id) =>
+        set((state) => ({
+          furnitures: state.furnitures.filter((f) => f.id !== id),
+          prevFurnitureStates: {
+            ...state.prevFurnitureStates,
+            [id]: null,
+          },
+        })),
+
+      setFurnitures: (items) => set({ furnitures: items }),
+
+      undoFurniture: (id) =>
+        set((state) => {
+          const prev = state.prevFurnitureStates[id];
+          if (!prev) return {};
+          return {
+            furnitures: state.furnitures.map((f) => (f.id === id ? prev : f)),
+            prevFurnitureStates: {
+              ...state.prevFurnitureStates,
+              [id]: null,
+            },
+          };
+        }),
     }),
-
-  removeFurniture: (id) =>
-    set((state) => ({
-      furnitures: state.furnitures.filter((f) => f.id !== id),
-      prevFurnitureStates: {
-        ...state.prevFurnitureStates,
-        [id]: null,
-      },
-    })),
-
-  setFurnitures: (items) => set({ furnitures: items }),
-
-  undoFurniture: (id) =>
-    set((state) => {
-      const prev = state.prevFurnitureStates[id];
-      if (!prev) return {};
-      return {
-        furnitures: state.furnitures.map((f) => (f.id === id ? prev : f)),
-        prevFurnitureStates: {
-          ...state.prevFurnitureStates,
-          [id]: null, 
-        },
-      };
-    }),
-}));
+    {
+      name: 'furniture-storage',
+      partialize: (state) => ({
+        furnitures: state.furnitures,
+      }),
+    },
+  ),
+);

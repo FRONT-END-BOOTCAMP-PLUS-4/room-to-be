@@ -52,7 +52,7 @@ export default function Lighting() {
           {/* 전체적으로 방을 밝히는 주 조명 */}
           <pointLight
             position={[2, 3, 2]}
-            intensity={0.8}
+            intensity={1}
             color={unifiedLightColor}
             castShadow
             distance={8}
