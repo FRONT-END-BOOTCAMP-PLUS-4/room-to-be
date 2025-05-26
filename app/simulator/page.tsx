@@ -1,6 +1,7 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
+import { useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -11,6 +12,7 @@ import { useFurnitureStore } from '@/stores/useFurnitureStore';
 import { useLoadingStore } from '@/stores/useLoadingStore';
 import { useRoomSizeStore } from '@/stores/useRoomSizeStore';
 
+import CaptureCanvas from './components/capture/CaptureCanvas';
 import FurnitureController from './components/furnitures/FurnitureController';
 import FurnitureModel from './components/furnitures/FurnitureModel';
 import BackgroundController from './components/room/BackgroundController';
@@ -18,12 +20,16 @@ import BackgroundSelector from './components/room/BackgroundSelector';
 import CameraController from './components/room/CameraController';
 import Lighting from './components/room/Lighting';
 import Room from './components/room/Room';
+import RoomSaveModal from './components/room/RoomSaveModal';
 import FurnitureSidebar from './components/sidebar/FurnitureSidebar';
 
 export default function SimulatorPage() {
   const { setLoading } = useLoadingStore();
   const [canvasCreated, setCanvasCreated] = useState(false);
   const [sceneLoaded, setSceneLoaded] = useState(false);
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+
+  const captureCanvasRef = useRef<HTMLCanvasElement>(null);
 
   const {
     width: storeWidth,
@@ -41,36 +47,50 @@ export default function SimulatorPage() {
   const extendedWidth = roomWidth + wallExtension * 2;
   const extendedHeight = roomHeight + wallExtension * 2;
 
-  const roomBoundary = {
-    xMin: wallExtension,
-    xMax: extendedWidth - wallExtension,
-    zMin: wallExtension,
-    zMax: extendedHeight - wallExtension,
-    yMin: 0,
-    yMax: storeWallHeight || 2.5,
-  };
+  const roomBoundary = useMemo(
+    () => ({
+      xMin: wallExtension,
+      xMax: extendedWidth - wallExtension,
+      zMin: wallExtension,
+      zMax: extendedHeight - wallExtension,
+      yMin: 0,
+      yMax: storeWallHeight || 2.5,
+    }),
+    [extendedWidth, extendedHeight, storeWallHeight],
+  );
 
   const furnitures = useFurnitureStore((state) => state.furnitures);
+  const renderableFurnitureIds = useFurnitureStore(
+    (state) => state.renderableFurnitureIds,
+  );
   const cameraDistance = Math.max(roomWidth, roomHeight) * 1.4;
 
-  // Canvas가 생성되고 첫 프레임이 렌더링되면 실행
+  const roomComponent = useMemo(
+    () => (
+      <Room
+        width={roomWidth}
+        height={roomHeight}
+        wallTexture='/assets/images/testwall.jpg'
+        floorTexture='/assets/images/woodfloor.png'
+        floorExtension={floorExtension}
+      />
+    ),
+    [roomWidth, roomHeight],
+  );
   useEffect(() => {
     if (canvasCreated) {
       const timer = setTimeout(() => {
         setSceneLoaded(true);
       }, 1000);
-
       return () => clearTimeout(timer);
     }
   }, [canvasCreated]);
 
-  // 모든 준비가 완료되면 로딩 해제
   useEffect(() => {
     if (canvasCreated && sceneLoaded) {
       const timer = setTimeout(() => {
         setLoading(false);
       }, 300);
-
       return () => clearTimeout(timer);
     }
   }, [canvasCreated, sceneLoaded, setLoading]);
@@ -95,23 +115,21 @@ export default function SimulatorPage() {
         >
           <Suspense fallback={null}>
             <BackgroundController />
-            <Room
-              width={roomWidth}
-              height={roomHeight}
-              wallTexture='/assets/images/testwall.jpg'
-              floorTexture='/assets/images/woodfloor.png'
-              floorExtension={floorExtension}
-            />
-            {furnitures.map((furniture) => (
-              <FurnitureModel
-                key={furniture.id}
-                roomBoundary={roomBoundary}
-                {...furniture}
-              />
-            ))}
-            <Lighting />
-            <CameraController width={roomWidth} height={roomHeight} />
+            {roomComponent}
           </Suspense>
+          <Suspense fallback={null}>
+            {furnitures
+              .filter((f) => renderableFurnitureIds.includes(f.id))
+              .map((furniture) => (
+                <FurnitureModel
+                  key={furniture.id}
+                  roomBoundary={roomBoundary}
+                  {...furniture}
+                />
+              ))}
+          </Suspense>
+          <Lighting />
+          <CameraController width={roomWidth} height={roomHeight} />
         </Canvas>
       </div>
 
@@ -128,17 +146,19 @@ export default function SimulatorPage() {
           setIsOpen={setIsSidebarOpen}
         />
       </div>
+
+      {/* 사이드바 토글 버튼 */}
       <Button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         variant='ghost'
         size='icon'
         className={`
-    absolute top-1/2 z-40 -translate-y-1/2 transition-all
-    ${isSidebarOpen ? 'left-[320px]' : 'left-2'}
-    bg-white/20 backdrop-blur-sm text-white
-    border border-white/30 shadow-md hover:bg-white/30
-    rounded-full w-8 h-8
-  `}
+          absolute top-1/2 z-40 -translate-y-1/2 transition-all
+          ${isSidebarOpen ? 'left-[320px]' : 'left-2'}
+          bg-white/20 backdrop-blur-sm text-white
+          border border-white/30 shadow-md hover:bg-white/30
+          rounded-full w-8 h-8
+        `}
       >
         {isSidebarOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
       </Button>
@@ -150,6 +170,37 @@ export default function SimulatorPage() {
       <div className='absolute top-[140px] right-[70px] z-30'>
         <FurnitureController />
       </div>
+
+      {/* 저장/나가기 버튼 UI */}
+      <div className='absolute top-[20px] right-[20px] z-30 flex gap-2'>
+        <Button onClick={() => setIsSaveModalOpen(true)}>저장하기</Button>
+        <Button variant='secondary' onClick={() => history.back()}>
+          나가기
+        </Button>
+      </div>
+
+      {/* 저장 모달 & 캡처 캔버스 (조건부 렌더) */}
+      {isSaveModalOpen && (
+        <>
+          <RoomSaveModal
+            onClose={() => setIsSaveModalOpen(false)}
+            canvasRef={captureCanvasRef} // ✅ 캡처용 ref 전달
+            furnitures={furnitures}
+            width={roomWidth}
+            height={roomHeight}
+            userId={'2'}
+          />
+          <div className='hidden'>
+            <CaptureCanvas
+              ref={captureCanvasRef}
+              furnitures={furnitures}
+              width={roomWidth}
+              height={roomHeight}
+              wallHeight={storeWallHeight}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }
