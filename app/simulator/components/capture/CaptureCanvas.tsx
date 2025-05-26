@@ -4,12 +4,13 @@ import { forwardRef, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 
 import FurnitureModel from '../furnitures/FurnitureModel';
+import BackgroundBackground from '../room/BackgroundController';
 import CameraController from '../room/CameraController';
 import Lighting from '../room/Lighting';
 import Room from '../room/Room';
 
 interface CaptureCanvasProps {
-  furnitures: any[]; // 필요 시 정확한 타입 지정 가능
+  furnitures: any[]; 
   width: number;
   height: number;
   wallHeight: number;
@@ -32,14 +33,15 @@ const CaptureCanvas = forwardRef<HTMLCanvasElement, CaptureCanvasProps>(
       <Canvas
         ref={ref}
         shadows
-        gl={{ preserveDrawingBuffer: true }} 
+        gl={{ preserveDrawingBuffer: true }}
         camera={{
           position: [cameraDistance, cameraDistance, cameraDistance],
           fov: 50,
         }}
-        style={{ width: 512, height: 512 }} 
+        style={{ width: 512, height: 512 }}
       >
         <Suspense fallback={null}>
+          <BackgroundBackground />
           <Room
             width={width}
             height={height}
