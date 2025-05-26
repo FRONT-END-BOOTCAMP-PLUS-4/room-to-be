@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -170,6 +170,39 @@ export default function FurnitureModel({
       });
     }
   };
+
+  useEffect(() => {
+    if (
+      name.toLowerCase().includes('window') ||
+      name.toLowerCase().includes('창문')
+    ) {
+      const box = new THREE.Box3().setFromObject(clonedScene);
+      const size = box.getSize(new THREE.Vector3());
+      const center = box.getCenter(new THREE.Vector3());
+
+      const glassGeometry = new THREE.PlaneGeometry(size.x * 0.8, size.y * 0.8);
+
+      const glassMaterial = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        transparent: false,
+        opacity: 1.0,
+        roughness: 0.0,
+        metalness: 0.0,
+        emissive: 0xffffff,
+        emissiveIntensity: 1,
+      });
+
+      const glassMesh = new THREE.Mesh(glassGeometry, glassMaterial);
+
+      glassMesh.position.set(
+        center.x - clonedScene.position.x,
+        center.y - clonedScene.position.y,
+        0.001,
+      );
+
+      clonedScene.add(glassMesh);
+    }
+  }, [clonedScene, name]);
 
   return (
     <primitive
