@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 
 import { fetchFurnitureByPlacementType } from '@/apis/furnitures';
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
+import { useLoadingStore } from '@/stores/useLoadingStore';
 import { useRoomSizeStore } from '@/stores/useRoomSizeStore';
 
 import FurnitureController from './components/furnitures/FurnitureController';
@@ -20,6 +21,10 @@ import Room from './components/room/Room';
 import FurnitureSidebar from './components/sidebar/FurnitureSidebar';
 
 export default function SimulatorPage() {
+  const { setLoading } = useLoadingStore();
+  const [canvasCreated, setCanvasCreated] = useState(false);
+  const [sceneLoaded, setSceneLoaded] = useState(false);
+
   const {
     width: storeWidth,
     height: storeHeight,
@@ -48,6 +53,28 @@ export default function SimulatorPage() {
   const furnitures = useFurnitureStore((state) => state.furnitures);
   const cameraDistance = Math.max(roomWidth, roomHeight) * 1.4;
 
+  // Canvas가 생성되고 첫 프레임이 렌더링되면 실행
+  useEffect(() => {
+    if (canvasCreated) {
+      const timer = setTimeout(() => {
+        setSceneLoaded(true);
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [canvasCreated]);
+
+  // 모든 준비가 완료되면 로딩 해제
+  useEffect(() => {
+    if (canvasCreated && sceneLoaded) {
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 300);
+
+      return () => clearTimeout(timer);
+    }
+  }, [canvasCreated, sceneLoaded, setLoading]);
+
   return (
     <div className='relative w-full h-screen overflow-hidden'>
       {/* Canvas */}
@@ -61,6 +88,9 @@ export default function SimulatorPage() {
           className='w-full h-full'
           onPointerMissed={() => {
             useFurnitureStore.getState().clearSelection();
+          }}
+          onCreated={() => {
+            setCanvasCreated(true);
           }}
         >
           <Suspense fallback={null}>
