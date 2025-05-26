@@ -11,6 +11,7 @@
     "seed": "node backend/infra/db/prisma/seed.js"
   },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.9.1",
     "@lottiefiles/react-lottie-player": "^3.6.0",
     "@prisma/client": "^6.7.0",
     "@radix-ui/react-checkbox": "^1.3.1",
@@ -29,12 +30,15 @@
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.508.0",
     "next": "14.2.16",
+    "next-auth": "^5.0.0-beta.28",
     "react": "^18",
     "react-dom": "^18",
     "react-lottie-player": "^2.1.0",
     "tailwind-merge": "^3.2.0",
     "tailwindcss-animate": "^1.0.7",
-    "three": "^0.176.0"
+    "three": "^0.176.0",
+    "uuid": "^11.1.0",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.26.0",
