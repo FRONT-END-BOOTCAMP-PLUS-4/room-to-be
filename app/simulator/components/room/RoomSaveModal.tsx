@@ -62,6 +62,7 @@ export default function RoomSaveModal({
 
       alert('방이 성공적으로 저장되었습니다.');
       onClose();
+      await new Promise((res) => setTimeout(res, 300)); 
       router.push('/list');
     } catch (error) {
       console.error('방 저장 실패:', error);
@@ -84,7 +85,7 @@ export default function RoomSaveModal({
           disabled={isSaving}
         />
         <BoxTextButton
-          showImg
+          showImg={false}
           onClick={handleSave}
           className='w-full'
           disabled={isSaving}

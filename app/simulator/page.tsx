@@ -184,13 +184,13 @@ export default function SimulatorPage() {
         <>
           <RoomSaveModal
             onClose={() => setIsSaveModalOpen(false)}
-            canvasRef={captureCanvasRef} // ✅ 캡처용 ref 전달
+            canvasRef={captureCanvasRef}
             furnitures={furnitures}
             width={roomWidth}
             height={roomHeight}
             userId={'2'}
           />
-          <div className='hidden'>
+          <div className='absolute top-0 left-0 w-full h-full opacity-0 pointer-events-none'>
             <CaptureCanvas
               ref={captureCanvasRef}
               furnitures={furnitures}
