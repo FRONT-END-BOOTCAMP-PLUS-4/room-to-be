@@ -21,7 +21,7 @@ export default function Page() {
   const [isLoading, setIsLoading] = useState(true);
 
   // 나중에 민혁이 Auth코드 연동할때 수정해야해 userId= 1 은 방 6개 userId = 2는 방 0개
-  const userId = '1';
+  const userId = '2';
 
   useEffect(() => {
     async function fetchRooms() {
