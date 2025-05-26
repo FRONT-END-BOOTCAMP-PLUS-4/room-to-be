@@ -4,6 +4,7 @@ import {
 } from '@prisma/client';
 
 import { Furniture } from '@/backend/domain/entities/Furniture';
+import { PlacedFurniture } from '@/backend/domain/entities/PlacedFurniture';
 import { Room } from '@/backend/domain/entities/Room';
 
 // Room 변환 함수
@@ -46,16 +47,18 @@ export function toDomainFurniture(p: PrismaFurniture): Furniture {
   );
 }
 
-export function toPrismaFurniture(f: Furniture): Omit<PrismaFurniture, 'id'> {
-  return {
-    name: f.name,
-    category: f.category,
-    model_url: f.modelUrl,
-    thumbnail_url: f.thumbnailUrl,
-    placement_type: f.placementType,
-    created_at: f.createdAt,
-    scale_x: f.scaleX,
-    scale_y: f.scaleY,
-    scale_z: f.scaleZ,
-  };
+export function toPlacedFurnitureEntity(prismaModel: any): PlacedFurniture {
+  return new PlacedFurniture(
+    prismaModel.id,
+    prismaModel.room_id,
+    prismaModel.furniture_id,
+    prismaModel.position_x,
+    prismaModel.position_y,
+    prismaModel.position_z,
+    prismaModel.rotation_y,
+    prismaModel.scale_x,
+    prismaModel.scale_y,
+    prismaModel.scale_z,
+    prismaModel.created_at,
+  );
 }
