@@ -13,9 +13,9 @@ export default function Lighting() {
   );
   const Background = getCurrentBackground();
 
-  const lightColor = isDay
-    ? Background.dayLightColor
-    : Background.nightLightColor;
+  const unifiedLightColor = '#ffd89b';
+
+  const lightColor = isDay ? Background.dayLightColor : unifiedLightColor;
   const lightIntensity = isDay
     ? Background.dayLightIntensity
     : Background.nightLightIntensity;
@@ -52,27 +52,27 @@ export default function Lighting() {
           {/* 전체적으로 방을 밝히는 주 조명 */}
           <pointLight
             position={[2, 3, 2]}
-            intensity={1.2}
-            color={lightColor}
+            intensity={0.8}
+            color={unifiedLightColor}
             castShadow
-            distance={10}
+            distance={8}
             decay={1}
           />
 
           {/* 보조 조명 */}
           <pointLight
             position={[-2, 2, -2]}
-            intensity={0.4}
-            color={lightColor}
+            intensity={0.2}
+            color={unifiedLightColor}
             distance={8}
-            decay={1.5}
+            decay={1}
           />
 
           {/* 전체 조명*/}
           <directionalLight
             position={[1, 4, 1]}
             intensity={0.3}
-            color={lightColor}
+            color={unifiedLightColor}
           />
         </>
       )}
