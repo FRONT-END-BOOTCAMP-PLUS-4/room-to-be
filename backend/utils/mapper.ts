@@ -1,5 +1,6 @@
 import {
   Furniture as PrismaFurniture,
+  PlacedFurniture as PrismaPlacedFurniture,
   Room as PrismaRoom,
 } from '@prisma/client';
 
@@ -7,8 +8,11 @@ import { Furniture } from '@/backend/domain/entities/Furniture';
 import { PlacedFurniture } from '@/backend/domain/entities/PlacedFurniture';
 import { Room } from '@/backend/domain/entities/Room';
 
-// Room 변환 함수
-export function toDomainRoom(p: PrismaRoom): Room {
+export function toDomainRoom(
+  p: PrismaRoom & { furnitures: PrismaPlacedFurniture[] },
+): Room {
+  const furnitures = p.furnitures.map(toPlacedFurnitureEntity);
+
   return new Room(
     p.id,
     p.name,
@@ -17,21 +21,41 @@ export function toDomainRoom(p: PrismaRoom): Room {
     p.thumbnail_url,
     p.user_id,
     p.created_at,
+    furnitures,
   );
 }
 
-export function toPrismaRoom(r: Room): Omit<PrismaRoom, 'id'> {
+export function toPlacedFurnitureEntity(
+  p: PrismaPlacedFurniture,
+): PlacedFurniture {
+  return new PlacedFurniture(
+    p.id,
+    p.room_id,
+    p.furniture_id,
+    p.position_x,
+    p.position_y,
+    p.position_z,
+    p.rotation_y,
+    p.scale_x,
+    p.scale_y,
+    p.scale_z,
+    p.created_at,
+  );
+}
+
+export function toPrismaPlacedFurnitureCreateInput(f: PlacedFurniture) {
   return {
-    name: r.name,
-    width: r.width,
-    height: r.height,
-    thumbnail_url: r.thumbnailUrl,
-    user_id: r.userId,
-    created_at: r.createdAt,
+    furniture_id: f.furnitureId,
+    position_x: f.positionX,
+    position_y: f.positionY,
+    position_z: f.positionZ,
+    rotation_y: f.rotationY,
+    scale_x: f.scaleX,
+    scale_y: f.scaleY,
+    scale_z: f.scaleZ,
   };
 }
 
-// Furniture 변환 함수
 export function toDomainFurniture(p: PrismaFurniture): Furniture {
   return new Furniture(
     p.id,
@@ -47,18 +71,16 @@ export function toDomainFurniture(p: PrismaFurniture): Furniture {
   );
 }
 
-export function toPlacedFurnitureEntity(prismaModel: any): PlacedFurniture {
-  return new PlacedFurniture(
-    prismaModel.id,
-    prismaModel.room_id,
-    prismaModel.furniture_id,
-    prismaModel.position_x,
-    prismaModel.position_y,
-    prismaModel.position_z,
-    prismaModel.rotation_y,
-    prismaModel.scale_x,
-    prismaModel.scale_y,
-    prismaModel.scale_z,
-    prismaModel.created_at,
-  );
+export function toPrismaFurniture(f: Furniture) {
+  return {
+    name: f.name,
+    category: f.category,
+    model_url: f.modelUrl,
+    thumbnail_url: f.thumbnailUrl,
+    placement_type: f.placementType,
+    created_at: f.createdAt,
+    scale_x: f.scaleX,
+    scale_y: f.scaleY,
+    scale_z: f.scaleZ,
+  };
 }
