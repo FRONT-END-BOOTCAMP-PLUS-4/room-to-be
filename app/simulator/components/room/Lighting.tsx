@@ -1,4 +1,3 @@
-// app/simulator/components/room/Lighting.tsx
 'use client';
 
 import { useBackgroundStore } from '@/stores/useBackgroundStore';
