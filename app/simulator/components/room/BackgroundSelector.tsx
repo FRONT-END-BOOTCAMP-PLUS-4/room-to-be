@@ -4,6 +4,22 @@ import { useEffect, useRef, useState } from 'react';
 
 import { Backgrounds, useBackgroundStore } from '@/stores/useBackgroundStore';
 
+// 색상 배열을 CSS 그라데이션으로 변환하는 함수
+function createCSSGradient(colors: string[]): string {
+  if (colors.length === 1) {
+    return colors[0];
+  }
+
+  const colorStops = colors
+    .map((color, index) => {
+      const percentage = (index / (colors.length - 1)) * 100;
+      return `${color} ${percentage}%`;
+    })
+    .join(', ');
+
+  return `linear-gradient(180deg, ${colorStops})`;
+}
+
 export default function BackgroundSelector() {
   const [isExpanded, setIsExpanded] = useState(false);
   const currentBackgroundId = useBackgroundStore(
@@ -11,6 +27,8 @@ export default function BackgroundSelector() {
   );
   const setBackground = useBackgroundStore((state) => state.setBackground);
   const lastClickTimeRef = useRef<number>(0);
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => setIsClient(true), []);
 
   // 현재 선택된 테마 정보 가져오기
   const currentBackground =
@@ -62,7 +80,7 @@ export default function BackgroundSelector() {
 
       {/* 테마 선택 옵션들 */}
       <div
-        className={`flex items-center gap-2 ml-4 overflow-hidden ${isExpanded ? 'w-auto' : 'w-7'}`}
+        className={`flex items-center gap-2 ml-4 ${isExpanded ? 'w-auto' : 'w-7'}`}
       >
         {isExpanded ? (
           // 모든 테마 옵션 보여주기
@@ -71,16 +89,22 @@ export default function BackgroundSelector() {
               key={Background.id}
               onClick={() => handleBackgroundSelect(Background.id)}
               className={`
-                w-7 h-7 rounded-full 
-                border-2 transition-all duration-200 flex-shrink-0
+                w-6 h-6 rounded-full 
+                border-3 transition-all duration-200 flex-shrink-0
                 ${
                   currentBackgroundId === Background.id
-                    ? 'border-white'
-                    : 'border-transparent hover:border-white/50'
+                    ? 'ring-2 ring-white'
+                    : 'hover:ring-2 hover:ring-white/50'
                 }
               `}
               title={Background.name}
-              style={{ background: Background.dayBackground }}
+              style={{
+                background: createCSSGradient(Background.dayBackground),
+                ...(isClient && {
+                  backgroundSize: '100% 100%',
+                  backgroundRepeat: 'no-repeat',
+                }),
+              }}
             >
               <span className='sr-only'>{Background.name}</span>
             </button>
@@ -88,8 +112,14 @@ export default function BackgroundSelector() {
         ) : (
           // 현재 선택된 테마만 보여주기
           <div
-            className='w-7 h-7 rounded-full border-2 border-white flex-shrink-0'
-            style={{ background: currentBackground.dayBackground }}
+            className='w-6 h-6 rounded-full border-3 border-transparent ring-2 ring-white flex-shrink-0'
+            style={{
+              background: createCSSGradient(currentBackground.dayBackground),
+              ...(isClient && {
+                backgroundSize: '100% 100%',
+                backgroundRepeat: 'no-repeat',
+              }),
+            }}
             title={currentBackground.name}
           >
             <span className='sr-only'>{currentBackground.name}</span>

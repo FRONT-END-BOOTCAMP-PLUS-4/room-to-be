@@ -71,7 +71,7 @@ export default function Lighting() {
           {/* 전체 조명*/}
           <directionalLight
             position={[1, 4, 1]}
-            intensity={0.4}
+            intensity={0.3}
             color={lightColor}
           />
         </>

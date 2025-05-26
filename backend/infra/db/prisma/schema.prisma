@@ -30,16 +30,16 @@ model Room {
 }
 
 model Furniture {
-  id             String  @id @default(uuid())
-  name           String
-  category       String
-  model_url      String
-  thumbnail_url  String
-  created_at     DateTime @default(now())
-  placement_type String
-  scale_x        Float    @default(1.0)
-  scale_y        Float    @default(1.0)
-  scale_z        Float    @default(1.0)  
+  id               String            @id @default(uuid())
+  name             String
+  model_url        String
+  thumbnail_url    String
+  created_at       DateTime          @default(now())
+  placement_type   String
+  category         String
+  scale_x          Float             @default(1.0)
+  scale_y          Float             @default(1.0)
+  scale_z          Float             @default(1.0)
   placedFurnitures PlacedFurniture[]
 }
 
