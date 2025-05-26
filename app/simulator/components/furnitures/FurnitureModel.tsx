@@ -16,6 +16,7 @@ import useSyncScaleFromStore from '@/app/hooks/useSyncScaleFromStore';
 import type { FurnitureModelProps } from '@/app/types/furniture';
 
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
+import { useLightingStore } from '@/stores/useLightingStore';
 
 export default function FurnitureModel({
   id,
@@ -34,6 +35,8 @@ export default function FurnitureModel({
   const gltf = useGLTF(modelUrl);
   const clonedScene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
   const meshRef = useRef<THREE.Group>(null);
+  const isDay = useLightingStore((state) => state.isDay);
+  const glassMaterialRef = useRef<THREE.MeshStandardMaterial | null>(null);
 
   const { furnitures, selectedFurnitureId, selectFurniture, updateFurniture } =
     useFurnitureStore();
@@ -171,6 +174,7 @@ export default function FurnitureModel({
     }
   };
 
+  // 창문 배경(유리) 생성
   useEffect(() => {
     if (
       name.toLowerCase().includes('window') ||
@@ -192,6 +196,8 @@ export default function FurnitureModel({
         emissiveIntensity: 1,
       });
 
+      glassMaterialRef.current = glassMaterial;
+
       const glassMesh = new THREE.Mesh(glassGeometry, glassMaterial);
 
       glassMesh.position.set(
@@ -203,6 +209,23 @@ export default function FurnitureModel({
       clonedScene.add(glassMesh);
     }
   }, [clonedScene, name]);
+
+  // 낮/밤 모드 변경 시 창문 배경(유리) 색상 업데이트
+  useEffect(() => {
+    if (glassMaterialRef.current) {
+      if (isDay) {
+        // 낮: 밝은 흰색
+        glassMaterialRef.current.color.setHex(0xffffff);
+        glassMaterialRef.current.emissive.setHex(0xffffff);
+        glassMaterialRef.current.emissiveIntensity = 0.3;
+      } else {
+        // 밤: 어두운 남색
+        glassMaterialRef.current.color.setHex(0x1a237e);
+        glassMaterialRef.current.emissive.setHex(0x0d1b69);
+        glassMaterialRef.current.emissiveIntensity = 0.1;
+      }
+    }
+  }, [isDay]);
 
   return (
     <primitive
