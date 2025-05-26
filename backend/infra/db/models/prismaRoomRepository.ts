@@ -6,6 +6,7 @@ import {
 } from '@/backend/utils/mapper';
 
 import { prisma } from '../prisma/prismaClient';
+import { deleteRoomThumbnail } from '../supabase/SupabaseStorageRemover';
 
 export class PrismaRoomRepository implements RoomRepository {
   async findById(id: string): Promise<Room | null> {
@@ -40,15 +41,21 @@ export class PrismaRoomRepository implements RoomRepository {
   async findByUserId(userId: string): Promise<Room[]> {
     const data = await prisma.room.findMany({
       where: { user_id: userId },
-      include: { furnitures: true }, 
+      include: { furnitures: true },
     });
 
     return data.map(toDomainRoom);
   }
 
   async deleteById(id: string): Promise<void> {
-    await prisma.room.delete({
-      where: { id },
-    });
+    await prisma.placedFurniture.deleteMany({ where: { room_id: id } });
+
+    try {
+      await deleteRoomThumbnail(id);
+    } catch (e) {
+      console.error('썸네일 삭제 실패:', e);
+    }
+
+    await prisma.room.delete({ where: { id } });
   }
 }
