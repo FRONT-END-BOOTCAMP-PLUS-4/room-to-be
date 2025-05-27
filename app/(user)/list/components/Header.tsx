@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 import BoxTextButton from '@/app/components/buttons/BoxTextButton';
 import ProfileButton from '@/app/components/buttons/ProfileButton';
@@ -48,9 +49,11 @@ export default function Header({ userId }: { userId: string }) {
       </div>
 
       <div className='absolute bottom-[120px] right-[40px]'>
-        <BoxTextButton showImg={true} className='text-sm'>
-          3D 인테리어하러가기
-        </BoxTextButton>
+        <Link href='/simulator'>
+          <BoxTextButton showImg={true} className='text-sm'>
+            3D 인테리어하러가기
+          </BoxTextButton>
+        </Link>
       </div>
     </div>
   );

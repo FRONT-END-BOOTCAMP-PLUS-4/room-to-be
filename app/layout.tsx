@@ -5,6 +5,8 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import { SessionProvider } from 'next-auth/react';
 
+import GlobalLoadingProvider from './components/loading/GlobalLoadingProvider';
+
 // 폰트 설정
 const pretendard = localFont({
   src: [
@@ -59,9 +61,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='ko' className={pretendard.variable}>
-      <body>
-        <SessionProvider>{children}</SessionProvider>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

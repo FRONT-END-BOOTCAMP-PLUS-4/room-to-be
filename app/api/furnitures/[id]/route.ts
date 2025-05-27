@@ -26,7 +26,9 @@ export async function GET(
     modelUrl: furniture.modelUrl,
     thumbnailUrl: furniture.thumbnailUrl,
     placementType: furniture.placementType,
-   
+    scaleX: furniture.scaleX,
+    scaleY: furniture.scaleY,
+    scaleZ: furniture.scaleZ,
   };
 
   return NextResponse.json(dto);
