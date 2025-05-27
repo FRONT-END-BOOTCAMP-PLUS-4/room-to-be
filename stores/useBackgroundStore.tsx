@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 export interface Background {
   id: string;
@@ -101,8 +101,10 @@ export const Backgrounds: Background[] = [
 
 interface BackgroundStore {
   currentBackgroundId: string;
+  hasHydrated: boolean;
   setBackground: (BackgroundId: string) => void;
   getCurrentBackground: () => Background;
+  setHasHydrated: (hasHydrated: boolean) => void;
 }
 
 // 상태를 로컬 스토리지에 저장하도록 persist 미들웨어 추가
@@ -110,6 +112,7 @@ export const useBackgroundStore = create<BackgroundStore>()(
   persist(
     (set, get) => ({
       currentBackgroundId: 'beige',
+      hasHydrated: false,
       setBackground: (id: string) => {
         const backgroundExists = Backgrounds.find((bg) => bg.id === id);
         if (backgroundExists) {
@@ -123,12 +126,22 @@ export const useBackgroundStore = create<BackgroundStore>()(
           Backgrounds[0]
         );
       },
+
+      setHasHydrated: (hasHydrated: boolean) => {
+        set({ hasHydrated });
+      },
     }),
     {
       name: 'Background-storage',
+      storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         currentBackgroundId: state.currentBackgroundId,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.setHasHydrated(true);
+        }
+      },
     },
   ),
 );

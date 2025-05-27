@@ -51,10 +51,12 @@ export default function BackgroundBackground() {
     (s) => s.getCurrentBackground,
   );
   const currentBackgroundId = useBackgroundStore((s) => s.currentBackgroundId);
+  const hasHydrated = useBackgroundStore((s) => s.hasHydrated);
   const currentTextureRef = useRef<CanvasTexture | null>(null);
-  const animationRef = useRef<number>();
 
   useEffect(() => {
+    if (!hasHydrated) return;
+
     const Background = getCurrentBackground();
     const targetColor = isDay
       ? Background.dayBackground
@@ -62,20 +64,12 @@ export default function BackgroundBackground() {
 
     const newTexture = createGradientTexture(targetColor);
 
-    if (currentTextureRef.current && scene.background) {
-      if (currentTextureRef.current) {
-        currentTextureRef.current.dispose();
-      }
+    if (currentTextureRef.current) {
+      currentTextureRef.current.dispose();
     }
 
     scene.background = newTexture;
     currentTextureRef.current = newTexture;
-
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
   }, [isDay, getCurrentBackground, scene, currentBackgroundId]);
 
   useEffect(() => {

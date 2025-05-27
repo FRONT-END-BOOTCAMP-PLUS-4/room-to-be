@@ -22,13 +22,17 @@ function createCSSGradient(colors: string[]): string {
 
 export default function BackgroundSelector() {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const currentBackgroundId = useBackgroundStore(
     (state) => state.currentBackgroundId,
   );
   const setBackground = useBackgroundStore((state) => state.setBackground);
+  const hasHydrated = useBackgroundStore((state) => state.hasHydrated);
   const lastClickTimeRef = useRef<number>(0);
-  const [isClient, setIsClient] = useState(false);
-  useEffect(() => setIsClient(true), []);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // 현재 선택된 테마 정보 가져오기
   const currentBackground =
@@ -46,14 +50,37 @@ export default function BackgroundSelector() {
     setIsExpanded(false);
   };
 
-  // 컴포넌트 마운트 시 테마가 올바르게 로드되었는지 확인
-  useEffect(() => {
-    // 테마 스토어가 초기화되었는지 확인
-    const initialBackground = useBackgroundStore.getState().currentBackgroundId;
-    if (initialBackground !== currentBackgroundId) {
-      setBackground(currentBackgroundId);
-    }
-  }, []);
+  if (!mounted || !hasHydrated) {
+    return (
+      <div
+        className={`
+          px-[30px] py-[20px] rounded-[25px] 
+          bg-gradient-to-r from-white/10 to-black/20 
+          backdrop-blur-md shadow-[0_0_15px_#00000026] 
+          flex items-center justify-between
+          w-[219px]
+        `}
+      >
+        <button
+          className={`
+            py-[7px] h-7 bg-white/30 rounded-md
+            hover:bg-white/40 transition-colors duration-300 ease-in-out 
+            flex justify-center items-center select-none flex-grow
+          `}
+        >
+          <span className='text-[12px] text-white'>배경 선택</span>
+        </button>
+        <div className='flex items-center gap-2 ml-4 w-7'>
+          <div
+            className='w-6 h-6 rounded-full border-3 border-transparent ring-2 ring-white flex-shrink-0'
+            style={{
+              background: createCSSGradient(Backgrounds[0].dayBackground),
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -100,10 +127,8 @@ export default function BackgroundSelector() {
               title={Background.name}
               style={{
                 background: createCSSGradient(Background.dayBackground),
-                ...(isClient && {
-                  backgroundSize: '100% 100%',
-                  backgroundRepeat: 'no-repeat',
-                }),
+                backgroundSize: '100% 100%',
+                backgroundRepeat: 'no-repeat',
               }}
             >
               <span className='sr-only'>{Background.name}</span>
@@ -115,10 +140,8 @@ export default function BackgroundSelector() {
             className='w-6 h-6 rounded-full border-3 border-transparent ring-2 ring-white flex-shrink-0'
             style={{
               background: createCSSGradient(currentBackground.dayBackground),
-              ...(isClient && {
-                backgroundSize: '100% 100%',
-                backgroundRepeat: 'no-repeat',
-              }),
+              backgroundSize: '100% 100%',
+              backgroundRepeat: 'no-repeat',
             }}
             title={currentBackground.name}
           >
