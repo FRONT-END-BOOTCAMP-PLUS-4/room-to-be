@@ -9,13 +9,15 @@ import { prisma } from '../prisma/prismaClient';
 import { deleteRoomThumbnail } from '../supabase/SupabaseStorageRemover';
 
 export class PrismaRoomRepository implements RoomRepository {
-  async findById(id: string): Promise<Room | null> {
-    const data = await prisma.room.findUnique({
-      where: { id },
-      include: { furnitures: true }, //
+  async findById(roomId: string) {
+    const prismaRoom = await prisma.room.findUnique({
+      where: { id: roomId },
+      include: { furnitures: true },
     });
 
-    return data ? toDomainRoom(data) : null;
+    if (!prismaRoom) return null;
+
+    return toDomainRoom(prismaRoom);
   }
 
   async save(room: Room): Promise<Room> {
