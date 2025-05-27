@@ -43,3 +43,17 @@ export async function getRoomsByUserId(
   const data = await res.json();
   return data.rooms;
 }
+
+export async function getRoomById(roomId: string): Promise<RoomResponse> {
+  const res = await fetch(`/api/rooms/${roomId}`);
+
+  if (!res.ok) {
+    if (res.status === 404) {
+      throw new Error('존재하지 않는 방입니다.');
+    }
+    throw new Error(`방 조회 실패: ${res.status}`);
+  }
+
+  return await res.json();
+  
+}
