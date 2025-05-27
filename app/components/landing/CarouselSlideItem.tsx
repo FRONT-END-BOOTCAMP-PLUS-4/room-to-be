@@ -19,7 +19,6 @@ export default function CarouselSlideItem({
   idx,
   SLIDE_COUNT,
 }: CarouselSlideItemProps) {
-  console.log('서버 컴포넌트로 잘 됐나 확인');
   return (
     <div
       className={`

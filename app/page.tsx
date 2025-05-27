@@ -32,18 +32,20 @@ const slidesData = [
   },
 ];
 
-const SLIDE_COUNT = slidesData.length;
-
-// 슬라이드 데이터로부터 JSX 생성
-const slidesJsx = slidesData.map((slide, idx) => (
-  <CarouselSlideItem
-    key={idx}
-    slide={slide}
-    idx={idx + 1}
-    SLIDE_COUNT={SLIDE_COUNT}
-  />
-));
-
-export default function Page() {
-  return <CarouselSlider slides={slidesJsx} />;
+export default async function Page() {
+  const SLIDE_COUNT = slidesData.length;
+  // 슬라이드 데이터로부터 JSX 생성
+  const slidesJsx = slidesData.map((slide, idx) => (
+    <CarouselSlideItem
+      key={idx}
+      slide={slide}
+      idx={idx + 1}
+      SLIDE_COUNT={SLIDE_COUNT}
+    />
+  ));
+  return (
+    <>
+      <CarouselSlider slides={slidesJsx} />;
+    </>
+  );
 }
