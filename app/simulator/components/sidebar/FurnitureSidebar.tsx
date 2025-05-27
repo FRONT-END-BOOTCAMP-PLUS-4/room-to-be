@@ -78,7 +78,7 @@ export default function FurnitureSidebar({
             addFurniture(info);
             setTimeout(() => {
               markRenderable(info.id);
-            }, 150); // GLTF 안정화 시간
+            }, 200); // GLTF 안정화 시간
           }}
         />
       </ScrollArea>
