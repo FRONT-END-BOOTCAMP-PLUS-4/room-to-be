@@ -2,6 +2,8 @@
 import { useLoader } from '@react-three/fiber';
 import { TextureLoader } from 'three';
 
+import { useViewStore } from '@/stores/useViewStore';
+
 import RoomShadow from './RoomShadow';
 
 interface FloorProps {
@@ -24,14 +26,17 @@ export default function Floor({
   shadowFadeDistance = 2.0,
 }: FloorProps) {
   const map = useLoader(TextureLoader, texture);
+  const isTopView = useViewStore((s) => s.isTopView);
 
   const floorThickness = 0.1;
   const floorWidth = width + extension * 2;
   const floorHeight = height + extension * 2;
 
+  const shouldShowShadow = enableShadow && !isTopView;
+
   return (
     <>
-      {enableShadow && (
+      {shouldShowShadow && (
         <>
           {/* 1. 넓고 부드러운 그림자 (바깥쪽) */}
           <RoomShadow

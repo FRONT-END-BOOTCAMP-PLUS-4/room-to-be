@@ -117,7 +117,7 @@ export default function FurnitureController() {
           onClick={handleRoomRotate}
         />
         <FurnitureControllerBtn
-          text={isTopView ? '3D 뷰' : '2D 뷰'}
+          text={isTopView ? '3D 뷰' : '탑 뷰'}
           onClick={handleViewToggle}
         />
       </div>
