@@ -106,7 +106,7 @@ export default function SimulatorPage() {
             <Room
               width={roomWidth}
               height={roomHeight}
-              wallTexture='/assets/images/white-wall.png'
+              wallTexture='/assets/images/line-pattern-wall.jpg'
               floorTexture='/assets/images/white-wood-floor.png'
               floorExtension={floorExtension}
             />
