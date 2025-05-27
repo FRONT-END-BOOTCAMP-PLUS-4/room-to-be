@@ -18,6 +18,8 @@ interface FurnitureStore {
 
   setFurnitures: (items: FurnitureStoreInfo[]) => void;
   undoFurniture: (id: string) => void;
+  clearFurnitures: () => void;
+  setRenderableIds: (ids: string[]) => void;
 }
 
 export const useFurnitureStore = create<FurnitureStore>((set) => ({
@@ -68,6 +70,15 @@ export const useFurnitureStore = create<FurnitureStore>((set) => ({
     })),
 
   setFurnitures: (items) => set({ furnitures: items }),
+  //전체 가구 초기화
+  clearFurnitures: () =>
+    set({
+      furnitures: [],
+      renderableFurnitureIds: [],
+      selectedFurnitureId: null,
+    }),
+  //여러개 렌더링
+  setRenderableIds: (ids: string[]) => set({ renderableFurnitureIds: ids }),
 
   undoFurniture: (id) =>
     set((state) => {
