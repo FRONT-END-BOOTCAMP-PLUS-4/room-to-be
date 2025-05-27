@@ -51,6 +51,16 @@ export default function SimulatorPage() {
   // 방 크기에 따라 카메라 위치 조정
   const cameraDistance = Math.max(roomWidth, roomHeight) * 1.4;
 
+  useEffect(() => {
+    // 페이지 진입 시 로딩 시작
+    setLoading(true, '3D 공간을 준비하고 있습니다...');
+
+    // 컴포넌트 언마운트 시 로딩 해제
+    return () => {
+      setLoading(false);
+    };
+  }, [setLoading]);
+
   // Canvas가 생성되고 첫 프레임이 렌더링되면 실행
   useEffect(() => {
     if (canvasCreated) {
