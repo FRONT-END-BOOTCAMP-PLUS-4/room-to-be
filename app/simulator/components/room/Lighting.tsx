@@ -1,24 +1,112 @@
 // app/simulator/components/room/Lighting.tsx
 'use client';
+import { useEffect, useRef } from 'react';
+import { useThree } from '@react-three/fiber';
+import * as THREE from 'three';
 
 import { useBackgroundStore } from '@/stores/useBackgroundStore';
 import { useLightingStore } from '@/stores/useLightingStore';
+import { useRoomSizeStore } from '@/stores/useRoomSizeStore';
+import { useViewStore } from '@/stores/useViewStore';
 
 /* eslint-disable */
 // @ts-ignore
 export default function Lighting() {
+  const { camera } = useThree();
   const isDay = useLightingStore((s) => s.isDay);
   const getCurrentBackground = useBackgroundStore(
     (s) => s.getCurrentBackground,
   );
-  const Background = getCurrentBackground();
+  const angle = useViewStore((s) => s.angle);
+  const isTopView = useViewStore((s) => s.isTopView);
+  const { width, height } = useRoomSizeStore();
 
+  const directionalLightRef = useRef<THREE.DirectionalLight>(null);
+  const mainPointLightRef = useRef<THREE.PointLight>(null);
+  const backLightRef = useRef<THREE.DirectionalLight>(null);
+
+  const background = getCurrentBackground();
   const unifiedLightColor = '#ffd89b';
 
-  const lightColor = isDay ? Background.dayLightColor : unifiedLightColor;
+  const lightColor = isDay ? background.dayLightColor : unifiedLightColor;
   const lightIntensity = isDay
-    ? Background.dayLightIntensity
-    : Background.nightLightIntensity;
+    ? background.dayLightIntensity
+    : background.nightLightIntensity;
+
+  // 카메라 위치에 따라 조명 위치 업데이트
+  useEffect(() => {
+    const centerX = width / 2;
+    const centerZ = height / 2;
+    const roomDiagonal = Math.sqrt(width * width + height * height);
+
+    if (isDay) {
+      // 주 태양광을 카메라 뒤쪽에서 비추도록 설정
+      if (directionalLightRef.current) {
+        const rad = (angle * Math.PI) / 180;
+        const lightDistance = roomDiagonal * 1.5;
+
+        if (isTopView) {
+          // 탑뷰일 때는 위에서 아래로
+          directionalLightRef.current.position.set(
+            centerX,
+            roomDiagonal * 2,
+            centerZ,
+          );
+        } else {
+          // 3D 뷰일 때는 카메라 뒤쪽에서
+          const lightX = centerX + lightDistance * Math.sin(rad + Math.PI);
+          const lightZ = centerZ + lightDistance * Math.cos(rad + Math.PI);
+          directionalLightRef.current.position.set(
+            lightX,
+            roomDiagonal * 0.8,
+            lightZ,
+          );
+        }
+
+        // 조명이 방 중심을 향하도록 설정
+        directionalLightRef.current.target.position.set(centerX, 0, centerZ);
+        directionalLightRef.current.target.updateMatrixWorld();
+      }
+
+      // 보조 조명도 각도에 맞춰 조정
+      if (backLightRef.current) {
+        const rad = (angle * Math.PI) / 180;
+        const backLightDistance = roomDiagonal * 0.8;
+        const backLightX = centerX + backLightDistance * Math.sin(rad);
+        const backLightZ = centerZ + backLightDistance * Math.cos(rad);
+
+        backLightRef.current.position.set(
+          backLightX,
+          roomDiagonal * 0.4,
+          backLightZ,
+        );
+      }
+    } else {
+      // 밤 조명도 카메라 위치에 따라 조정
+      if (mainPointLightRef.current) {
+        const rad = (angle * Math.PI) / 180;
+        const lightDistance = roomDiagonal * 0.7;
+
+        if (isTopView) {
+          mainPointLightRef.current.position.set(
+            centerX,
+            roomDiagonal * 1.2,
+            centerZ,
+          );
+        } else {
+          const lightX =
+            centerX + lightDistance * Math.sin(rad + Math.PI * 0.7);
+          const lightZ =
+            centerZ + lightDistance * Math.cos(rad + Math.PI * 0.7);
+          mainPointLightRef.current.position.set(
+            lightX,
+            roomDiagonal * 0.6,
+            lightZ,
+          );
+        }
+      }
+    }
+  }, [angle, isTopView, width, height, isDay]);
 
   return (
     <>
@@ -29,17 +117,23 @@ export default function Lighting() {
 
           {/* 태양광 */}
           <directionalLight
-            position={[5, 5, 5]}
+            ref={directionalLightRef}
             intensity={lightIntensity}
             color={lightColor}
             castShadow
-            shadow-mapSize-width={1024}
-            shadow-mapSize-height={1024}
+            shadow-mapSize-width={2048}
+            shadow-mapSize-height={2048}
+            shadow-camera-near={0.1}
+            shadow-camera-far={50}
+            shadow-camera-left={-10}
+            shadow-camera-right={10}
+            shadow-camera-top={10}
+            shadow-camera-bottom={-10}
           />
 
-          {/* 반대쪽 벽에서 약하게 반사되는 빛 효과 */}
+          {/* 카메라 각도에 따른 보조 조명 */}
           <directionalLight
-            position={[-3, 2, -3]}
+            ref={backLightRef}
             intensity={0.3}
             color='#e6f0ff'
           />
@@ -49,28 +143,38 @@ export default function Lighting() {
           {/* 밤에는 주변광 매우 약하게 설정 */}
           <ambientLight intensity={0.3} color='#1a2035' />
 
-          {/* 전체적으로 방을 밝히는 주 조명 */}
+          {/* 카메라를 따라가는 주 조명 */}
           <pointLight
-            position={[2, 3, 2]}
-            intensity={1}
+            ref={mainPointLightRef}
+            intensity={lightIntensity * 1.2}
             color={unifiedLightColor}
             castShadow
-            distance={8}
+            distance={Math.max(width, height) * 2}
             decay={1}
+            shadow-mapSize-width={1024}
+            shadow-mapSize-height={1024}
           />
 
           {/* 보조 조명 */}
           <pointLight
-            position={[-2, 2, -2]}
+            position={[width * 0.8, height * 0.4, height * 0.8]}
             intensity={0.2}
             color={unifiedLightColor}
-            distance={8}
+            distance={Math.max(width, height) * 1.5}
             decay={1}
+          />
+
+          <pointLight
+            position={[width * 0.2, height * 0.4, height * 0.2]}
+            intensity={0.15}
+            color={unifiedLightColor}
+            distance={Math.max(width, height) * 1.5}
+            decay={1.5}
           />
 
           {/* 전체 조명*/}
           <directionalLight
-            position={[1, 4, 1]}
+            position={[width / 2, height * 2, height / 2]}
             intensity={0.3}
             color={unifiedLightColor}
           />
