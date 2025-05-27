@@ -1,3 +1,4 @@
+import { FurnitureStoreInfo } from './furniture';
 export interface PlacedFurnitureInput {
   furnitureId: string;
   positionX: number;
@@ -22,9 +23,10 @@ export interface RoomSaveRequest {
 export interface RoomResponse {
   id: string;
   name: string;
-  width: number;
-  height: number;
+  roomWidth: number;
+  roomHeight: number;
   thumbnailUrl: string;
   userId: string;
   createdAt: string;
+  furnitures: FurnitureStoreInfo[];
 }
