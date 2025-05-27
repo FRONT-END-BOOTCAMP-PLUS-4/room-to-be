@@ -1,7 +1,6 @@
 // app/simulator/components/room/Lighting.tsx
 'use client';
 import { useEffect, useRef } from 'react';
-import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
 import { useBackgroundStore } from '@/stores/useBackgroundStore';
@@ -12,7 +11,6 @@ import { useViewStore } from '@/stores/useViewStore';
 /* eslint-disable */
 // @ts-ignore
 export default function Lighting() {
-  const { camera } = useThree();
   const isDay = useLightingStore((s) => s.isDay);
   const getCurrentBackground = useBackgroundStore(
     (s) => s.getCurrentBackground,
@@ -26,12 +24,9 @@ export default function Lighting() {
   const backLightRef = useRef<THREE.DirectionalLight>(null);
 
   const background = getCurrentBackground();
-  const unifiedLightColor = '#ffd89b';
 
-  const lightColor = isDay ? background.dayLightColor : unifiedLightColor;
-  const lightIntensity = isDay
-    ? background.dayLightIntensity
-    : background.nightLightIntensity;
+  const lightColor = isDay ? '#ffffff' : '#ffd89b';
+  const lightIntensity = isDay ? 2.0 : 1.2;
 
   // 카메라 위치에 따라 조명 위치 업데이트
   useEffect(() => {
@@ -113,7 +108,7 @@ export default function Lighting() {
       {isDay ? (
         <>
           {/* 전체 씬 밝기용 기본 조명 */}
-          <ambientLight intensity={0.4} color='#f5f3ed' />
+          <ambientLight intensity={0.8} color='#ffffff' />
 
           {/* 태양광 */}
           <directionalLight
@@ -134,20 +129,28 @@ export default function Lighting() {
           {/* 카메라 각도에 따른 보조 조명 */}
           <directionalLight
             ref={backLightRef}
-            intensity={0.3}
-            color='#e6f0ff'
+            intensity={0.6}
+            color='#ffffff'
+          />
+
+          <pointLight
+            position={[width / 2, height * 0.5, height / 2]}
+            intensity={0.4}
+            color='#ffffff'
+            distance={Math.max(width, height) * 2}
+            decay={1}
           />
         </>
       ) : (
         <>
           {/* 밤에는 주변광 매우 약하게 설정 */}
-          <ambientLight intensity={0.3} color='#1a2035' />
+          <ambientLight intensity={0.5} color='#d0d0e0' />
 
           {/* 카메라를 따라가는 주 조명 */}
           <pointLight
             ref={mainPointLightRef}
             intensity={lightIntensity * 1.2}
-            color={unifiedLightColor}
+            color='#f5f5dc'
             castShadow
             distance={Math.max(width, height) * 2}
             decay={1}
@@ -158,16 +161,16 @@ export default function Lighting() {
           {/* 보조 조명 */}
           <pointLight
             position={[width * 0.8, height * 0.4, height * 0.8]}
-            intensity={0.2}
-            color={unifiedLightColor}
+            intensity={0.3}
+            color='#f5f5dc'
             distance={Math.max(width, height) * 1.5}
             decay={1}
           />
 
           <pointLight
             position={[width * 0.2, height * 0.4, height * 0.2]}
-            intensity={0.15}
-            color={unifiedLightColor}
+            intensity={0.25}
+            color='#f5f5dc'
             distance={Math.max(width, height) * 1.5}
             decay={1.5}
           />
@@ -175,8 +178,8 @@ export default function Lighting() {
           {/* 전체 조명*/}
           <directionalLight
             position={[width / 2, height * 2, height / 2]}
-            intensity={0.3}
-            color={unifiedLightColor}
+            intensity={0.5}
+            color='#f5f5dc'
           />
         </>
       )}

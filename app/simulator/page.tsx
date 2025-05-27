@@ -106,8 +106,8 @@ export default function SimulatorPage() {
             <Room
               width={roomWidth}
               height={roomHeight}
-              wallTexture='/assets/images/testwall.jpg'
-              floorTexture='/assets/images/woodfloor.png'
+              wallTexture='/assets/images/white-wall.png'
+              floorTexture='/assets/images/white-wood-floor.png'
               floorExtension={floorExtension}
             />
             {furnitures.map((furniture) => (
