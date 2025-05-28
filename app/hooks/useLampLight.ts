@@ -30,7 +30,7 @@ export default function useLampLight({ meshRef, name }: UseLampLightProps) {
 
     // 현재 테마 가져오기
     const Background = getCurrentBackground();
-    const lightColor = Background.nightLightColor;
+    const unifiedLightColor = '#ffd89b';
     const lightIntensity = Background.nightLightIntensity * 1.5;
 
     // 기존에 추가된 조명이 있으면 제거
@@ -43,7 +43,7 @@ export default function useLampLight({ meshRef, name }: UseLampLightProps) {
     // 낮/밤 모드에 따라 조명 설정
     if (!isDay) {
       const light = new THREE.PointLight(
-        lightColor,
+        unifiedLightColor,
         lightIntensity,
         5, // 도달 거리
         1.5, // 감쇠율

@@ -2,10 +2,47 @@
 
 import { useEffect, useRef } from 'react';
 import { useThree } from '@react-three/fiber';
-import { Color } from 'three';
+import { CanvasTexture } from 'three';
+import * as THREE from 'three';
 
 import { useBackgroundStore } from '@/stores/useBackgroundStore';
 import { useLightingStore } from '@/stores/useLightingStore';
+
+// Canvas로 그라데이션 텍스처 생성하는 함수
+function createGradientTexture(colors: string[]): CanvasTexture {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 1024;
+
+  const context = canvas.getContext('2d');
+  if (!context) {
+    throw new Error('Canvas context not available');
+  }
+
+  // 세로 그라데이션
+  const gradient = context.createLinearGradient(0, 0, 0, canvas.height);
+
+  // 색상 스톱 추가
+  colors.forEach((color, index) => {
+    const stop = index / (colors.length - 1);
+    gradient.addColorStop(stop, color);
+  });
+
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, canvas.width, canvas.height);
+
+  const texture = new CanvasTexture(canvas);
+  texture.needsUpdate = true;
+
+  // 부드러운 보간을 위한 설정
+  texture.generateMipmaps = false;
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+
+  texture.colorSpace = THREE.SRGBColorSpace;
+
+  return texture;
+}
 
 export default function BackgroundBackground() {
   const { scene } = useThree();
@@ -14,53 +51,34 @@ export default function BackgroundBackground() {
     (s) => s.getCurrentBackground,
   );
   const currentBackgroundId = useBackgroundStore((s) => s.currentBackgroundId);
-  const prevBackgroundRef = useRef<string | null>(null);
-  const animationRef = useRef<number>();
+  const hasHydrated = useBackgroundStore((s) => s.hasHydrated);
+  const currentTextureRef = useRef<CanvasTexture | null>(null);
 
   useEffect(() => {
+    if (!hasHydrated) return;
+
     const Background = getCurrentBackground();
     const targetColor = isDay
       ? Background.dayBackground
       : Background.nightBackground;
 
-    // 현재 배경색 저장
-    const currentColor = prevBackgroundRef.current || targetColor;
-    prevBackgroundRef.current = targetColor;
+    const newTexture = createGradientTexture(targetColor);
 
-    // 색상 애니메이션 효과
-    let startTime = performance.now();
-    const duration = 300;
-
-    // 시작 색상과 타겟 색상 생성
-    const startColor = new Color(currentColor);
-    const endColor = new Color(targetColor);
-
-    // 애니메이션 함수
-    function animateColor() {
-      const elapsed = performance.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-
-      // 색상 보간
-      const currentR = startColor.r + (endColor.r - startColor.r) * progress;
-      const currentG = startColor.g + (endColor.g - startColor.g) * progress;
-      const currentB = startColor.b + (endColor.b - startColor.b) * progress;
-
-      scene.background = new Color(currentR, currentG, currentB);
-
-      if (progress < 1) {
-        animationRef.current = requestAnimationFrame(animateColor);
-      }
+    if (currentTextureRef.current) {
+      currentTextureRef.current.dispose();
     }
 
-    animateColor();
-
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-      prevBackgroundRef.current = targetColor;
-    };
+    scene.background = newTexture;
+    currentTextureRef.current = newTexture;
   }, [isDay, getCurrentBackground, scene, currentBackgroundId]);
+
+  useEffect(() => {
+    return () => {
+      if (currentTextureRef.current) {
+        currentTextureRef.current.dispose();
+      }
+    };
+  });
 
   return null;
 }
