@@ -57,7 +57,7 @@ export default function FurnitureController() {
   const setIsDay = useLightingStore((state) => state.setIsDay);
 
   const selectedFurniture = useMemo(() => {
-    return furnitures.find((f) => f.id === selectedFurnitureId) || null;
+    return (furnitures ?? []).find((f) => f.id === selectedFurnitureId) || null;
   }, [furnitures, selectedFurnitureId]);
 
   const updateSelectedFurniture = (updated: Partial<FurnitureStoreInfo>) => {

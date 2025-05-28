@@ -1,7 +1,17 @@
-export interface SaveRoomDto {
+export type SaveRoomDto = {
   name: string;
   width: number;
   height: number;
+  thumbnailUrl: string;
   userId: string;
-  imageBlob: Blob; // 클라이언트에서 보내는 썸네일 이미지/ 파일처럼 다룰 수 있는 이진 데이터 묶음 타입
-}
+  furnitures: {
+    furnitureId: string;
+    positionX: number;
+    positionY: number;
+    positionZ: number;
+    rotationY: number;
+    scaleX: number;
+    scaleY: number;
+    scaleZ: number;
+  }[];
+};

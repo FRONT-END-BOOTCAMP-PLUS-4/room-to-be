@@ -1,10 +1,11 @@
 // backend/usecases/furniture/createFurniture.ts
 import { Furniture } from '@/backend/domain/entities/Furniture';
 import { FurnitureRepository } from '@/backend/domain/repositories/FurnitureRepository';
+
 import {
   uploadFurnitureModel,
   uploadFurnitureThumbnail,
-} from '@/backend/infra/db/supabase/SupabaseStorageUploader';
+} from '@/utils/SupabaseStorageUploader';
 
 interface CreateFurnitureParams {
   name: string;

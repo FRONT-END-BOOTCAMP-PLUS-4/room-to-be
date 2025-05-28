@@ -46,3 +46,4 @@ export async function uploadFurnitureModel(
   if (error) throw error;
   return supabase.storage.from('r2b').getPublicUrl(path).data.publicUrl;
 }
+
