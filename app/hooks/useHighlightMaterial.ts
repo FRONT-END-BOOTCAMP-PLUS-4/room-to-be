@@ -54,7 +54,7 @@ export default function useHighlightMaterial({
         if (isSelected) {
           mat.emissive = new THREE.Color(0x00ffff);
           mat.emissiveIntensity = 0.8;
-        } else {
+        } else { 
           mat.emissive.copy(child.userData._originalEmissive);
           mat.emissiveIntensity = child.userData._originalIntensity ?? 0;
         }
