@@ -29,24 +29,31 @@ export default function useLampEmissiveMaterial({
   useEffect(() => {
     if (!isLamp || isDay) return;
 
-    // 현재 테마 가져오기
-    const Background = getCurrentBackground();
-    const emissiveColor = isDay ? '#000000' : Background.nightLightColor;
+    const unifiedEmissiveColor = '#ffd89b';
     const emissiveIntensity = isDay ? 0 : 2.0;
 
-    scene.traverse((child: any) => {
+    scene.traverse((child: THREE.Object3D) => {
       // 메시가 아니거나 발광 속성이 없으면 무시
-      if (!child.isMesh || !('emissive' in child.material)) return;
+      if (
+        !(child as THREE.Mesh).isMesh ||
+        !('emissive' in (child as THREE.Mesh).material)
+      )
+        return;
+
+      const mesh = child as THREE.Mesh;
+      const material = mesh.material as THREE.MeshStandardMaterial;
 
       // 재질 클론하기 (중복 clone 방지)
       if (!child.userData._emissiveCloned) {
-        child.material = child.material.clone();
-        child.userData._emissiveCloned = true;
+        mesh.material = material.clone();
+        mesh.userData._emissiveCloned = true;
 
         // 원래 색 저장
-        child.userData._originalEmissive = child.material.emissive.clone();
-        child.userData._originalIntensity =
-          child.material.emissiveIntensity ?? 0;
+        mesh.userData._originalEmissive = (
+          mesh.material as THREE.MeshStandardMaterial
+        ).emissive.clone();
+        mesh.userData._originalIntensity =
+          (mesh.material as THREE.MeshStandardMaterial).emissiveIntensity ?? 0;
       }
 
       // 램프의 갓이나 전구 부분 이름 찾기
@@ -68,25 +75,27 @@ export default function useLampEmissiveMaterial({
 
       // 특정 색상의 메시도 발광 부분으로 간주 (노란색, 금색 등)
       const hasEmissiveColor =
-        child.material.color &&
-        ((child.material.color.r > 0.7 &&
-          child.material.color.g > 0.5 &&
-          child.material.color.b < 0.3) || // 금색/노란색
-          (child.material.color.r > 0.8 &&
-            child.material.color.g > 0.8 &&
-            child.material.color.b > 0.7)); // 흰색/밝은색
+        (mesh.material as THREE.MeshStandardMaterial).color &&
+        (((mesh.material as THREE.MeshStandardMaterial).color.r > 0.7 &&
+          (mesh.material as THREE.MeshStandardMaterial).color.g > 0.5 &&
+          (mesh.material as THREE.MeshStandardMaterial).color.b < 0.3) || // 금색/노란색
+          ((mesh.material as THREE.MeshStandardMaterial).color.r > 0.8 &&
+            (mesh.material as THREE.MeshStandardMaterial).color.g > 0.8 &&
+            (mesh.material as THREE.MeshStandardMaterial).color.b > 0.7));
 
       if (isLampPart || hasEmissiveColor) {
+        const meshMaterial = mesh.material as THREE.MeshStandardMaterial;
+
         // 낮/밤에 따라 빛나는 효과 조정
         if (!isDay) {
           // 빛나는 효과 부여
-          child.material.emissive.set(emissiveColor);
-          child.material.emissiveIntensity = emissiveIntensity;
+          meshMaterial.emissive.set(unifiedEmissiveColor);
+          meshMaterial.emissiveIntensity = emissiveIntensity;
         } else {
           // 낮에는 원래 상태로 복원
           if (child.userData._originalEmissive) {
-            child.material.emissive.copy(child.userData._originalEmissive);
-            child.material.emissiveIntensity =
+            meshMaterial.emissive.copy(child.userData._originalEmissive);
+            meshMaterial.emissiveIntensity =
               child.userData._originalIntensity ?? 0;
           }
         }

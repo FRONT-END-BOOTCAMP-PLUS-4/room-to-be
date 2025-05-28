@@ -21,9 +21,6 @@ export default function useHighlightMaterial({
       child.castShadow = true;
       child.receiveShadow = true;
 
-      // material 복제하여 독립적인 인스턴스 생성
-      child.material = child.material.clone();
-
       // 클릭 무시할 mesh 이름 정의
       const ignoredNames = ['FLOOR', 'WALL', 'CEILING', 'GLASS'];
       const name = child.name?.toUpperCase?.() ?? '';
@@ -31,6 +28,12 @@ export default function useHighlightMaterial({
       // 위에서 지정한 이름이라면 raycast 무효화하여 클릭 방지
       if (ignoredNames.includes(name)) {
         child.raycast = () => null;
+        return;
+      }
+
+      // 창문 유리 재질인지 확인
+      const isWindowGlass = child.userData._isWindowGlass === true;
+      if (isWindowGlass) {
         return;
       }
 

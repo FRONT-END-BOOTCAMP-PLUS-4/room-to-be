@@ -10,6 +10,9 @@ interface RoomProps {
   wallTexture: string; // public 경로 또는 import된 이미지
   floorTexture: string;
   floorExtension?: number;
+  enableFloorShadow?: boolean;
+  shadowOpacity?: number;
+  shadowFadeDistance?: number;
 }
 
 const Room = ({
@@ -18,7 +21,11 @@ const Room = ({
   wallTexture,
   floorTexture,
   floorExtension = 0.2,
-}: RoomProps) => {
+
+  enableFloorShadow = true,
+  shadowOpacity = 1,
+  shadowFadeDistance = 0.5,
+}: RoomProps) {
   return (
     <>
       <Floor
@@ -26,6 +33,9 @@ const Room = ({
         height={height}
         texture={floorTexture}
         extension={floorExtension}
+        enableShadow={enableFloorShadow}
+        shadowOpacity={shadowOpacity}
+        shadowFadeDistance={shadowFadeDistance}
       />
       <Wall width={width} height={height} texture={wallTexture} />
     </>

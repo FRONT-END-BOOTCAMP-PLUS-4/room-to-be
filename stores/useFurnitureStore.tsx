@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 import { FurnitureStoreInfo } from '@/app/types/furniture';
 
@@ -22,19 +23,22 @@ interface FurnitureStore {
   setRenderableIds: (ids: string[]) => void;
 }
 
+
 export const useFurnitureStore = create<FurnitureStore>((set) => ({
   furnitures: [],
   selectedFurnitureId: null,
   prevFurnitureStates: {},
   renderableFurnitureIds: [],
 
-  selectFurniture: (id) => set({ selectedFurnitureId: id }),
-  clearSelection: () => set({ selectedFurnitureId: null }),
 
-  addFurniture: (info) =>
-    set((state) => ({
-      furnitures: [...state.furnitures, info],
-    })),
+      selectFurniture: (id) => set({ selectedFurnitureId: id }),
+      clearSelection: () => set({ selectedFurnitureId: null }),
+
+      addFurniture: (info) =>
+        set((state) => ({
+          furnitures: [...state.furnitures, info],
+        })),
+
 
   markRenderable: (id) =>
     set((state) => ({
@@ -91,5 +95,13 @@ export const useFurnitureStore = create<FurnitureStore>((set) => ({
           [id]: null,
         },
       };
+
     }),
-}));
+    {
+      name: 'furniture-storage',
+      partialize: (state) => ({
+        furnitures: state.furnitures,
+      }),
+    },
+  ),
+);
