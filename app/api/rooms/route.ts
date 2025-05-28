@@ -1,41 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { PrismaRoomRepository } from '@/backend/infra/db/models/PrismaRoomRepository';
 import { GetRoomsByUserIdDto } from '@/backend/dto/GetRoomsByUserIdDto';
+import { SaveRoomDto } from '@/backend/dto/SaveRoomDto';
 import { GetRoomsByUserId } from '@/backend/usecase/room/GetRoomsByUserId';
 import { SaveRoom } from '@/backend/usecase/room/SaveRoom';
 
 export async function POST(req: NextRequest) {
   try {
-    const form = await req.formData();
+    const body = (await req.json()) as SaveRoomDto;
 
-    const name = form.get('name') as string;
-    const width = parseInt(form.get('width') as string, 10);
-    const height = parseInt(form.get('height') as string, 10);
-    const userId = form.get('userId') as string;
-    const image = form.get('image') as Blob;
+    const usecase = new SaveRoom(new PrismaRoomRepository());
+    const room = await usecase.execute(body);
 
-    if (!name || !width || !height || !userId || !image) {
-      return NextResponse.json({ message: '필수 값 누락' }, { status: 400 });
-    }
-
-    const result = await SaveRoom({
-      name,
-      width,
-      height,
-      userId,
-      imageBlob: image,
-    });
-
-    return NextResponse.json(result, { status: 201 });
-  } catch (error: any) {
-    console.error('[POST /api/rooms]', error);
-    return NextResponse.json(
-      {
-        message: '서버 오류 (방 저장 실패)',
-        error: error?.message || String(error),
-      },
-      { status: 500 },
-    );
+    return NextResponse.json(room, { status: 201 });
+  } catch (err) {
+    console.error('[POST /api/rooms] Error:', err);
+    return NextResponse.json({ error: 'Failed to save room' }, { status: 500 });
   }
 }
 

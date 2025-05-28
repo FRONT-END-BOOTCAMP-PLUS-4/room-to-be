@@ -82,7 +82,12 @@ export default function SavedRoomCard({
           setIsHovered(false);
         }
       }}
-      className={`w-full max-w-[400px] aspect-[10/7] group relative ${isHovered || isMenuOpen ? 'active-card' : ''}`}
+      className={`
+    w-full max-w-[400px] aspect-[10/7] group relative
+    rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1
+    transform transition-all duration-300 overflow-hidden
+    ${isHovered || isMenuOpen ? 'active-card' : ''}
+  `}
     >
       <Image
         src={imageUrl}

@@ -1,9 +1,16 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { signOut, useSession } from 'next-auth/react';
 
 import OnlyTextButton from './buttons/OnlyTextButton';
 
 function Header() {
+  const session = useSession();
+  const router = useRouter();
+
   return (
     <div className='absolute w-full h-[70px] z-10 flex items-center justify-between px-10'>
       <Link href='/' className='inline-block p-[10px]'>
@@ -14,12 +21,21 @@ function Header() {
           height={30}
         />
       </Link>
-      <div className='flex items-center gap-2'>
-        <OnlyTextButton>Login</OnlyTextButton>
-        {/* <OnlyTextButton>MyPage</OnlyTextButton>
-        <OnlyTextButton>Logout</OnlyTextButton> */}
-      </div>
+      {session.data ? (
+        <div className='flex items-center gap-2'>
+          {/* TODO: 라우터 경로 수정하기 */}
+          <OnlyTextButton onClick={() => router.push('/login')}>
+            My Page
+          </OnlyTextButton>
+          <OnlyTextButton onClick={() => signOut()}>Logout</OnlyTextButton>
+        </div>
+      ) : (
+        <OnlyTextButton onClick={() => router.push('/login')}>
+          Login
+        </OnlyTextButton>
+      )}
     </div>
   );
 }
+
 export default Header;

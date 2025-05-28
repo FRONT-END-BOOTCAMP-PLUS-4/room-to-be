@@ -1,4 +1,3 @@
-// app/simulator/components/room/Floor.tsx
 import { useLoader } from '@react-three/fiber';
 import { TextureLoader } from 'three';
 
