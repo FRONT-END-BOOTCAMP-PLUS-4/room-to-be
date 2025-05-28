@@ -9,12 +9,15 @@ datasource db {
 }
 
 model User {
-  id         String   @id @default(uuid())
-  name       String
-  email      String   @unique
-  image      String?
-  created_at DateTime @default(now())
-  rooms      Room[]
+  id            String    @id @default(uuid())
+  name          String
+  email         String?   @unique
+  image         String?
+  created_at    DateTime  @default(now())
+  emailVerified DateTime?
+  accounts      Account[]
+  rooms         Room[]
+  sessions      Session[]
 }
 
 model Room {
@@ -57,4 +60,40 @@ model PlacedFurniture {
   scale_z      Float
   furniture    Furniture @relation(fields: [furniture_id], references: [id])
   room         Room      @relation(fields: [room_id], references: [id])
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
 }
