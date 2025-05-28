@@ -25,7 +25,7 @@ const Room = ({
   enableFloorShadow = true,
   shadowOpacity = 1,
   shadowFadeDistance = 0.5,
-}: RoomProps) {
+}: RoomProps) => {
   return (
     <>
       <Floor
