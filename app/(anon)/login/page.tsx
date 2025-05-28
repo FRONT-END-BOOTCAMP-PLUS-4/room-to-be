@@ -58,9 +58,9 @@ export default function LoginPage() {
           >
             <span className='bg-white rounded-full w-7 h-7 flex items-center justify-center'>
               <Image
-                width={15}
-                height={15}
-                src='/assets/icons/kakao.png'
+                width={17}
+                height={17}
+                src='/assets/icons/kakao.svg'
                 alt='Kakao Logo'
               />
             </span>
