@@ -41,7 +41,12 @@ export default function LoginPage() {
             onClick={() => signIn('google')}
           >
             <span className='bg-white text-[#EA4335] rounded-full w-7 h-7 flex items-center justify-center font-extrabold text-xl'>
-              G
+              <Image
+                width={17}
+                height={17}
+                src='/assets/icons/google-logo.svg'
+                alt='Google Logo'
+              />
             </span>
             <span className='flex-1 text-center'>구글로 로그인 하기</span>
           </button>
