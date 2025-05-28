@@ -61,7 +61,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='ko' className={pretendard.variable}>
-      <body>{children}</body>
+      <body>
+        <SessionProvider>{children}</SessionProvider>
+        <GlobalLoadingProvider />
+      </body>
     </html>
   );
 }
