@@ -28,7 +28,6 @@ interface SimulatorPageProps {
   roomId?: string;
 }
 export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
-  console.log('무슨 모드?', mode);
   const { setLoading } = useLoadingStore();
   const [canvasCreated, setCanvasCreated] = useState(false);
   const [sceneLoaded, setSceneLoaded] = useState(false);
@@ -101,8 +100,6 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
       const load = async () => {
         try {
           const room = await getRoomById(roomId);
-          console.log('room 전체 구조:', room);
-          console.log('방 크기 찍히니?', room.roomHeight, room.roomWidth);
           const validFurnitures = (room.furnitures ?? []).map((f) => ({
             id: f.id,
             furnitureId: f.furnitureId,
