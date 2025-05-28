@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 
 import { Button } from '@/components/ui/button';
 
@@ -10,6 +11,7 @@ import { fetchFurnitureByPlacementType } from '@/apis/furnitures';
 import { getRoomById } from '@/apis/rooms';
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
 import { useLoadingStore } from '@/stores/useLoadingStore';
+import { useLoginRedirectModalStore } from '@/stores/useLoginRedirectModalStore';
 import { useRoomSizeStore } from '@/stores/useRoomSizeStore';
 
 import CaptureCanvas from './components/capture/CaptureCanvas';
@@ -28,6 +30,8 @@ interface SimulatorPageProps {
   roomId?: string;
 }
 export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
+  const session = useSession();
+  const { openModal } = useLoginRedirectModalStore();
   const { setLoading } = useLoadingStore();
   const [canvasCreated, setCanvasCreated] = useState(false);
   const [sceneLoaded, setSceneLoaded] = useState(false);
@@ -70,6 +74,10 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
   const cameraDistance = Math.max(roomWidth, roomHeight) * 1.4;
 
   const handleSaveClick = () => {
+    if (!session.data) {
+      openModal();
+      return;
+    }
     if (mode === 'create') {
       setIsSaveModalOpen(true); // 저장 모달 띄우기
       // } else {
