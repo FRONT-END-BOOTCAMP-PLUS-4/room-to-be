@@ -1,3 +1,4 @@
+import { PlacedFurniture } from './PlacedFurniture';
 export class Room {
   constructor(
     public id: string = '',
@@ -7,5 +8,6 @@ export class Room {
     public thumbnailUrl: string,
     public userId: string,
     public createdAt: Date,
+    public furnitures: PlacedFurniture[] = [], 
   ) {}
 }

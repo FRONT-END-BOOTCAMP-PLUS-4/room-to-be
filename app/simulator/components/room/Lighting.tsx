@@ -1,4 +1,3 @@
-// app/simulator/components/room/Lighting.tsx
 'use client';
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';

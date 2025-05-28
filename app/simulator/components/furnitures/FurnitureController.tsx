@@ -57,7 +57,7 @@ export default function FurnitureController() {
   const setIsDay = useLightingStore((state) => state.setIsDay);
 
   const selectedFurniture = useMemo(() => {
-    return furnitures.find((f) => f.id === selectedFurnitureId) || null;
+    return (furnitures ?? []).find((f) => f.id === selectedFurnitureId) || null;
   }, [furnitures, selectedFurnitureId]);
 
   const updateSelectedFurniture = (updated: Partial<FurnitureStoreInfo>) => {
@@ -117,7 +117,7 @@ export default function FurnitureController() {
           onClick={handleRoomRotate}
         />
         <FurnitureControllerBtn
-          text={isTopView ? '3D 뷰' : '2D 뷰'}
+          text={isTopView ? '3D 뷰' : '탑 뷰'}
           onClick={handleViewToggle}
         />
       </div>

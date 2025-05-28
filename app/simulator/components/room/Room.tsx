@@ -1,9 +1,9 @@
-// app/simulator/components/room/Room.tsx
 'use client';
+
+import React from 'react';
 
 import Floor from './Floor';
 import Wall from './Wall';
-
 interface RoomProps {
   width: number; // meters
   height: number; // meters
@@ -15,12 +15,13 @@ interface RoomProps {
   shadowFadeDistance?: number;
 }
 
-export default function Room({
+const Room = ({
   width,
   height,
   wallTexture,
   floorTexture,
   floorExtension = 0.2,
+
   enableFloorShadow = true,
   shadowOpacity = 1,
   shadowFadeDistance = 0.5,
@@ -39,4 +40,6 @@ export default function Room({
       <Wall width={width} height={height} texture={wallTexture} />
     </>
   );
-}
+};
+
+export default React.memo(Room);

@@ -3,6 +3,7 @@ import './globals.css';
 import React from 'react';
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
+import { SessionProvider } from 'next-auth/react';
 
 import GlobalLoadingProvider from './components/loading/GlobalLoadingProvider';
 
@@ -61,7 +62,7 @@ export default function RootLayout({
   return (
     <html lang='ko' className={pretendard.variable}>
       <body>
-        {children}
+        <SessionProvider>{children}</SessionProvider>
         <GlobalLoadingProvider />
       </body>
     </html>

@@ -1,30 +1,39 @@
-import { randomUUID } from 'crypto';
-
+import { PlacedFurniture } from '@/backend/domain/entities/PlacedFurniture';
 import { Room } from '@/backend/domain/entities/Room';
-import { PrismaRoomRepository } from '@/backend/infra/db/models/PrismaRoomRepository';
-import { uploadRoomThumbnail } from '@/backend/infra/db/supabase/SupabaseStorageUploader';
+import { RoomRepository } from '@/backend/domain/repositories/RoomRepository';
 import { SaveRoomDto } from '@/backend/dto/SaveRoomDto';
 
-export async function SaveRoom(input: SaveRoomDto): Promise<Room> {
-  const roomRepository = new PrismaRoomRepository();
+export class SaveRoom {
+  constructor(private readonly roomRepo: RoomRepository) {}
 
-  // uuid 직접 생성
-  const roomId = randomUUID();
+  async execute(dto: SaveRoomDto): Promise<Room> {
+    const furnitures = dto.furnitures.map((f) => {
+      return new PlacedFurniture(
+        '', // id 
+        '', // roomId
+        f.furnitureId,
+        f.positionX,
+        f.positionY,
+        f.positionZ,
+        f.rotationY,
+        f.scaleX,
+        f.scaleY,
+        f.scaleZ,
+        new Date(),
+      );
+    });
 
-  // Supabase Storage에 썸네일 업로드
-  const thumbnailUrl = await uploadRoomThumbnail(input.imageBlob, roomId);
+    const room = new Room(
+      '', // id
+      dto.name,
+      dto.width,
+      dto.height,
+      dto.thumbnailUrl,
+      dto.userId,
+      new Date(),
+      furnitures,
+    );
 
-  // Room 객체 생성
-  const room = new Room(
-    roomId,
-    input.name,
-    input.width,
-    input.height,
-    thumbnailUrl,
-    input.userId,
-    new Date(),
-  );
-
-  // DB 저장
-  return await roomRepository.saveRoom(room);
+    return this.roomRepo.save(room);
+  }
 }
