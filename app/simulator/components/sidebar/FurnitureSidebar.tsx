@@ -1,11 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import type { Furnitures } from '@/app/types/furniture';
 
-import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
@@ -31,7 +29,7 @@ export default function FurnitureSidebar({
   const [search, setSearch] = useState('');
   const [furniture, setFurniture] = useState<Furnitures[]>([]);
   const addFurniture = useFurnitureStore((state) => state.addFurniture);
-
+  const markRenderable = useFurnitureStore((state) => state.markRenderable);
   useEffect(() => {
     const fetch = async () => {
       const data = await fetchFurnitureByPlacementType(placementType);
@@ -74,7 +72,15 @@ export default function FurnitureSidebar({
       <PlacementToggle value={placementType} onChange={setPlacementType} />
 
       <ScrollArea className='h-[calc(100vh-180px)] pr-2'>
-        <FurnitureGroupList grouped={grouped} onSelect={addFurniture} />
+        <FurnitureGroupList
+          grouped={grouped}
+          onSelect={(info) => {
+            addFurniture(info);
+            setTimeout(() => {
+              markRenderable(info.id);
+            }, 200); // GLTF 안정화 시간
+          }}
+        />
       </ScrollArea>
     </div>
   );

@@ -37,14 +37,13 @@ export default function Page() {
     <div className='relative'>
       <Header userId={userId} />
 
-      {/* 하얀 박스는 absolute로 고정 배치 */}
       <div className='absolute top-[320px] left-0 w-full z-10'>
         <div className='bg-white rounded-t-[28px] pt-10 overflow-hidden'>
           <div className='container mx-auto px-7'>
             {!isLoading && (
               <>
                 {rooms.length > 0 && <RoomCount count={rooms.length} />}
-                <RoomList rooms={rooms} />
+                <RoomList rooms={rooms} setRooms={setRooms} />
               </>
             )}
 

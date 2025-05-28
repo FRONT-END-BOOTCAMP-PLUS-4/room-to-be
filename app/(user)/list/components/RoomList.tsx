@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { Player } from '@lottiefiles/react-lottie-player';
 import Link from 'next/link';
 
@@ -16,10 +15,13 @@ interface Room {
   createdAt: string;
 }
 
-export default function RoomList({ rooms }: { rooms: Room[] }) {
-  const [roomList, setRoomList] = useState<Room[]>(rooms);
+interface RoomListProps {
+  rooms: Room[];
+  setRooms: React.Dispatch<React.SetStateAction<Room[]>>;
+}
 
-  if (roomList.length === 0) {
+export default function RoomList({ rooms, setRooms }: RoomListProps) {
+  if (rooms.length === 0) {
     return (
       <div className='flex flex-col items-center justify-center text-center mt-1 relative'>
         <Player
@@ -46,14 +48,14 @@ export default function RoomList({ rooms }: { rooms: Room[] }) {
 
   return (
     <ul className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-[26px] gap-y-[48px]'>
-      {roomList.map((room) => (
+      {rooms.map((room) => (
         <SavedRoomCard
           key={room.id}
           roomId={room.id}
           imageUrl={room.thumbnailUrl}
           title={room.name}
           onDelete={() =>
-            setRoomList((prev) => prev.filter((r) => r.id !== room.id))
+            setRooms((prev) => prev.filter((r) => r.id !== room.id))
           }
         />
       ))}

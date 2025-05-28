@@ -1,13 +1,15 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+
 import { useLoadingStore } from '@/stores/useLoadingStore';
 
-import Loading from './Loading';
+const ClientLoading = dynamic(() => import('./Loading'), { ssr: false });
 
 export default function GlobalLoadingProvider() {
   const { isLoading } = useLoadingStore();
 
   if (!isLoading) return null;
 
-  return <Loading />;
+  return <ClientLoading />;
 }
