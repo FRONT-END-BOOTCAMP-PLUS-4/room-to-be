@@ -1,4 +1,3 @@
-// src/store/useLoginRedirectModalStore.ts
 import { create } from 'zustand';
 
 interface LoginRedirectModalState {
