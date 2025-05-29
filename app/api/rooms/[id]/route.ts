@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { PrismaRoomRepository } from '@/backend/infra/db/models/PrismaRoomRepository';
+import { SaveRoomDto } from '@/backend/dto/SaveRoomDto';
 import { DeleteRoomUseCase } from '@/backend/usecase/room/DeleteRoom';
+import { UpdateRoom } from '@/backend/usecase/room/UpdateRoom';
 
 export async function GET(
   req: Request,
@@ -47,6 +49,24 @@ export async function GET(
   return new Response(JSON.stringify(room), { status: 200 });
 }
 
+export async function PUT(
+  req: NextRequest,
+  context: { params: { id: string } },
+) {
+  const { id } = context.params;
+  const body: SaveRoomDto = await req.json();
+
+  const repo = new PrismaRoomRepository();
+  const updateRoom = new UpdateRoom(repo);
+
+  try {
+    const updated = await updateRoom.execute(id, body);
+    return NextResponse.json(updated, { status: 200 });
+  } catch (error: any) {
+    console.error('Room update failed:', error);
+    return NextResponse.json({ error: 'Room update failed' }, { status: 500 });
+  }
+}
 export async function DELETE(
   _req: NextRequest,
   context: { params: { id: string } },

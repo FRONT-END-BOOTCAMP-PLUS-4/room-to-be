@@ -5,4 +5,5 @@ export interface RoomRepository {
   save(room: Room): Promise<Room>;
   findByUserId(userId: string): Promise<Room[]>;
   deleteById(id: string): Promise<void>;
+  update(room: Room): Promise<Room>;
 }

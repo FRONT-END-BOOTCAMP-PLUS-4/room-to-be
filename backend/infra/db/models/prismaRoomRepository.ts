@@ -95,4 +95,27 @@ export class PrismaRoomRepository implements RoomRepository {
 
     await prisma.room.delete({ where: { id } });
   }
+  async update(room: Room): Promise<Room> {
+    await prisma.placedFurniture.deleteMany({
+      where: { room_id: room.id },
+    });
+
+    const updated = await prisma.room.update({
+      where: { id: room.id },
+      data: {
+        name: room.name,
+        width: room.width,
+        height: room.height,
+        thumbnail_url: room.thumbnailUrl,
+        furnitures: {
+          create: room.furnitures.map(toPrismaPlacedFurnitureCreateInput),
+        },
+      },
+      include: {
+        furnitures: true,
+      },
+    });
+
+    return toDomainRoom(updated);
+  }
 }

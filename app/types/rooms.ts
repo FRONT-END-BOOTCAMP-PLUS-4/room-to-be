@@ -11,7 +11,7 @@ export interface PlacedFurnitureInput {
 }
 
 export interface RoomSaveRequest {
-  id: string;
+  id?: string;
   name: string;
   width: number;
   height: number;
