@@ -11,6 +11,9 @@ import { PlacedFurnitureInput, RoomSaveRequest } from '@/app/types/rooms';
 import { uploadRoomThumbnail } from '@/utils/SupabaseStorageUploader';
 
 import { getRoomById, updateRoom } from '@/apis/rooms';
+import { useBackgroundStore } from '@/stores/useBackgroundStore';
+import { useCameraStore } from '@/stores/useCameraStore';
+import { useLightingStore } from '@/stores/useLightingStore';
 
 interface RoomEditModalProps {
   onClose: () => void;
@@ -52,6 +55,9 @@ export default function RoomEditModal({
         await deleteRoomThumbnail(roomId);
         const thumbnailUrl = await uploadRoomThumbnail(blob, roomId);
         const existingRoom = await getRoomById(roomId);
+        const cameraPosition = useCameraStore.getState().position;
+        const background = useBackgroundStore.getState().currentBackgroundId;
+        const isNightMode = !useLightingStore.getState().isDay;
 
         const dto: RoomSaveRequest = {
           id: roomId,
@@ -61,6 +67,11 @@ export default function RoomEditModal({
           thumbnailUrl,
           userId,
           furnitures,
+          background,
+          isNightMode,
+          cameraX: cameraPosition[0],
+          cameraY: cameraPosition[1],
+          cameraZ: cameraPosition[2],
         };
 
         await updateRoom(roomId, dto);

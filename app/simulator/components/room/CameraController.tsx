@@ -5,6 +5,7 @@ import { useThree } from '@react-three/fiber';
 import { PerspectiveCamera } from 'three';
 import * as THREE from 'three';
 
+import { useCameraStore } from '@/stores/useCameraStore';
 import { useViewStore } from '@/stores/useViewStore';
 
 interface CameraControllerProps {
@@ -24,6 +25,7 @@ export default function CameraController({
 
   const [introCompleted, setIntroCompleted] = useState(false);
   const animationIdRef = useRef<number>();
+  const setCameraPosition = useCameraStore((s) => s.setPosition);
 
   useEffect(() => {
     const centerX = width / 2;
@@ -56,6 +58,7 @@ export default function CameraController({
     if (isCaptureMode) {
       camera.position.copy(targetPosition);
       camera.lookAt(targetLookAt);
+      setCameraPosition([targetPosition.x, targetPosition.y, targetPosition.z]);
       if (camera instanceof PerspectiveCamera) {
         camera.fov = Math.max(50 / Math.pow(scaleFactor, 0.6), 25);
         camera.updateProjectionMatrix();
@@ -77,6 +80,7 @@ export default function CameraController({
 
       camera.position.copy(startPosition);
       camera.lookAt(targetLookAt);
+      setCameraPosition([targetPosition.x, targetPosition.y, targetPosition.z]);
 
       if (camera instanceof PerspectiveCamera) {
         camera.fov = 90;
