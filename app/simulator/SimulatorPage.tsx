@@ -150,7 +150,6 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
             .setRenderableIds(validFurnitures.map((f) => f.id));
           setHasLoaded(true);
         } catch (e) {
-          alert('방 정보를 불러오는 데 실패했습니다.');
           console.error(e);
         } finally {
           setLoading(false);

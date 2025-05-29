@@ -109,9 +109,9 @@ export default function SavedRoomCard({
               try {
                 await deleteRoomById(roomId); // 실제 삭제 API 호출
                 onDelete?.(); // 부모에서 넘겨준 삭제 콜백 호출 (리스트에서 제거됨)
-                alert('방이 삭제되었습니다');
+                console.log('저장')
               } catch (e) {
-                alert('삭제에 실패했습니다');
+                console.log('실패')
               } finally {
                 setIsMenuOpen(false);
               }

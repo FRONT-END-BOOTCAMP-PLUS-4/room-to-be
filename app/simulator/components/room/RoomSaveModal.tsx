@@ -36,7 +36,6 @@ export default function RoomSaveModal({
   const router = useRouter();
   const handleSave = async () => {
     if (!roomName.trim()) {
-      alert('방 이름을 입력해주세요.');
       return;
     }
 
@@ -70,13 +69,11 @@ export default function RoomSaveModal({
         cameraZ: cameraPosition[2],
       });
 
-      alert('방이 성공적으로 저장되었습니다.');
       onClose();
       await new Promise((res) => setTimeout(res, 300));
       router.push('/list');
     } catch (error) {
       console.error('방 저장 실패:', error);
-      alert('방 저장 중 오류가 발생했습니다.');
     } finally {
       setIsSaving(false);
     }
