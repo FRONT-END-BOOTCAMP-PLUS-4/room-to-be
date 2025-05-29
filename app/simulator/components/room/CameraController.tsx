@@ -10,11 +10,13 @@ import { useViewStore } from '@/stores/useViewStore';
 interface CameraControllerProps {
   width: number;
   height: number;
+  isCaptureMode?: boolean;
 }
 
 export default function CameraController({
   width,
   height,
+  isCaptureMode = false,
 }: CameraControllerProps) {
   const { camera } = useThree();
   const angle = useViewStore((s) => s.angle);
@@ -28,19 +30,12 @@ export default function CameraController({
     const centerZ = height / 2;
 
     const baseRoomSize = 4.07;
-
-    // 방 크기에 따른 비율 계산
     const scaleFactor = Math.max(width, height) / baseRoomSize;
-
-    // 방 크기에 따라 카메라 거리 동적 계산
     const roomDiagonal = Math.sqrt(width * width + height * height);
-
-    // 방 크기가 커져도 보이는 크기가 비슷하게 유지되도록 조정
     const cameraDistance = isTopView ? roomDiagonal * 0.8 : roomDiagonal * 1.2;
 
-    // 최종 카메라 위치 계산
+    const targetLookAt = new THREE.Vector3(centerX, 0.5, centerZ);
     let targetPosition = new THREE.Vector3();
-    let targetLookAt = new THREE.Vector3(centerX, 0.5, centerZ);
 
     if (isTopView) {
       const topViewHeight = Math.max(width, height) * 2;
@@ -48,20 +43,28 @@ export default function CameraController({
       const r = 0.001;
       const x = centerX + r * Math.sin(rad);
       const z = centerZ + r * Math.cos(rad);
-
       targetPosition.set(x, topViewHeight, z);
     } else {
       const rad = (angle * Math.PI) / 180;
       const r = cameraDistance;
       const x = centerX + r * Math.sin(rad);
       const z = centerZ + r * Math.cos(rad);
-
       targetPosition.set(x, cameraDistance * 0.7, z);
     }
 
-    // 첫 진입 시에만 애니메이션 실행
+    //캡쳐모드
+    if (isCaptureMode) {
+      camera.position.copy(targetPosition);
+      camera.lookAt(targetLookAt);
+      if (camera instanceof PerspectiveCamera) {
+        camera.fov = Math.max(50 / Math.pow(scaleFactor, 0.6), 25);
+        camera.updateProjectionMatrix();
+      }
+      return;
+    }
+
+    // 처음 접근시에만 애니메이션 동작
     if (!introCompleted) {
-      // 시작 위치: 매우 멀리서 시작
       const startDistance = roomDiagonal * 5;
       const startHeight = roomDiagonal * 3;
       const startRad = (angle * Math.PI) / 180;
@@ -72,18 +75,16 @@ export default function CameraController({
         centerZ + startDistance * Math.cos(startRad),
       );
 
-      // 카메라 초기 설정
       camera.position.copy(startPosition);
       camera.lookAt(targetLookAt);
 
       if (camera instanceof PerspectiveCamera) {
-        camera.fov = 90; // 매우 넓은 시야각으로 시작
+        camera.fov = 90;
         camera.updateProjectionMatrix();
       }
 
-      // 애니메이션 실행
       const startTime = performance.now();
-      const duration = 2500; // 2.5초
+      const duration = 2500;
 
       const animate = (currentTime: number) => {
         const elapsed = currentTime - startTime;
@@ -94,14 +95,11 @@ export default function CameraController({
           setIntroCompleted(true);
         }
 
-        // 부드러운 easing (ease-out)
         const eased = 1 - Math.pow(1 - progress, 3);
 
-        // 위치 보간
         camera.position.lerpVectors(startPosition, targetPosition, eased);
         camera.lookAt(targetLookAt);
 
-        // FOV 보간
         if (camera instanceof PerspectiveCamera) {
           const targetFov = Math.max(50 / Math.pow(scaleFactor, 0.6), 25);
           camera.fov = THREE.MathUtils.lerp(90, targetFov, eased);
@@ -114,15 +112,10 @@ export default function CameraController({
       };
 
       animationIdRef.current = requestAnimationFrame(animate);
-    }
-    // 애니메이션 완료 후 일반 업데이트
-    else {
+    } else {
       camera.position.copy(targetPosition);
       camera.lookAt(targetLookAt);
-
-      // FOV 조정 (방이 커질수록 FOV는 좁아짐 - 망원경 효과)
       if (camera instanceof PerspectiveCamera) {
-        // 기본 FOV는 50도, 방 크기에 따라 조정
         camera.fov = Math.max(50 / Math.pow(scaleFactor, 0.6), 25);
         camera.updateProjectionMatrix();
       }
@@ -133,7 +126,7 @@ export default function CameraController({
         cancelAnimationFrame(animationIdRef.current);
       }
     };
-  }, [angle, isTopView, width, height, camera, introCompleted]);
+  }, [angle, isTopView, width, height, camera, introCompleted, isCaptureMode]);
 
   return null;
 }
