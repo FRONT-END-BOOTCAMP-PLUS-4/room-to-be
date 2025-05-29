@@ -221,7 +221,7 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
         {isSidebarOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
       </Button>
 
-      <div className='absolute top-[50px] right-[70px] z-30'>
+      <div className='absolute top-[20px] left-[40%] z-30'>
         <BackgroundSelector />
       </div>
       <div className='absolute top-[140px] right-[70px] z-30'>
