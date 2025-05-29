@@ -18,9 +18,10 @@ interface Room {
 interface RoomListProps {
   rooms: Room[];
   setRooms: React.Dispatch<React.SetStateAction<Room[]>>;
+  onImageLoad: () => void;
 }
 
-export default function RoomList({ rooms, setRooms }: RoomListProps) {
+export default function RoomList({ rooms, setRooms, onImageLoad }: RoomListProps) {
   if (rooms.length === 0) {
     return (
       <div className='flex flex-col items-center justify-center text-center mt-1 relative'>
@@ -57,6 +58,7 @@ export default function RoomList({ rooms, setRooms }: RoomListProps) {
           onDelete={() =>
             setRooms((prev) => prev.filter((r) => r.id !== room.id))
           }
+          onImageLoad={onImageLoad} 
         />
       ))}
     </ul>

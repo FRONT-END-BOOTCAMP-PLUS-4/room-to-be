@@ -17,6 +17,7 @@ interface SavedRoomCardProps {
   title?: string;
   isPriority?: boolean;
   onDelete?: () => void;
+  onImageLoad?: () => void;
 }
 
 export default function SavedRoomCard({
@@ -26,6 +27,7 @@ export default function SavedRoomCard({
   title,
   isPriority = false,
   onDelete,
+  onImageLoad,
 }: SavedRoomCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -83,11 +85,11 @@ export default function SavedRoomCard({
         }
       }}
       className={`
-    w-full max-w-[400px] aspect-[10/7] group relative
-    rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1
-    transform transition-all duration-300 overflow-hidden
-    ${isHovered || isMenuOpen ? 'active-card' : ''}
-  `}
+        w-full max-w-[400px] aspect-[10/7] group relative
+        rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1
+        transform transition-all duration-300 overflow-hidden
+        ${isHovered || isMenuOpen ? 'active-card' : ''}
+      `}
     >
       <Image
         src={imageUrl}
@@ -96,6 +98,7 @@ export default function SavedRoomCard({
         className='object-cover'
         sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw'
         priority={isPriority}
+        onLoadingComplete={onImageLoad}
       />
 
       <div
@@ -107,11 +110,9 @@ export default function SavedRoomCard({
             setIsOpen={setIsMenuOpen}
             onDelete={async () => {
               try {
-                await deleteRoomById(roomId); // 실제 삭제 API 호출
-                onDelete?.(); // 부모에서 넘겨준 삭제 콜백 호출 (리스트에서 제거됨)
-                console.log('저장')
+                await deleteRoomById(roomId);
+                onDelete?.();
               } catch (e) {
-                console.log('실패')
               } finally {
                 setIsMenuOpen(false);
               }
