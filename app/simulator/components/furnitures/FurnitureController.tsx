@@ -155,28 +155,31 @@ export default function FurnitureController() {
 
           {/* 가구 조작 버튼 모음 */}
           <div className='w-full flex flex-col gap-[10px]'>
-            <div className='w-full flex gap-[10px]'>
-              <FurnitureControllerBtn
-                width={14}
-                height={14}
-                icon='/assets/icons/rotate-left.svg'
-                onClick={() => {
-                  updateSelectedFurniture({
-                    rotationY: selectedFurniture.rotationY + Math.PI / 4, // 반시계 방향으로 회전
-                  });
-                }}
-              />
-              <FurnitureControllerBtn
-                width={14}
-                height={14}
-                icon='/assets/icons/rotate-right.svg'
-                onClick={() => {
-                  updateSelectedFurniture({
-                    rotationY: selectedFurniture.rotationY - Math.PI / 4, // 시계 방향으로 회전
-                  });
-                }}
-              />
-            </div>
+            {selectedFurniture.placementType === 'floor' && (
+              <div className='w-full flex gap-[10px]'>
+                <FurnitureControllerBtn
+                  width={14}
+                  height={14}
+                  icon='/assets/icons/rotate-left.svg'
+                  onClick={() => {
+                    updateSelectedFurniture({
+                      rotationY: selectedFurniture.rotationY + Math.PI / 4, // 반시계 방향으로 회전
+                    });
+                  }}
+                />
+                <FurnitureControllerBtn
+                  width={14}
+                  height={14}
+                  icon='/assets/icons/rotate-right.svg'
+                  onClick={() => {
+                    updateSelectedFurniture({
+                      rotationY: selectedFurniture.rotationY - Math.PI / 4, // 시계 방향으로 회전
+                    });
+                  }}
+                />
+              </div>
+            )}
+
             <FurnitureControllerBtn
               text='이전 상태로 되돌리기'
               onClick={() => {
