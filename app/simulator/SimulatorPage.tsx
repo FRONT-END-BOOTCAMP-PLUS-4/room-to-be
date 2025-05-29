@@ -3,18 +3,10 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-
-import { deleteRoomThumbnail } from '@/backend/infra/db/supabase/SupabaseStorageRemover';
-
-import { RoomSaveRequest } from '@/app/types/rooms';
 
 import { Button } from '@/components/ui/button';
 
-import { uploadRoomThumbnail } from '@/utils/SupabaseStorageUploader';
-
 import { fetchFurnitureByPlacementType } from '@/apis/furnitures';
-import { updateRoom } from '@/apis/rooms';
 import { getRoomById } from '@/apis/rooms';
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
 import { useLoadingStore } from '@/stores/useLoadingStore';
@@ -28,6 +20,7 @@ import BackgroundSelector from './components/room/BackgroundSelector';
 import CameraController from './components/room/CameraController';
 import Lighting from './components/room/Lighting';
 import Room from './components/room/Room';
+import RoomEditModal from './components/room/RoomEditModal';
 import RoomSaveModal from './components/room/RoomSaveModal';
 import FurnitureSidebar from './components/sidebar/FurnitureSidebar';
 interface SimulatorPageProps {
@@ -39,8 +32,8 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
   const [canvasCreated, setCanvasCreated] = useState(false);
   const [sceneLoaded, setSceneLoaded] = useState(false);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
-  const router = useRouter();
   const captureCanvasRef = useRef<HTMLCanvasElement>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const {
     width: storeWidth,
@@ -76,65 +69,21 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
   );
   const cameraDistance = Math.max(roomWidth, roomHeight) * 1.4;
 
-  const handleSaveClick = async () => {
+  const handleSaveClick = () => {
     if (mode === 'edit' && roomId) {
-      console.log('🟡 roomId:', roomId);
-      try {
-        await deleteRoomThumbnail(roomId);
-        console.log('🟢 캔버스 존재:', !!captureCanvasRef.current);
-
-        const blob = await new Promise<Blob>((resolve, reject) => {
-          captureCanvasRef.current?.toBlob((b) => {
-            if (b) {
-              console.log('🟢 Blob 생성 성공');
-              resolve(b);
-            } else {
-              console.error('🔴 Blob 생성 실패');
-              reject(new Error('썸네일 캡처 실패'));
-            }
-          }, 'image/png');
-        });
-
-        const thumbnailUrl = await uploadRoomThumbnail(blob, roomId);
-
-        const existingRoom = await getRoomById(roomId);
-
-        const dto: RoomSaveRequest = {
-          id: roomId,
-          name: existingRoom.name,
-          width: roomWidth,
-          height: roomHeight,
-          thumbnailUrl,
-          userId: existingRoom.userId,
-          furnitures: furnitures.map((f) => ({
-            furnitureId: f.furnitureId,
-            positionX: f.positionX,
-            positionY: f.positionY,
-            positionZ: f.positionZ,
-            rotationY: f.rotationY,
-            scaleX: f.scaleX,
-            scaleY: f.scaleY,
-            scaleZ: f.scaleZ,
-          })),
-        };
-
-        await updateRoom(roomId, dto);
-        alert('방 수정 성공!');
-        router.push('/list');
-      } catch (err) {
-        console.error('수정 실패:', err);
-        alert('수정 실패');
-      }
+      setIsEditModalOpen(true);
     } else {
       setIsSaveModalOpen(true);
     }
   };
+
   useEffect(() => {
     if (mode === 'create') {
       useFurnitureStore.getState().clearFurnitures();
       useFurnitureStore.getState().setRenderableIds([]);
     }
   }, [mode]);
+
   useEffect(() => {
     if (canvasCreated) {
       const timer = setTimeout(() => {
@@ -286,7 +235,28 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
           나가기
         </Button>
       </div>
-
+      {isEditModalOpen && roomId && (
+        <>
+          <RoomEditModal
+            onClose={() => setIsEditModalOpen(false)}
+            canvasRef={captureCanvasRef}
+            furnitures={furnitures}
+            width={roomWidth}
+            height={roomHeight}
+            userId={'2'}
+            roomId={roomId}
+          />
+          <div className='absolute top-0 left-0 w-full h-full opacity-0 pointer-events-none'>
+            <CaptureCanvas
+              ref={captureCanvasRef}
+              furnitures={furnitures}
+              width={roomWidth}
+              height={roomHeight}
+              wallHeight={storeWallHeight}
+            />
+          </div>
+        </>
+      )}
       {isSaveModalOpen && (
         <>
           <RoomSaveModal
