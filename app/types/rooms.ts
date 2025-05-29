@@ -17,12 +17,12 @@ export interface RoomSaveRequest {
   height: number;
   thumbnailUrl: string;
   userId: string;
-  furnitures: PlacedFurnitureInput[];
   background?: string;
   isNightMode?: boolean;
   cameraX?: number;
   cameraY?: number;
   cameraZ?: number;
+  furnitures: PlacedFurnitureInput[];
 }
 
 export interface RoomResponse {
@@ -33,5 +33,10 @@ export interface RoomResponse {
   thumbnailUrl: string;
   userId: string;
   createdAt: string;
+  background?: string;
+  cameraX?: number;
+  cameraY?: number;
+  cameraZ?: number;
+  isNightMode?: boolean;
   furnitures: FurnitureStoreInfo[];
 }

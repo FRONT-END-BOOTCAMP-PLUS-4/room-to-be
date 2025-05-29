@@ -28,6 +28,11 @@ export async function GET(
     thumbnailUrl: first.roomThumbnailUrl,
     userId: first.userId,
     createdAt: first.createdAt,
+    background: first.background,
+    cameraX: first.cameraX,
+    cameraY: first.cameraY,
+    cameraZ: first.cameraZ,
+    isNightMode: first.isNightMode,
     furnitures: dtos.map((dto) => ({
       id: dto.placedId,
       furnitureId: dto.furnitureId,
