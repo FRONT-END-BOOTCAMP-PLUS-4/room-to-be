@@ -36,8 +36,9 @@ export default function FurnitureModel({
   const clonedScene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
   const meshRef = useRef<THREE.Group>(null);
 
-  const { furnitures, selectedFurnitureId, selectFurniture, updateFurniture } =
+  const { furnitures, selectedFurnitureId, selectFurniture, updateFurniture ,prevFurnitureStates} =
     useFurnitureStore();
+  console.log(prevFurnitureStates)
 
   const isSelected = selectedFurnitureId === id;
   const selectedFurniture =
@@ -105,12 +106,13 @@ export default function FurnitureModel({
       halfWidth,
       halfDepth,
       halfHeight,
-      onDragEnd: (pos) => {
+      onDragEnd: (pos,rot) => {
         setCurrentPosition([pos.x, pos.y, pos.z]);
         updateFurniture(id, {
           positionX: pos.x,
           positionY: pos.y,
           positionZ: pos.z,
+          rotationY: rot?.y,
         });
       },
     },
