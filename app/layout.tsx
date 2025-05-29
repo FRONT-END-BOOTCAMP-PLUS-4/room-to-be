@@ -6,6 +6,7 @@ import localFont from 'next/font/local';
 import { SessionProvider } from 'next-auth/react';
 
 import GlobalLoadingProvider from './components/loading/GlobalLoadingProvider';
+import LoginRedirectModal from './components/login/LoginRedirectModal';
 
 // 폰트 설정
 const pretendard = localFont({
@@ -64,6 +65,7 @@ export default function RootLayout({
       <body>
         <SessionProvider>{children}</SessionProvider>
         <GlobalLoadingProvider />
+        <LoginRedirectModal />
       </body>
     </html>
   );
