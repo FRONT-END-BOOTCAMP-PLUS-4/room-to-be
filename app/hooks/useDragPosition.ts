@@ -124,11 +124,6 @@ export default function useDragPosition(
 
       raycaster.current.setFromCamera(mouse.current, camera);
 
-      console.log(
-        '👁️ Visible Walls:',
-        getVisibleWalls().map((w) => w.id),
-      );
-
       const intersections: Array<{
         wall: WallInfo;
         point: Vector3;
@@ -149,7 +144,6 @@ export default function useDragPosition(
       // 가장 가까운 교차점 반환
       if (intersections.length > 0) {
         intersections.sort((a, b) => a.distance - b.distance);
-        console.log('🎯 Mouse intersects wall:', intersections[0].wall.id);
         return intersections[0];
       }
 
