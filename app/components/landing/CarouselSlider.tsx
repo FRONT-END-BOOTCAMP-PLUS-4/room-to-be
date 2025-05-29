@@ -89,7 +89,7 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
         onTransitionEnd={handleTransitionEnd}
       >
         {renderSlides.map((jsx, idx) => (
-          <div key={idx}>{jsx}</div>
+          <div key={`${current}-${idx}`}>{jsx}</div>
         ))}
       </div>
       {/* Progress Bar & Play Button */}
