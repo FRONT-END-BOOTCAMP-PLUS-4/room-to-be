@@ -26,6 +26,30 @@ interface WallInfo {
   rotationY: number;
 }
 
+// 회전 각도 비교 시 허용되는 오차의 범위
+const ROTATION_EPSILON = 0.01;
+
+// 현재 뷰 각도와 topview 여부에 따라 보이지 않는 벽 이름 반환
+const getHiddenWalls = (angle: number, isTopView: boolean): string[] => {
+  if (isTopView) return ['front', 'right', 'back', 'left'];
+
+  const hideWallsByAngle: Record<number, string[]> = {
+    45: ['front', 'right'],
+    135: ['right', 'back'],
+    225: ['back', 'left'],
+    315: ['left', 'front'],
+  };
+  return hideWallsByAngle[angle] ?? [];
+};
+
+const getWallIdFromRotation = (rotationY: number): string | null => {
+  if (Math.abs(rotationY - Math.PI) < ROTATION_EPSILON) return 'front';
+  if (Math.abs(rotationY - 0) < ROTATION_EPSILON) return 'back';
+  if (Math.abs(rotationY - Math.PI / 2) < ROTATION_EPSILON) return 'left';
+  if (Math.abs(rotationY + Math.PI / 2) < ROTATION_EPSILON) return 'right';
+  return null;
+};
+
 // 마우스 이벤트에 따라 가구 position 변경하는 훅
 export default function useDragPosition(
   meshRef: React.RefObject<Object3D>,
@@ -54,6 +78,30 @@ export default function useDragPosition(
   const angle = useViewStore((s) => s.angle);
   const isTopView = useViewStore((s) => s.isTopView);
 
+  useEffect(() => {
+    const mesh = meshRef.current;
+    if (!mesh) return;
+
+    if (placementType === 'floor') {
+      // 바닥에 놓인 가구는 항상 보이게
+      mesh.visible = true;
+    } else if (placementType === 'wall') {
+      const hiddenWallIds = getHiddenWalls(angle, isTopView);
+
+      if (isTopView) {
+        // 탑뷰일 땐 벽에 붙은 가구는 모두 안 보이게
+        mesh.visible = false;
+      } else {
+        const wallId = getWallIdFromRotation(mesh.rotation.y);
+        if (wallId && hiddenWallIds.includes(wallId)) {
+          mesh.visible = false;
+        } else {
+          mesh.visible = true;
+        }
+      }
+    }
+  }, [angle, isTopView, placementType, meshRef]);
+
   // 충돌 처리 훅 사용
   const { handleCollision, checkFinalPosition } = useFurnitureCollision({
     currentFurnitureId: selectedFurnitureId!,
@@ -67,19 +115,7 @@ export default function useDragPosition(
 
   // 현재 보이는 벽들 계산
   const getVisibleWalls = useCallback(() => {
-    const hideWallsByAngle: Record<number, string[]> = {
-      45: ['front', 'right'],
-      135: ['right', 'back'],
-      225: ['back', 'left'],
-      315: ['left', 'front'],
-    };
-
-    let hiddenWalls: string[] = [];
-    if (isTopView) {
-      hiddenWalls = ['front', 'right', 'back', 'left'];
-    } else {
-      hiddenWalls = hideWallsByAngle[angle] ?? [];
-    }
+    const hiddenWalls = getHiddenWalls(angle, isTopView);
 
     const allWalls: WallInfo[] = [
       {
