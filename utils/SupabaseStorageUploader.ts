@@ -10,12 +10,15 @@ export async function uploadRoomThumbnail(
   blob: Blob,
   roomId: string,
 ): Promise<string> {
-  const path = `room-thumbnails/${roomId}.png`;
+  const timestamp = Date.now();
+  const path = `room-thumbnails/${roomId}-${timestamp}.png`; // 매번 다르게 저장
+
   const { error } = await supabase.storage.from('r2b').upload(path, blob, {
     upsert: true,
     contentType: 'image/png',
   });
   if (error) throw error;
+
   return supabase.storage.from('r2b').getPublicUrl(path).data.publicUrl;
 }
 
@@ -46,4 +49,3 @@ export async function uploadFurnitureModel(
   if (error) throw error;
   return supabase.storage.from('r2b').getPublicUrl(path).data.publicUrl;
 }
-
