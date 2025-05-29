@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 
 import { fetchFurnitureByPlacementType } from '@/apis/furnitures';
 import { getRoomById } from '@/apis/rooms';
+import { useBackgroundStore } from '@/stores/useBackgroundStore';
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
 import { useLoadingStore } from '@/stores/useLoadingStore';
 import { useLoginRedirectModalStore } from '@/stores/useLoginRedirectModalStore';
@@ -20,8 +21,10 @@ import FurnitureModel from './components/furnitures/FurnitureModel';
 import BackgroundController from './components/room/BackgroundController';
 import BackgroundSelector from './components/room/BackgroundSelector';
 import CameraController from './components/room/CameraController';
+import CameraTracker from './components/room/CameraTracker';
 import Lighting from './components/room/Lighting';
 import Room from './components/room/Room';
+import RoomEditModal from './components/room/RoomEditModal';
 import RoomSaveModal from './components/room/RoomSaveModal';
 import FurnitureSidebar from './components/sidebar/FurnitureSidebar';
 
@@ -29,6 +32,7 @@ interface SimulatorPageProps {
   mode: 'create' | 'edit';
   roomId?: string;
 }
+
 export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
   const session = useSession();
   const { openModal } = useLoginRedirectModalStore();
@@ -36,8 +40,11 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
   const [canvasCreated, setCanvasCreated] = useState(false);
   const [sceneLoaded, setSceneLoaded] = useState(false);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
-
   const captureCanvasRef = useRef<HTMLCanvasElement>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [roomCameraPosition, setRoomCameraPosition] = useState<
+    [number, number, number] | undefined
+  >(undefined);
 
   const {
     width: storeWidth,
@@ -74,25 +81,19 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
   const cameraDistance = Math.max(roomWidth, roomHeight) * 1.4;
 
   const handleSaveClick = () => {
-    if (!session.data) {
-      openModal();
-      return;
-    }
-    if (mode === 'create') {
-      setIsSaveModalOpen(true); // 저장 모달 띄우기
-      // } else {
-      //   handleDirectUpdate(); // 바로 수정 저장
-      // }
+    if (mode === 'edit' && roomId) {
+      setIsEditModalOpen(true);
+    } else {
+      setIsSaveModalOpen(true);
     }
   };
+
   useEffect(() => {
-    if (canvasCreated) {
-      const timer = setTimeout(() => {
-        setSceneLoaded(true);
-      }, 1000);
-      return () => clearTimeout(timer);
+    if (mode === 'create') {
+      useFurnitureStore.getState().clearFurnitures();
+      useFurnitureStore.getState().setRenderableIds([]);
     }
-  }, [canvasCreated]);
+  }, [mode]);
 
   useEffect(() => {
     if (canvasCreated && sceneLoaded) {
@@ -106,8 +107,17 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
   useEffect(() => {
     if (mode === 'edit' && roomId && !hasLoaded) {
       const load = async () => {
+        const { setLoading } = useLoadingStore.getState();
+        setLoading(true);
         try {
           const room = await getRoomById(roomId);
+          if (
+            room.cameraX !== undefined &&
+            room.cameraY !== undefined &&
+            room.cameraZ !== undefined
+          ) {
+            setRoomCameraPosition([room.cameraX, room.cameraY, room.cameraZ]);
+          }
           const validFurnitures = (room.furnitures ?? []).map((f) => ({
             id: f.id,
             furnitureId: f.furnitureId,
@@ -124,6 +134,11 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
             scaleY: f.scaleY,
             scaleZ: f.scaleZ,
           }));
+
+          if (room.background) {
+            useBackgroundStore.getState().setBackground(room.background);
+          }
+
           useRoomSizeStore
             .getState()
             .setDimensions(room.roomWidth, room.roomHeight, 2.5);
@@ -133,11 +148,13 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
           useFurnitureStore
             .getState()
             .setRenderableIds(validFurnitures.map((f) => f.id));
+          setHasLoaded(true);
         } catch (e) {
-          console.error('방 불러오기 실패:', e);
-          alert('방 데이터를 불러오는 데 실패했습니다.');
+          alert('방 정보를 불러오는 데 실패했습니다.');
+          console.error(e);
+        } finally {
+          setLoading(false);
         }
-        setHasLoaded(true);
       };
 
       load();
@@ -156,6 +173,7 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
       />
     );
   }, [roomWidth, roomHeight]);
+
   return (
     <div className='relative w-full h-screen overflow-hidden'>
       <div className='absolute top-0 left-0 w-full h-full z-0'>
@@ -189,52 +207,90 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
               ))}
           </Suspense>
           <Lighting />
-          <CameraController width={roomWidth} height={roomHeight} />
+          <CameraController
+            width={roomWidth}
+            height={roomHeight}
+            initialCameraPosition={roomCameraPosition}
+            onIntroEnd={() => setSceneLoaded(true)}
+          />
+          <CameraTracker />
         </Canvas>
       </div>
 
-      <div
-        className={`
-          absolute top-0 left-0 z-30 w-80 h-full
-          ${isSidebarOpen ? 'pointer-events-auto' : 'pointer-events-none'}
-        `}
-      >
-        <FurnitureSidebar
-          fetchFurnitureByPlacementType={fetchFurnitureByPlacementType}
-          isOpen={isSidebarOpen}
-          setIsOpen={setIsSidebarOpen}
-        />
-      </div>
+      {sceneLoaded && (
+        <>
+          <div
+            className={`
+              absolute top-0 left-0 z-30 w-80 h-full
+              ${isSidebarOpen ? 'pointer-events-auto' : 'pointer-events-none'}
+            `}
+          >
+            <FurnitureSidebar
+              fetchFurnitureByPlacementType={fetchFurnitureByPlacementType}
+              isOpen={isSidebarOpen}
+              setIsOpen={setIsSidebarOpen}
+            />
+          </div>
 
-      <Button
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        variant='ghost'
-        size='icon'
-        className={`
-          absolute top-1/2 z-40 -translate-y-1/2 transition-all
-          ${isSidebarOpen ? 'left-[320px]' : 'left-2'}
-          bg-white/20 backdrop-blur-sm text-white
-          border border-white/30 shadow-md hover:bg-white/30
-          rounded-full w-8 h-8
-        `}
-      >
-        {isSidebarOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-      </Button>
+          <Button
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            variant='ghost'
+            size='icon'
+            className={`
+              absolute top-1/2 z-40 -translate-y-1/2 transition-all
+              ${isSidebarOpen ? 'left-[320px]' : 'left-2'}
+              bg-white/20 backdrop-blur-sm text-white
+              border border-white/30 shadow-md hover:bg-white/30
+              rounded-full w-8 h-8
+            `}
+          >
+            {isSidebarOpen ? (
+              <ChevronLeft size={16} />
+            ) : (
+              <ChevronRight size={16} />
+            )}
+          </Button>
 
-      <div className='absolute top-[50px] right-[70px] z-30'>
-        <BackgroundSelector />
-      </div>
-      <div className='absolute top-[140px] right-[70px] z-30'>
-        <FurnitureController />
-      </div>
+          <div className='absolute top-[50px] right-[70px] z-30'>
+            <BackgroundSelector />
+          </div>
+          <div className='absolute top-[140px] right-[70px] z-30'>
+            <FurnitureController />
+          </div>
 
-      <div className='absolute top-[20px] right-[20px] z-30 flex gap-2'>
-        <Button onClick={handleSaveClick}>저장하기</Button>
-        <Button variant='secondary' onClick={() => history.back()}>
-          나가기
-        </Button>
-      </div>
+          <div className='absolute top-[20px] right-[20px] z-30 flex gap-2'>
+            <Button onClick={handleSaveClick}>
+              {mode === 'edit' ? '수정하기' : '저장하기'}
+            </Button>
+            <Button variant='secondary' onClick={() => history.back()}>
+              나가기
+            </Button>
+          </div>
+        </>
+      )}
 
+      {isEditModalOpen && roomId && (
+        <>
+          <RoomEditModal
+            onClose={() => setIsEditModalOpen(false)}
+            canvasRef={captureCanvasRef}
+            furnitures={furnitures}
+            width={roomWidth}
+            height={roomHeight}
+            userId={'2'}
+            roomId={roomId}
+          />
+          <div className='absolute top-0 left-0 w-full h-full opacity-0 pointer-events-none'>
+            <CaptureCanvas
+              ref={captureCanvasRef}
+              furnitures={furnitures}
+              width={roomWidth}
+              height={roomHeight}
+              wallHeight={storeWallHeight}
+            />
+          </div>
+        </>
+      )}
       {isSaveModalOpen && (
         <>
           <RoomSaveModal

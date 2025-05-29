@@ -3,14 +3,14 @@ import { Room } from '@/backend/domain/entities/Room';
 import { RoomRepository } from '@/backend/domain/repositories/RoomRepository';
 import { SaveRoomDto } from '@/backend/dto/SaveRoomDto';
 
-export class SaveRoom {
+export class UpdateRoom {
   constructor(private readonly roomRepo: RoomRepository) {}
 
-  async execute(dto: SaveRoomDto): Promise<Room> {
+  async execute(id: string, dto: SaveRoomDto): Promise<Room> {
     const furnitures = dto.furnitures.map((f) => {
       return new PlacedFurniture(
-        '', // id
-        '', // roomId
+        '',
+        id,
         f.furnitureId,
         f.positionX,
         f.positionY,
@@ -24,7 +24,7 @@ export class SaveRoom {
     });
 
     const room = new Room(
-      '', // id
+      id,
       dto.name,
       dto.width,
       dto.height,
@@ -39,6 +39,6 @@ export class SaveRoom {
       dto.cameraZ,
     );
 
-    return this.roomRepo.save(room);
+    return this.roomRepo.update(room);
   }
 }

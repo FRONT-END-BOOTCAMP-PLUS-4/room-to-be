@@ -6,7 +6,11 @@ export interface GetRoomByIdDto {
   roomThumbnailUrl: string;
   userId: string;
   createdAt: Date;
-
+  background?: string | null;
+  isNightMode?: boolean | null;
+  cameraX?: number | null;
+  cameraY?: number | null;
+  cameraZ?: number | null;
   // 가구정보
   furnitureId: string;
   furnitureName: string;

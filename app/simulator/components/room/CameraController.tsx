@@ -2,109 +2,142 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useThree } from '@react-three/fiber';
-import { PerspectiveCamera } from 'three';
-import * as THREE from 'three';
+import { MathUtils, PerspectiveCamera, Vector3 } from 'three';
 
+import { useCameraStore } from '@/stores/useCameraStore';
 import { useViewStore } from '@/stores/useViewStore';
 
 interface CameraControllerProps {
   width: number;
   height: number;
+  isCaptureMode?: boolean;
+  initialCameraPosition?: [number, number, number];
+  onIntroEnd?: () => void;
 }
 
 export default function CameraController({
   width,
   height,
+  isCaptureMode = false,
+  initialCameraPosition,
+  onIntroEnd,
 }: CameraControllerProps) {
   const { camera } = useThree();
+  const setCameraPosition = useCameraStore((s) => s.setPosition);
   const angle = useViewStore((s) => s.angle);
+  const setAngle = useViewStore((s) => s.setAngle);
   const isTopView = useViewStore((s) => s.isTopView);
 
   const [introCompleted, setIntroCompleted] = useState(false);
   const animationIdRef = useRef<number>();
 
-  useEffect(() => {
-    const centerX = width / 2;
-    const centerZ = height / 2;
+  const centerX = width / 2;
+  const centerZ = height / 2;
+  const targetLookAt = new Vector3(centerX, 0.5, centerZ);
+  const baseRoomSize = 4.07;
+  const scaleFactor = Math.max(width, height) / baseRoomSize;
+  const roomDiagonal = Math.sqrt(width * width + height * height);
+  const cameraDistance = isTopView ? roomDiagonal * 0.8 : roomDiagonal * 1.2;
 
-    const baseRoomSize = 4.07;
+  const hasInitial =
+    Array.isArray(initialCameraPosition) &&
+    initialCameraPosition.length === 3 &&
+    initialCameraPosition.every((v) => typeof v === 'number' && !isNaN(v));
 
-    // 방 크기에 따른 비율 계산
-    const scaleFactor = Math.max(width, height) / baseRoomSize;
-
-    // 방 크기에 따라 카메라 거리 동적 계산
-    const roomDiagonal = Math.sqrt(width * width + height * height);
-
-    // 방 크기가 커져도 보이는 크기가 비슷하게 유지되도록 조정
-    const cameraDistance = isTopView ? roomDiagonal * 0.8 : roomDiagonal * 1.2;
-
-    // 최종 카메라 위치 계산
-    let targetPosition = new THREE.Vector3();
-    let targetLookAt = new THREE.Vector3(centerX, 0.5, centerZ);
-
+  const getTargetPosition = () => {
+    const rad = (angle * Math.PI) / 180;
     if (isTopView) {
-      const topViewHeight = Math.max(width, height) * 2;
-      const rad = (angle * Math.PI) / 180;
+      const h = Math.max(width, height) * 2;
       const r = 0.001;
       const x = centerX + r * Math.sin(rad);
       const z = centerZ + r * Math.cos(rad);
-
-      targetPosition.set(x, topViewHeight, z);
+      return new Vector3(x, h, z);
     } else {
-      const rad = (angle * Math.PI) / 180;
       const r = cameraDistance;
       const x = centerX + r * Math.sin(rad);
       const z = centerZ + r * Math.cos(rad);
+      return new Vector3(x, cameraDistance * 0.7, z);
+    }
+  };
 
-      targetPosition.set(x, cameraDistance * 0.7, z);
+  useEffect(() => {
+    // edit 모드 진입 직후 angle 추정
+    if (hasInitial) {
+      const [x, , z] = initialCameraPosition!;
+      const dx = x - centerX;
+      const dz = z - centerZ;
+      const rad = Math.atan2(dx, dz); // z가 앞쪽 기준
+      const deg = (rad * 180) / Math.PI;
+      const normalized = ((deg % 360) + 360) % 360;
+      setAngle(normalized);
+    }
+  }, [initialCameraPosition]);
+
+  useEffect(() => {
+    const targetPosition = getTargetPosition();
+
+    if (isCaptureMode) {
+      camera.position.copy(targetPosition);
+      camera.lookAt(targetLookAt);
+      setCameraPosition([targetPosition.x, targetPosition.y, targetPosition.z]);
+      if (camera instanceof PerspectiveCamera) {
+        camera.fov = Math.max(50 / Math.pow(scaleFactor, 0.6), 25);
+        camera.updateProjectionMatrix();
+      }
+      return;
     }
 
-    // 첫 진입 시에만 애니메이션 실행
     if (!introCompleted) {
-      // 시작 위치: 매우 멀리서 시작
-      const startDistance = roomDiagonal * 5;
-      const startHeight = roomDiagonal * 3;
-      const startRad = (angle * Math.PI) / 180;
+      let startPosition: Vector3;
+      if (hasInitial) {
+        const offsetDir = new Vector3()
+          .subVectors(targetLookAt, new Vector3(...initialCameraPosition!))
+          .normalize()
+          .multiplyScalar(5);
+        startPosition = new Vector3(...initialCameraPosition!).add(offsetDir);
+        startPosition.y += 3;
+      } else {
+        const dist = roomDiagonal * 5;
+        const height = roomDiagonal * 3;
+        const rad = (angle * Math.PI) / 180;
+        startPosition = new Vector3(
+          centerX + dist * Math.sin(rad),
+          height,
+          centerZ + dist * Math.cos(rad),
+        );
+      }
 
-      const startPosition = new THREE.Vector3(
-        centerX + startDistance * Math.sin(startRad),
-        startHeight,
-        centerZ + startDistance * Math.cos(startRad),
-      );
-
-      // 카메라 초기 설정
       camera.position.copy(startPosition);
       camera.lookAt(targetLookAt);
-
       if (camera instanceof PerspectiveCamera) {
-        camera.fov = 90; // 매우 넓은 시야각으로 시작
+        camera.fov = 90;
         camera.updateProjectionMatrix();
       }
 
-      // 애니메이션 실행
       const startTime = performance.now();
-      const duration = 2500; // 2.5초
+      const duration = 2500;
 
       const animate = (currentTime: number) => {
         const elapsed = currentTime - startTime;
         let progress = elapsed / duration;
-
         if (progress >= 1) {
           progress = 1;
           setIntroCompleted(true);
+          onIntroEnd?.();
+          setCameraPosition([
+            targetPosition.x,
+            targetPosition.y,
+            targetPosition.z,
+          ]);
         }
 
-        // 부드러운 easing (ease-out)
         const eased = 1 - Math.pow(1 - progress, 3);
-
-        // 위치 보간
         camera.position.lerpVectors(startPosition, targetPosition, eased);
         camera.lookAt(targetLookAt);
 
-        // FOV 보간
         if (camera instanceof PerspectiveCamera) {
           const targetFov = Math.max(50 / Math.pow(scaleFactor, 0.6), 25);
-          camera.fov = THREE.MathUtils.lerp(90, targetFov, eased);
+          camera.fov = MathUtils.lerp(90, targetFov, eased);
           camera.updateProjectionMatrix();
         }
 
@@ -115,25 +148,21 @@ export default function CameraController({
 
       animationIdRef.current = requestAnimationFrame(animate);
     }
-    // 애니메이션 완료 후 일반 업데이트
-    else {
-      camera.position.copy(targetPosition);
-      camera.lookAt(targetLookAt);
+  }, [camera, angle, isTopView, isCaptureMode, width, height]);
 
-      // FOV 조정 (방이 커질수록 FOV는 좁아짐 - 망원경 효과)
-      if (camera instanceof PerspectiveCamera) {
-        // 기본 FOV는 50도, 방 크기에 따라 조정
-        camera.fov = Math.max(50 / Math.pow(scaleFactor, 0.6), 25);
-        camera.updateProjectionMatrix();
-      }
+  useEffect(() => {
+    if (!introCompleted || isCaptureMode) return;
+
+    const targetPosition = getTargetPosition();
+    camera.position.copy(targetPosition);
+    camera.lookAt(targetLookAt);
+    if (camera instanceof PerspectiveCamera) {
+      const targetFov = Math.max(50 / Math.pow(scaleFactor, 0.6), 25);
+      camera.fov = targetFov;
+      camera.updateProjectionMatrix();
     }
-
-    return () => {
-      if (animationIdRef.current) {
-        cancelAnimationFrame(animationIdRef.current);
-      }
-    };
-  }, [angle, isTopView, width, height, camera, introCompleted]);
+    setCameraPosition([targetPosition.x, targetPosition.y, targetPosition.z]);
+  }, [angle, isTopView, introCompleted]);
 
   return null;
 }

@@ -10,6 +10,9 @@ import { PlacedFurnitureInput } from '@/app/types/rooms';
 import { uploadRoomThumbnail } from '@/utils/SupabaseStorageUploader';
 
 import { saveRoom } from '@/apis/rooms';
+import { useBackgroundStore } from '@/stores/useBackgroundStore';
+import { useCameraStore } from '@/stores/useCameraStore';
+import { useLightingStore } from '@/stores/useLightingStore';
 
 interface RoomSaveModalProps {
   onClose: () => void;
@@ -39,7 +42,9 @@ export default function RoomSaveModal({
 
     setIsSaving(true);
     const roomId = uuid();
-
+    const background = useBackgroundStore.getState().currentBackgroundId;
+    const isNight = !useLightingStore.getState().isDay;
+    const cameraPosition = useCameraStore.getState().position;
     try {
       const blob = await new Promise<Blob>((resolve, reject) => {
         canvasRef.current?.toBlob((b) => {
@@ -58,11 +63,16 @@ export default function RoomSaveModal({
         thumbnailUrl,
         userId,
         furnitures,
+        background,
+        isNightMode: isNight,
+        cameraX: cameraPosition[0],
+        cameraY: cameraPosition[1],
+        cameraZ: cameraPosition[2],
       });
 
       alert('방이 성공적으로 저장되었습니다.');
       onClose();
-      await new Promise((res) => setTimeout(res, 300)); 
+      await new Promise((res) => setTimeout(res, 300));
       router.push('/list');
     } catch (error) {
       console.error('방 저장 실패:', error);
@@ -95,9 +105,7 @@ export default function RoomSaveModal({
         <button
           onClick={onClose}
           className='absolute top-4 right-4 text-white text-xl'
-        >
-          ×
-        </button>
+        ></button>
       </div>
     </div>
   );
