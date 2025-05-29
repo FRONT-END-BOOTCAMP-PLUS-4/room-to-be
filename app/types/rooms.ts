@@ -18,6 +18,11 @@ export interface RoomSaveRequest {
   thumbnailUrl: string;
   userId: string;
   furnitures: PlacedFurnitureInput[];
+  background?: string;
+  isNightMode?: boolean;
+  cameraX?: number;
+  cameraY?: number;
+  cameraZ?: number;
 }
 
 export interface RoomResponse {

@@ -9,7 +9,7 @@ export class SaveRoom {
   async execute(dto: SaveRoomDto): Promise<Room> {
     const furnitures = dto.furnitures.map((f) => {
       return new PlacedFurniture(
-        '', // id 
+        '', // id
         '', // roomId
         f.furnitureId,
         f.positionX,
@@ -32,6 +32,11 @@ export class SaveRoom {
       dto.userId,
       new Date(),
       furnitures,
+      dto.background,
+      dto.isNightMode,
+      dto.cameraX,
+      dto.cameraY,
+      dto.cameraZ,
     );
 
     return this.roomRepo.save(room);
