@@ -2,9 +2,8 @@ import { useCallback } from 'react';
 import { Object3D, Vector3 } from 'three';
 
 import {
-  calculateCollisionResponse,
   createBoundingBox,
-  resolveCollision,
+  resolveMultipleCollisions,
 } from '@/utils/collisionUtils';
 
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
@@ -30,10 +29,13 @@ interface WallInfo {
 const ROTATION_EPSILON = 0.01;
 
 const getWallIdFromRotation = (rotationY: number): string | null => {
-  if (Math.abs(rotationY - Math.PI) < ROTATION_EPSILON) return 'front';
-  if (Math.abs(rotationY - 0) < ROTATION_EPSILON) return 'back';
-  if (Math.abs(rotationY - Math.PI / 2) < ROTATION_EPSILON) return 'left';
-  if (Math.abs(rotationY + Math.PI / 2) < ROTATION_EPSILON) return 'right';
+  // 정규화된 각도로 변환 (0 ~ 2π)
+  const normalizedRotation = ((rotationY % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
+  
+  if (Math.abs(normalizedRotation - Math.PI) < ROTATION_EPSILON) return 'front';
+  if (Math.abs(normalizedRotation - 0) < ROTATION_EPSILON || Math.abs(normalizedRotation - 2 * Math.PI) < ROTATION_EPSILON) return 'back';
+  if (Math.abs(normalizedRotation - Math.PI / 2) < ROTATION_EPSILON) return 'left';
+  if (Math.abs(normalizedRotation - 3 * Math.PI / 2) < ROTATION_EPSILON) return 'right';
   return null;
 };
 
@@ -114,8 +116,54 @@ export default function useFurnitureCollision({
     [roomBoundary, halfWidth, halfHeight, halfDepth],
   );
 
+  // 벽용 가구의 충돌 처리 (collisionUtils의 함수 활용)
+  const handleWallCollision = useCallback(
+    (newPos: Vector3, prevPos: Vector3, wallInfo: WallInfo): Vector3 => {
+      if (!meshRef.current) return newPos;
+
+      const currentFurniture = furnitures.find(
+        (f) => f.id === currentFurnitureId,
+      );
+      if (!currentFurniture) return newPos;
+
+      let adjustedPosition = newPos.clone();
+      
+      // 벽 제약 조건 먼저 적용
+      adjustedPosition = constrainToWall(wallInfo, adjustedPosition);
+
+      // 같은 벽에 있는 다른 벽용 가구들 필터링
+      const sameWallFurnitures = furnitures.filter(furniture => {
+        if (furniture.id === currentFurnitureId || furniture.placementType !== 'wall') {
+          return false;
+        }
+        const otherWallId = getWallIdFromRotation(furniture.rotationY);
+        return otherWallId === wallInfo.id;
+      });
+
+      // resolveMultipleCollisions 함수 사용 (벽용)
+      const resolvedPosition = resolveMultipleCollisions(
+        currentFurniture,
+        createBoundingBox(currentFurniture, undefined, adjustedPosition),
+        sameWallFurnitures,
+        adjustedPosition,
+        prevPos,
+        wallInfo.id
+      );
+
+      // 벽 제약 조건 재적용
+      return constrainToWall(wallInfo, resolvedPosition);
+    },
+    [
+      currentFurnitureId,
+      furnitures,
+      meshRef,
+      constrainToWall,
+    ],
+  );
+
   /**
    * 현재 이동 중인 가구와 다른 가구 간의 충돌 체크 및 위치 조정
+   * collisionUtils의 개선된 함수들을 활용
    */
   const handleCollision = useCallback(
     (newPos: Vector3, prevPos: Vector3, wallInfo?: WallInfo): Vector3 => {
@@ -126,65 +174,35 @@ export default function useFurnitureCollision({
       );
       if (!currentFurniture) return newPos;
 
+      // 벽용 가구인 경우 별도 처리
+      if (placementType === 'wall' && wallInfo) {
+        return handleWallCollision(newPos, prevPos, wallInfo);
+      }
+
+      // 바닥용 가구 처리 - resolveMultipleCollisions 사용
       let adjustedPosition = newPos.clone();
 
-      // 벽 가구인 경우 벽 제약 조건 먼저 적용
-      if (placementType === 'wall' && wallInfo) {
-        adjustedPosition = constrainToWall(wallInfo, adjustedPosition);
-      }
+      // 충돌할 수 있는 다른 가구들 (바닥용 가구는 모든 가구와 충돌 가능)
+      const otherFurnitures = furnitures.filter(f => f.id !== currentFurnitureId);
 
-      const movingBoundingBox = createBoundingBox(
+      // 다중 충돌 해결
+      adjustedPosition = resolveMultipleCollisions(
         currentFurniture,
-        undefined,
+        createBoundingBox(currentFurniture, undefined, adjustedPosition),
+        otherFurnitures,
         adjustedPosition,
+        prevPos
       );
-      let previousPosition = prevPos.clone();
 
-      for (const furniture of furnitures) {
-        if (furniture.id === currentFurnitureId) continue;
-
-        const staticBoundingBox = createBoundingBox(furniture);
-
-        const { collision, slidingDirection } = calculateCollisionResponse(
-          movingBoundingBox,
-          staticBoundingBox,
-          adjustedPosition,
-          previousPosition,
-        );
-
-        if (collision && slidingDirection) {
-          // 충돌한 가구의 테두리에 맞춰 위치 조정
-          adjustedPosition = resolveCollision(
-            movingBoundingBox,
-            staticBoundingBox,
-            adjustedPosition,
-            previousPosition,
-            slidingDirection,
-          );
-
-          // 방 경계 처리
-          if (placementType === 'floor') {
-            adjustedPosition.x = Math.min(
-              roomBoundary.xMax - halfWidth,
-              Math.max(roomBoundary.xMin + halfWidth, adjustedPosition.x),
-            );
-            adjustedPosition.z = Math.min(
-              roomBoundary.zMax - halfDepth,
-              Math.max(roomBoundary.zMin + halfDepth, adjustedPosition.z),
-            );
-          } else if (placementType === 'wall' && wallInfo) {
-            // 벽 가구인 경우 벽 제약 조건 재적용
-            adjustedPosition = constrainToWall(wallInfo, adjustedPosition);
-          }
-
-          // 새로운 경계 상자로 갱신
-          movingBoundingBox.setFromCenterAndSize(
-            adjustedPosition,
-            new Vector3(halfWidth * 2, halfHeight * 2, halfDepth * 2),
-          );
-          previousPosition = adjustedPosition.clone();
-        }
-      }
+      // 방 경계 처리
+      adjustedPosition.x = Math.min(
+        roomBoundary.xMax - halfWidth,
+        Math.max(roomBoundary.xMin + halfWidth, adjustedPosition.x),
+      );
+      adjustedPosition.z = Math.min(
+        roomBoundary.zMax - halfDepth,
+        Math.max(roomBoundary.zMin + halfDepth, adjustedPosition.z),
+      );
 
       return adjustedPosition;
     },
@@ -192,12 +210,11 @@ export default function useFurnitureCollision({
       currentFurnitureId,
       furnitures,
       halfDepth,
-      halfHeight,
       halfWidth,
       meshRef,
       placementType,
       roomBoundary,
-      constrainToWall,
+      handleWallCollision,
     ],
   );
 
@@ -220,61 +237,53 @@ export default function useFurnitureCollision({
         }
       }
 
-      const currentBox = createBoundingBox(
-        currentFurniture,
-        undefined,
-        adjusted,
-      );
+      // 충돌 체크 및 해결
+      if (placementType === 'wall' && rotationY !== undefined) {
+        const wallId = getWallIdFromRotation(rotationY);
+        if (wallId) {
+          // 같은 벽에 있는 가구들과만 충돌 체크
+          const sameWallFurnitures = furnitures.filter(furniture => {
+            if (furniture.id === currentFurnitureId || furniture.placementType !== 'wall') {
+              return false;
+            }
+            const otherWallId = getWallIdFromRotation(furniture.rotationY);
+            return otherWallId === wallId;
+          });
 
-      for (const furniture of furnitures) {
-        if (furniture.id === currentFurnitureId) continue;
-
-        const otherBox = createBoundingBox(furniture);
-
-        if (currentBox.intersectsBox(otherBox)) {
-          // 이전 위치가 아닌, 충돌한 가구의 테두리에 붙이기 위해 resolveCollision 호출
-          const prevPos = meshRef.current.position.clone();
-
-          const { slidingDirection } = calculateCollisionResponse(
-            currentBox,
-            otherBox,
+          adjusted = resolveMultipleCollisions(
+            currentFurniture,
+            createBoundingBox(currentFurniture, undefined, adjusted),
+            sameWallFurnitures,
             adjusted,
-            prevPos,
+            meshRef.current.position.clone(),
+            wallId
           );
 
-          if (slidingDirection) {
-            adjusted = resolveCollision(
-              currentBox,
-              otherBox,
-              adjusted,
-              prevPos,
-              slidingDirection,
-            );
-
-            // 경계 처리
-            if (placementType === 'floor') {
-              adjusted.x = Math.min(
-                roomBoundary.xMax - halfWidth,
-                Math.max(roomBoundary.xMin + halfWidth, adjusted.x),
-              );
-              adjusted.z = Math.min(
-                roomBoundary.zMax - halfDepth,
-                Math.max(roomBoundary.zMin + halfDepth, adjusted.z),
-              );
-            } else if (placementType === 'wall' && rotationY !== undefined) {
-              const wallId = getWallIdFromRotation(rotationY);
-              if (wallId) {
-                const wallInfo: WallInfo = { id: wallId, rotationY };
-                adjusted = constrainToWall(wallInfo, adjusted);
-              }
-            }
-
-            currentBox.setFromCenterAndSize(
-              adjusted,
-              new Vector3(halfWidth * 2, halfHeight * 2, halfDepth * 2),
-            );
-          }
+          // 벽 제약 조건 재적용
+          const wallInfo: WallInfo = { id: wallId, rotationY };
+          adjusted = constrainToWall(wallInfo, adjusted);
         }
+      } else {
+        // 바닥용 가구는 모든 가구와 충돌 체크
+        const otherFurnitures = furnitures.filter(f => f.id !== currentFurnitureId);
+        
+        adjusted = resolveMultipleCollisions(
+          currentFurniture,
+          createBoundingBox(currentFurniture, undefined, adjusted),
+          otherFurnitures,
+          adjusted,
+          meshRef.current.position.clone()
+        );
+
+        // 방 경계 처리
+        adjusted.x = Math.min(
+          roomBoundary.xMax - halfWidth,
+          Math.max(roomBoundary.xMin + halfWidth, adjusted.x),
+        );
+        adjusted.z = Math.min(
+          roomBoundary.zMax - halfDepth,
+          Math.max(roomBoundary.zMin + halfDepth, adjusted.z),
+        );
       }
 
       return adjusted;
@@ -286,7 +295,6 @@ export default function useFurnitureCollision({
       roomBoundary,
       halfWidth,
       halfDepth,
-      halfHeight,
       placementType,
       constrainToWall,
     ],
