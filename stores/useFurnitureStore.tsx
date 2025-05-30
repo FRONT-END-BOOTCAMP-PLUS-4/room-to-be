@@ -7,8 +7,8 @@ interface FurnitureStore {
   selectedFurnitureId: string | null;
   prevFurnitureStates: Record<string, FurnitureStoreInfo | null>;
   renderableFurnitureIds: string[];
-
-  selectFurniture: (id: string) => void;
+  isCreating: boolean;
+  selectFurniture: (id: string | null) => void;
   clearSelection: () => void;
 
   addFurniture: (info: FurnitureStoreInfo) => void;
@@ -20,6 +20,8 @@ interface FurnitureStore {
   undoFurniture: (id: string) => void;
   clearFurnitures: () => void;
   setRenderableIds: (ids: string[]) => void;
+
+  setIsCreating: (value: boolean) => void;
 }
 
 export const useFurnitureStore = create<FurnitureStore>((set) => ({
@@ -27,8 +29,9 @@ export const useFurnitureStore = create<FurnitureStore>((set) => ({
   selectedFurnitureId: null,
   prevFurnitureStates: {},
   renderableFurnitureIds: [],
-
-  selectFurniture: (id) => set({ selectedFurnitureId: id }),
+  isCreating: false,
+  setIsCreating: (value) => set({ isCreating: value }),
+  selectFurniture: (id: string | null) => set({ selectedFurnitureId: id }),
   clearSelection: () => set({ selectedFurnitureId: null }),
 
   addFurniture: (info) =>

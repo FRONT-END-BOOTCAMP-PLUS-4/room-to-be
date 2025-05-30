@@ -16,6 +16,7 @@ import { useRoomSizeStore } from '@/stores/useRoomSizeStore';
 
 import CameraModeButtons from './components/buttons/CameraModeButtons';
 import CaptureCanvas from './components/capture/CaptureCanvas';
+import EmptyFurnitureModal from './components/furnitures/EmptyFurnitureModal';
 import FurnitureController from './components/furnitures/FurnitureController';
 import FurnitureModel from './components/furnitures/FurnitureModel';
 import BackgroundController from './components/room/BackgroundController';
@@ -27,7 +28,6 @@ import Room from './components/room/Room';
 import RoomEditModal from './components/room/RoomEditModal';
 import RoomSaveModal from './components/room/RoomSaveModal';
 import FurnitureSidebar from './components/sidebar/FurnitureSidebar';
-
 interface SimulatorPageProps {
   mode: 'create' | 'edit';
   roomId?: string;
@@ -50,7 +50,8 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
     height: storeHeight,
     wallHeight: storeWallHeight,
   } = useRoomSizeStore();
-
+  const [isEmptyFurnitureModalOpen, setIsEmptyFurnitureModalOpen] =
+    useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [hasLoaded, setHasLoaded] = useState(false);
   const roomWidth = storeWidth;
@@ -76,6 +77,13 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
   const cameraDistance = Math.max(roomWidth, roomHeight) * 1.4;
 
   const handleSaveClick = () => {
+    useFurnitureStore.getState().selectFurniture(null);
+
+    if (furnitures.length === 0) {
+      setIsEmptyFurnitureModalOpen(true);
+      return;
+    }
+
     if (mode === 'edit' && roomId) {
       setIsEditModalOpen(true);
     } else {
@@ -85,6 +93,7 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
 
   useEffect(() => {
     if (mode === 'create') {
+      useFurnitureStore.getState().selectFurniture(null);
       useFurnitureStore.getState().clearFurnitures();
       useFurnitureStore.getState().setRenderableIds([]);
     }
@@ -145,7 +154,6 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
             .setRenderableIds(validFurnitures.map((f) => f.id));
           setHasLoaded(true);
         } catch (e) {
-          alert('방 정보를 불러오는 데 실패했습니다.');
           console.error(e);
         } finally {
           setLoading(false);
@@ -232,12 +240,12 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
             variant='ghost'
             size='icon'
             className={`
-              absolute top-1/2 z-40 -translate-y-1/2 transition-all
-              ${isSidebarOpen ? 'left-[320px]' : 'left-2'}
-              bg-white/20 backdrop-blur-sm text-white
-              border border-white/30 shadow-md hover:bg-white/30
-              rounded-full w-8 h-8
-            `}
+    absolute top-1/2 z-40 -translate-y-1/2 transition-all
+    ${isSidebarOpen ? 'left-[320px]' : 'left-2'}
+    w-[28px] h-[60px] bg-white/10 text-white backdrop-blur-sm
+    border border-white/20 shadow-md hover:bg-white/20
+    flex items-center justify-center
+  `}
           >
             {isSidebarOpen ? (
               <ChevronLeft size={16} />
@@ -261,7 +269,11 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
           </div>
         </>
       )}
-
+      {isEmptyFurnitureModalOpen && (
+        <EmptyFurnitureModal
+          onClose={() => setIsEmptyFurnitureModalOpen(false)}
+        />
+      )}
       {isEditModalOpen && roomId && (
         <>
           <RoomEditModal

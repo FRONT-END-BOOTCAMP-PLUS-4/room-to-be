@@ -18,9 +18,14 @@ interface Room {
 interface RoomListProps {
   rooms: Room[];
   setRooms: React.Dispatch<React.SetStateAction<Room[]>>;
+  onImageLoad: () => void;
 }
 
-export default function RoomList({ rooms, setRooms }: RoomListProps) {
+export default function RoomList({
+  rooms,
+  setRooms,
+  onImageLoad,
+}: RoomListProps) {
   if (rooms.length === 0) {
     return (
       <div className='flex flex-col items-center justify-center text-center mt-1 relative'>
@@ -45,10 +50,12 @@ export default function RoomList({ rooms, setRooms }: RoomListProps) {
       </div>
     );
   }
-
+  const sortedRooms = [...rooms].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
   return (
     <ul className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-[26px] gap-y-[48px]'>
-      {rooms.map((room) => (
+      {sortedRooms.map((room) => (
         <SavedRoomCard
           key={room.id}
           roomId={room.id}
@@ -57,6 +64,7 @@ export default function RoomList({ rooms, setRooms }: RoomListProps) {
           onDelete={() =>
             setRooms((prev) => prev.filter((r) => r.id !== room.id))
           }
+          onImageLoad={onImageLoad}
         />
       ))}
     </ul>

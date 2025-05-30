@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { v4 as uuid } from 'uuid';
@@ -34,7 +35,6 @@ export default function RoomSaveModal({
   const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
   const userId = useSession().data?.user?.id;
-
   const handleSave = async () => {
     if (!roomName.trim()) {
       alert('방 이름을 입력해주세요.');
@@ -50,6 +50,7 @@ export default function RoomSaveModal({
     const background = useBackgroundStore.getState().currentBackgroundId;
     const isNight = !useLightingStore.getState().isDay;
     const cameraPosition = useCameraStore.getState().position;
+
     try {
       const blob = await new Promise<Blob>((resolve, reject) => {
         canvasRef.current?.toBlob((b) => {
@@ -75,13 +76,11 @@ export default function RoomSaveModal({
         cameraZ: cameraPosition[2],
       });
 
-      alert('방이 성공적으로 저장되었습니다.');
       onClose();
       await new Promise((res) => setTimeout(res, 300));
       router.push('/list');
     } catch (error) {
       console.error('방 저장 실패:', error);
-      alert('방 저장 중 오류가 발생했습니다.');
     } finally {
       setIsSaving(false);
     }
@@ -89,7 +88,14 @@ export default function RoomSaveModal({
 
   return (
     <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50'>
-      <div className='bg-[#444] rounded-2xl p-6 w-[320px]'>
+      <div className='relative bg-[#444] rounded-2xl p-6 w-[320px]'>
+        <button
+          onClick={onClose}
+          className='absolute top-4 right-4 text-white hover:text-gray-300'
+        >
+          <X size={20} />
+        </button>
+
         <p className='text-white text-center mb-4'>방 이름을 입력해 주세요.</p>
         <input
           type='text'
@@ -107,10 +113,6 @@ export default function RoomSaveModal({
         >
           {isSaving ? '저장 중...' : '방 저장하기'}
         </BoxTextButton>
-        <button
-          onClick={onClose}
-          className='absolute top-4 right-4 text-white text-xl'
-        ></button>
       </div>
     </div>
   );

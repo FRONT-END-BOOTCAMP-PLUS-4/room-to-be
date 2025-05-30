@@ -22,9 +22,68 @@ interface Props {
     scaleZ: number;
     placementType: 'wall' | 'floor';
   }) => void;
+  expandedCategory: string | null;
+  setExpandedCategory: (category: string | null) => void;
 }
 
-export default function FurnitureGroupList({ grouped, onSelect }: Props) {
+export default function FurnitureGroupList({
+  grouped,
+  onSelect,
+  expandedCategory,
+  setExpandedCategory,
+}: Props) {
+  if (expandedCategory) {
+    const items = grouped[expandedCategory] ?? [];
+
+    return (
+      <div className='mb-6'>
+        <div className='flex justify-between items-center mb-2'>
+          <span className='text-sm font-semibold'>{expandedCategory}</span>
+          <Button
+            variant='link'
+            className='text-xs text-white/70 px-0 h-auto'
+            onClick={() => setExpandedCategory(null)}
+          >
+            ← Back
+          </Button>
+        </div>
+
+        <div className='grid grid-cols-3 gap-2'>
+          {items.map((item) => (
+            <div
+              key={item.id}
+              className='bg-white rounded-md overflow-hidden aspect-square cursor-pointer'
+              onClick={async () => {
+                await onSelect({
+                  id: uuidv4(),
+                  furnitureId: item.id,
+                  name: item.name,
+                  category: item.category,
+                  thumbnailUrl: item.thumbnailUrl,
+                  modelUrl: item.modelUrl,
+                  positionX: Math.random() * 2 + 1,
+                  positionY: 0,
+                  positionZ: Math.random() * 2 + 1,
+                  rotationY: 0,
+                  scaleX: item.scaleX,
+                  scaleY: item.scaleY,
+                  scaleZ: item.scaleZ,
+                  placementType: item.placementType as 'wall' | 'floor',
+                });
+              }}
+            >
+              <img
+                src={item.thumbnailUrl}
+                alt={item.name}
+                className='object-cover w-full h-full'
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       {Object.entries(grouped).map(([category, items]) => (
@@ -34,6 +93,7 @@ export default function FurnitureGroupList({ grouped, onSelect }: Props) {
             <Button
               variant='link'
               className='text-xs text-white/70 px-0 h-auto'
+              onClick={() => setExpandedCategory(category)} // ← 이게 핵심
             >
               See All
             </Button>
@@ -44,8 +104,8 @@ export default function FurnitureGroupList({ grouped, onSelect }: Props) {
               <div
                 key={item.id}
                 className='bg-white rounded-md overflow-hidden aspect-square cursor-pointer'
-                onClick={() =>
-                  onSelect({
+                onClick={async () => {
+                  await onSelect({
                     id: uuidv4(),
                     furnitureId: item.id,
                     name: item.name,
@@ -60,8 +120,8 @@ export default function FurnitureGroupList({ grouped, onSelect }: Props) {
                     scaleY: item.scaleY,
                     scaleZ: item.scaleZ,
                     placementType: item.placementType as 'wall' | 'floor',
-                  })
-                }
+                  });
+                }}
               >
                 <img
                   src={item.thumbnailUrl}
