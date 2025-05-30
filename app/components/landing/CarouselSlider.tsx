@@ -22,18 +22,19 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
   const [transition, setTransition] = useState(true);
   const [isSliding, setIsSliding] = useState(false);
   const [playing, setPlaying] = useState(true);
+  const [isResizing, setIsResizing] = useState(false);
 
   // 무한루프용 렌더 슬라이드
   const renderSlides = [slides[SLIDE_COUNT - 1], ...slides, slides[0]];
 
   const goTo = useCallback(
     (idx: number) => {
-      if (isSliding) return;
+      if (isSliding || isResizing) return;
       setIsSliding(true);
       setCurrent(idx);
       setTransition(true);
     },
-    [isSliding],
+    [isSliding, isResizing],
   );
   const nextSlide = useCallback(() => goTo(current + 1), [current, goTo]);
   const prevSlide = useCallback(() => goTo(current - 1), [current, goTo]);
@@ -49,17 +50,42 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
     }
   };
 
+  // resize 이벤트 핸들러
+  useEffect(() => {
+    let resizeTimer: NodeJS.Timeout;
+
+    const handleResize = () => {
+      setIsResizing(true);
+      setTransition(false);
+
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        setIsResizing(false);
+        setTimeout(() => {
+          setTransition(true);
+        }, 50);
+      }, 300);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(resizeTimer);
+    };
+  }, []);
+
   // transition이 꺼지면 바로 다시 켜서 자연스러운 무한루프 구현!
   useEffect(() => {
-    if (!transition) {
+    if (!transition && !isResizing) {
       const id = requestAnimationFrame(() => setTransition(true));
       return () => cancelAnimationFrame(id);
     }
-  }, [transition]);
+  }, [transition, isResizing]);
 
   // 프로그레스 커스텀훅
   const { progress, setProgress } = useSliderProgress({
-    playing,
+    playing: playing && !isResizing,
     autoPlayInterval: AUTO_PLAY_INTERVAL,
     onComplete: () => {
       setTimeout(() => {
@@ -80,16 +106,19 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
       <div
         className={clsx(
           'flex h-full',
-          transition ? 'transition-transform duration-700 ease-in-out' : '',
+          transition && !isResizing
+            ? 'transition-transform duration-700 ease-in-out'
+            : '',
         )}
         style={{
           width: `calc(100vw * ${renderSlides.length})`,
           transform: `translateX(-${current * 100}vw)`,
+          willChange: isResizing ? 'auto' : 'transform',
         }}
         onTransitionEnd={handleTransitionEnd}
       >
         {renderSlides.map((jsx, idx) => (
-          <div key={idx}>{jsx}</div>
+          <div key={`${current}-${idx}`}>{jsx}</div>
         ))}
       </div>
       {/* Progress Bar & Play Button */}
@@ -132,6 +161,7 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
         imageSrc='/assets/icons/left.svg'
         className='absolute top-1/2 left-4'
         onClick={prevSlide}
+        disabled={isResizing}
       />
       <IconButton
         height={46}
@@ -139,6 +169,7 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
         imageSrc='/assets/icons/right.svg'
         className='absolute top-1/2 right-4'
         onClick={nextSlide}
+        disabled={isResizing}
       />
     </div>
   );

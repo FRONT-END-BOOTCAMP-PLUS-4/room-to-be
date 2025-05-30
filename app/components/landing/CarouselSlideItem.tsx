@@ -1,3 +1,6 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 
 import Preview3DButton from './Preview3DButton';
@@ -19,6 +22,16 @@ export default function CarouselSlideItem({
   idx,
   SLIDE_COUNT,
 }: CarouselSlideItemProps) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  });
+
   return (
     <div
       className={`
@@ -72,30 +85,30 @@ export default function CarouselSlideItem({
         `}
         style={{ minHeight: 180 }}
       >
-        <Image
-          src={slide.image2}
-          alt='받침 이미지'
-          width={540}
-          height={260}
-          className='
-            absolute left-1/2 -translate-x-1/2 bottom-0 z-0 sm:bottom-[-82px] md:bottom-0 pointer-events-none select-none
-          '
-          style={{
-            width: '100%',
-            height: 'auto',
-            maxWidth: '100%',
-          }}
-          draggable={false}
-        />
+        {slide?.image2 && (
+          <Image
+            src={slide.image2}
+            alt='받침 이미지'
+            width={540}
+            height={260}
+            className={`
+            absolute left-1/2 -translate-x-1/2 bottom-0 z-0 sm:bottom-[-82px] md:bottom-0 pointer-events-none select-none ${isVisible ? 'animate-[slideUpFromBottom_1.2s_ease-out_0.3s_both]' : 'opacity-0 translate-y-[100px]'}`}
+            style={{
+              width: '100%',
+              height: 'auto',
+              maxWidth: '100%',
+            }}
+            draggable={false}
+          />
+        )}
         <Image
           src={slide.image}
           alt='3D 이미지'
           width={540}
           height={540}
-          className='
+          className={`
             absolute left-1/2 -translate-x-1/2 bottom-[143px] sm:bottom-[60px] z-10 pointer-events-none select-none
-            md:bottom-[189px]
-            '
+            md:bottom-[189px] ${isVisible ? 'animate-[slideDownFromTop_1.4s_ease-out_0.1s_both]' : 'opacity-0 -translate-y-[100px]'}`}
           style={{
             width: '100%',
             height: 'auto',
@@ -104,6 +117,30 @@ export default function CarouselSlideItem({
           draggable={false}
         />
       </div>
+
+      <style jsx>{`
+        @keyframes slideUpFromBottom {
+          0% {
+            transform: translate(-50%, 100px);
+            opacity: 0;
+          }
+          100% {
+            transform: translate(-50%, 0);
+            opacity: 1;
+          }
+        }
+
+        @keyframes slideDownFromTop {
+          0% {
+            transform: translate(-50%, -100px);
+            opacity: 0;
+          }
+          100% {
+            transform: translate(-50%, 0);
+            opacity: 1;
+          }
+        }
+      `}</style>
     </div>
   );
 }
