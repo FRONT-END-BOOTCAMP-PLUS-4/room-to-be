@@ -223,71 +223,6 @@ export default function useDragPosition(
     ],
   );
 
-  // 벽 위치에 따른 좌표 제한
-  const constrainToWall = useCallback(
-    (wall: WallInfo, position: Vector3) => {
-      const constrainedPos = position.clone();
-      const wallThickness = 0.1;
-
-      const yMin = roomBoundary.yMin + wallThickness;
-      const yMax = roomBoundary.yMax - halfHeight * 2;
-      const yRange = Math.min(yMax, Math.max(yMin, constrainedPos.y));
-
-      switch (wall.id) {
-        case 'front':
-          constrainedPos.x = Math.min(
-            roomBoundary.xMax - halfWidth - wallThickness,
-            Math.max(
-              roomBoundary.xMin + halfWidth + wallThickness,
-              constrainedPos.x,
-            ), 
-          );
-          constrainedPos.y = yRange;
-          constrainedPos.z = roomBoundary.zMax - wallThickness / 2 - halfDepth;
-          break;
-
-        case 'back':
-          constrainedPos.x = Math.min(
-            roomBoundary.xMax - halfWidth - wallThickness, 
-            Math.max(
-              roomBoundary.xMin + halfWidth + wallThickness,
-              constrainedPos.x,
-            ), 
-          );
-          constrainedPos.y = yRange;
-          constrainedPos.z = roomBoundary.zMin + wallThickness / 2;
-          break;
-
-        case 'left':
-          constrainedPos.x = roomBoundary.xMin + wallThickness / 2 + halfDepth;
-          constrainedPos.y = yRange;
-          constrainedPos.z = Math.min(
-            roomBoundary.zMax - halfWidth - wallThickness,
-            Math.max(
-              roomBoundary.zMin + halfWidth + wallThickness,
-              constrainedPos.z,
-            ),
-          );
-          break;
-
-        case 'right':
-          constrainedPos.x = roomBoundary.xMax - wallThickness / 2 - halfDepth;
-          constrainedPos.y = yRange;
-          constrainedPos.z = Math.min(
-            roomBoundary.zMax - halfWidth - wallThickness,
-            Math.max(
-              roomBoundary.zMin + halfWidth + wallThickness,
-              constrainedPos.z,
-            ),
-          );
-          break;
-      }
-
-      return constrainedPos;
-    },
-    [roomBoundary, halfWidth, halfHeight, halfDepth],
-  );
-
   // 가구를 클릭했을 때,
   const handlePointerDown = useCallback(
     (event: PointerEvent) => {
@@ -334,11 +269,12 @@ export default function useDragPosition(
           const adjusted = handleCollision(newPos, prevPos);
           meshRef.current.position.copy(adjusted);
         } else if (placementType === 'wall' && intersect.wall) {
-          // [wall] 벽 위 이동: 해당 벽에 맞게 위치 제한
-          const constrainedPos = constrainToWall(intersect.wall, newPos);
-          meshRef.current.position.copy(constrainedPos);
-
-          // 벽에 맞게 회전 적용
+          // [wall] 벽 위 이동: 충돌 처리 훅에서 벽 제약 조건도 처리
+          const prevPos = meshRef.current.position.clone();
+          const wallInfo = { id: intersect.wall.id, rotationY: intersect.wall.rotationY };
+          const adjusted = handleCollision(newPos, prevPos, wallInfo);
+          
+          meshRef.current.position.copy(adjusted);
           meshRef.current.rotation.y = intersect.wall.rotationY;
         }
       }
@@ -351,9 +287,7 @@ export default function useDragPosition(
       placementType,
       halfWidth,
       halfDepth,
-      halfHeight,
       handleCollision,
-      constrainToWall,
     ],
   );
 
@@ -370,6 +304,9 @@ export default function useDragPosition(
         if (placementType === 'floor') {
           // 마우스 놓을 때 충돌 정리 후 최종 위치 확정
           final = checkFinalPosition(final);
+          meshRef.current.position.copy(final);
+        } else if (placementType === 'wall') {
+          final = checkFinalPosition(final, finalRotation);
           meshRef.current.position.copy(final);
         }
 
