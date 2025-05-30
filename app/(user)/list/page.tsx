@@ -26,7 +26,6 @@ export default function Page() {
   const session = useSession();
   const userId = session.data?.user?.id;
 
-
   useEffect(() => {
     async function fetchRooms() {
       const res = await fetch(`/api/rooms?userId=${userId}`);
@@ -36,7 +35,6 @@ export default function Page() {
     fetchRooms();
   }, [userId]);
 
-  
   useEffect(() => {
     if (rooms.length > 0 && imagesLoaded === rooms.length) {
       setIsLoading(false);
@@ -47,7 +45,7 @@ export default function Page() {
     <>
       {isLoading && <Loading />}
       <div className='relative'>
-        <Header userId={userId} />
+        <Header />
         <div className='absolute top-[320px] left-0 w-full z-10'>
           <div className='bg-white rounded-t-[28px] pt-10 overflow-hidden'>
             <div className='container mx-auto px-7'>
