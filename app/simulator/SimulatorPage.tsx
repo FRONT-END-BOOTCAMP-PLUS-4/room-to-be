@@ -238,10 +238,9 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
             className={`
     absolute top-1/2 z-40 -translate-y-1/2 transition-all
     ${isSidebarOpen ? 'left-[320px]' : 'left-2'}
-    w-[36px] h-[80px] bg-white/10 text-white backdrop-blur-sm
+    w-[28px] h-[60px] bg-white/10 text-white backdrop-blur-sm
     border border-white/20 shadow-md hover:bg-white/20
     flex items-center justify-center
-    [clip-path:polygon(0%_0%,100%_10%,100%_90%,0%_100%)]
   `}
           >
             {isSidebarOpen ? (
