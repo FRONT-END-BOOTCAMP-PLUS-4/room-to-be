@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
 
 import Header from './components/Header';
 import RoomCount from './components/RoomCount';
@@ -19,9 +20,8 @@ interface Room {
 export default function Page() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  // 나중에 민혁이 Auth코드 연동할때 수정해야해 userId= 1 은 방 6개 userId = 2는 방 0개
-  const userId = '2';
+  const session = useSession();
+  const userId = session.data?.user?.id;
 
   useEffect(() => {
     async function fetchRooms() {
@@ -35,7 +35,7 @@ export default function Page() {
 
   return (
     <div className='relative'>
-      <Header userId={userId} />
+      <Header />
 
       <div className='absolute top-[320px] left-0 w-full z-10'>
         <div className='bg-white rounded-t-[28px] pt-10 overflow-hidden'>
