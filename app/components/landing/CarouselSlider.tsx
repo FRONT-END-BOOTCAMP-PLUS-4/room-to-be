@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import clsx from 'clsx';
 
 import IconButton from '@/app/components/buttons/IconButton';
-import Header from '@/app/components/Header';
+import MainHeader from '@/app/components/MainHeader';
 
 import { Progress } from '@/components/ui/progress';
 
@@ -102,7 +102,7 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
 
   return (
     <div className='relative w-screen h-screen overflow-hidden shadow-2xl'>
-      <Header />
+      <MainHeader />
       <div
         className={clsx(
           'flex h-full',
