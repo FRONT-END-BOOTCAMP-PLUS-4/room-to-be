@@ -8,6 +8,11 @@ export class Room {
     public thumbnailUrl: string,
     public userId: string,
     public createdAt: Date,
-    public furnitures: PlacedFurniture[] = [], 
+    public furnitures: PlacedFurniture[] = [],
+    public background: string,
+    public isNightMode: boolean,
+    public cameraX: number,
+    public cameraY: number,
+    public cameraZ: number,
   ) {}
 }

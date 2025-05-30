@@ -17,6 +17,26 @@ export async function saveRoom(dto: RoomSaveRequest): Promise<RoomResponse> {
 
   return await res.json();
 }
+
+// 방 업데이트
+export async function updateRoom(
+  roomId: string,
+  dto: RoomSaveRequest,
+): Promise<RoomResponse> {
+  const res = await fetch(`/api/rooms/${roomId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(dto),
+  });
+
+  if (!res.ok) {
+    throw new Error(`방 수정 실패: ${res.status}`);
+  }
+
+  return await res.json();
+}
 //방 삭제
 export async function deleteRoomById(roomId: string): Promise<void> {
   const res = await fetch(`/api/rooms/${roomId}`, {
@@ -55,5 +75,4 @@ export async function getRoomById(roomId: string): Promise<RoomResponse> {
   }
 
   return await res.json();
-  
 }

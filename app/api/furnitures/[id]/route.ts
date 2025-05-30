@@ -30,6 +30,5 @@ export async function GET(
     scaleY: furniture.scaleY,
     scaleZ: furniture.scaleZ,
   };
-
   return NextResponse.json(dto);
 }

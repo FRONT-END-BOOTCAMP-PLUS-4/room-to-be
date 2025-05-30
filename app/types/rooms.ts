@@ -11,12 +11,17 @@ export interface PlacedFurnitureInput {
 }
 
 export interface RoomSaveRequest {
-  id: string;
+  id?: string;
   name: string;
   width: number;
   height: number;
   thumbnailUrl: string;
   userId: string;
+  background?: string;
+  isNightMode?: boolean;
+  cameraX?: number;
+  cameraY?: number;
+  cameraZ?: number;
   furnitures: PlacedFurnitureInput[];
 }
 
@@ -28,5 +33,10 @@ export interface RoomResponse {
   thumbnailUrl: string;
   userId: string;
   createdAt: string;
+  background?: string;
+  cameraX?: number;
+  cameraY?: number;
+  cameraZ?: number;
+  isNightMode?: boolean;
   furnitures: FurnitureStoreInfo[];
 }

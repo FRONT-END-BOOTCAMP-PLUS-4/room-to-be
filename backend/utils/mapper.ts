@@ -22,6 +22,11 @@ export function toDomainRoom(
     p.user_id,
     p.created_at,
     furnitures,
+    p.background ?? '', 
+    p.is_night ?? false, 
+    p.camera_pos_x ?? 0, 
+    p.camera_pos_y ?? 0, 
+    p.camera_pos_z ?? 0, 
   );
 }
 
