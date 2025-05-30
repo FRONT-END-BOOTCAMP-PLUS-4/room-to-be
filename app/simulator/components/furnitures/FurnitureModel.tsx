@@ -36,9 +36,8 @@ export default function FurnitureModel({
   const clonedScene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
   const meshRef = useRef<THREE.Group>(null);
 
-  const { furnitures, selectedFurnitureId, selectFurniture, updateFurniture ,prevFurnitureStates} =
+  const { furnitures, selectedFurnitureId, selectFurniture, updateFurniture } =
     useFurnitureStore();
-  console.log(prevFurnitureStates)
 
   const isSelected = selectedFurnitureId === id;
   const selectedFurniture =
