@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { v4 as uuid } from 'uuid';
 
 import BoxTextButton from '@/app/components/buttons/BoxTextButton';
@@ -20,7 +21,6 @@ interface RoomSaveModalProps {
   furnitures: PlacedFurnitureInput[];
   width: number;
   height: number;
-  userId: string;
 }
 
 export default function RoomSaveModal({
@@ -29,14 +29,19 @@ export default function RoomSaveModal({
   furnitures,
   width,
   height,
-  userId,
 }: RoomSaveModalProps) {
   const [roomName, setRoomName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
+  const userId = useSession().data?.user?.id;
+
   const handleSave = async () => {
     if (!roomName.trim()) {
       alert('방 이름을 입력해주세요.');
+      return;
+    }
+    if (!userId) {
+      alert('로그인이 필요합니다.');
       return;
     }
 
@@ -61,7 +66,7 @@ export default function RoomSaveModal({
         width,
         height,
         thumbnailUrl,
-        userId,
+        userId: userId,
         furnitures,
         background,
         isNightMode: isNight,
