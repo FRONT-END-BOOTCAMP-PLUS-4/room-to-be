@@ -26,6 +26,7 @@ export default function FurnitureSidebar({
   setIsOpen,
 }: Props) {
   const [placementType, setPlacementType] = useState<'wall' | 'floor'>('floor');
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [furniture, setFurniture] = useState<Furnitures[]>([]);
   const addFurniture = useFurnitureStore((state) => state.addFurniture);
@@ -68,17 +69,21 @@ export default function FurnitureSidebar({
         />
       </div>
 
-      <FurnitureSearchInput value={search} onChange={setSearch} />
-      <PlacementToggle value={placementType} onChange={setPlacementType} />
-
+      {!expandedCategory && (
+        <>
+          <FurnitureSearchInput value={search} onChange={setSearch} />
+          <PlacementToggle value={placementType} onChange={setPlacementType} />
+        </>
+      )}
       <ScrollArea className='h-[calc(100vh-180px)] pr-2'>
         <FurnitureGroupList
           grouped={grouped}
-          onSelect={(info) => {
+          expandedCategory={expandedCategory}
+          setExpandedCategory={setExpandedCategory}
+          onSelect={async (info) => {
             addFurniture(info);
-            setTimeout(() => {
-              markRenderable(info.id);
-            }, 200); // GLTF 안정화 시간
+            await new Promise((r) => setTimeout(r, 200));
+            markRenderable(info.id);
           }}
         />
       </ScrollArea>
