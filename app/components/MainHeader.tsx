@@ -7,7 +7,7 @@ import { signOut, useSession } from 'next-auth/react';
 
 import OnlyTextButton from './buttons/OnlyTextButton';
 
-function Header() {
+export default function MainHeader() {
   const session = useSession();
   const router = useRouter();
 
@@ -23,8 +23,7 @@ function Header() {
       </Link>
       {session.data ? (
         <div className='flex items-center gap-2'>
-          {/* TODO: 라우터 경로 수정하기 */}
-          <OnlyTextButton onClick={() => router.push('/login')}>
+          <OnlyTextButton onClick={() => router.push('/list')}>
             My Page
           </OnlyTextButton>
           <OnlyTextButton onClick={() => signOut()}>Logout</OnlyTextButton>
@@ -37,5 +36,3 @@ function Header() {
     </div>
   );
 }
-
-export default Header;

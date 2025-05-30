@@ -3,7 +3,6 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useSession } from 'next-auth/react';
 
 import { Button } from '@/components/ui/button';
 
@@ -15,6 +14,7 @@ import { useLoadingStore } from '@/stores/useLoadingStore';
 import { useLoginRedirectModalStore } from '@/stores/useLoginRedirectModalStore';
 import { useRoomSizeStore } from '@/stores/useRoomSizeStore';
 
+import CameraModeButtons from './components/buttons/CameraModeButtons';
 import CaptureCanvas from './components/capture/CaptureCanvas';
 import EmptyFurnitureModal from './components/furnitures/EmptyFurnitureModal';
 import FurnitureController from './components/furnitures/FurnitureController';
@@ -34,7 +34,6 @@ interface SimulatorPageProps {
 }
 
 export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
-  const session = useSession();
   const { openModal } = useLoginRedirectModalStore();
   const { setLoading } = useLoadingStore();
   const [canvasCreated, setCanvasCreated] = useState(false);
@@ -58,21 +57,17 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
   const roomWidth = storeWidth;
   const roomHeight = storeHeight;
   const floorExtension = 0.1;
-  const wallExtension = 0.1;
-
-  const extendedWidth = roomWidth + wallExtension * 2;
-  const extendedHeight = roomHeight + wallExtension * 2;
 
   const roomBoundary = useMemo(
     () => ({
-      xMin: wallExtension,
-      xMax: extendedWidth - wallExtension,
-      zMin: wallExtension,
-      zMax: extendedHeight - wallExtension,
+      xMin: 0,
+      xMax: roomWidth,
+      zMin: 0,
+      zMax: roomHeight,
       yMin: 0,
       yMax: storeWallHeight || 2.5,
     }),
-    [extendedWidth, extendedHeight, storeWallHeight],
+    [roomWidth, roomHeight, storeWallHeight],
   );
 
   const furnitures = useFurnitureStore((state) => state.furnitures ?? []);
@@ -259,20 +254,18 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
             )}
           </Button>
 
-          <div className='absolute top-[50px] right-[70px] z-30'>
-            <BackgroundSelector />
+          <div className='absolute gap-4 flex top-[20px] left-[40%] z-40'>
+            <div>
+              {/* 카메라 모드 버튼*/}
+              <CameraModeButtons />
+            </div>
+            <div>
+              {/* 배경 선택 버튼들 */}
+              <BackgroundSelector />
+            </div>
           </div>
-          <div className='absolute top-[140px] right-[70px] z-30'>
-            <FurnitureController />
-          </div>
-
-          <div className='absolute top-[20px] right-[20px] z-30 flex gap-2'>
-            <Button onClick={handleSaveClick}>
-              {mode === 'edit' ? '수정하기' : '저장하기'}
-            </Button>
-            <Button variant='secondary' onClick={() => history.back()}>
-              나가기
-            </Button>
+          <div className='absolute top-[30px] right-[20px] z-30'>
+            <FurnitureController mode={mode} onSaveClick={handleSaveClick} />
           </div>
         </>
       )}
@@ -311,7 +304,6 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
             furnitures={furnitures}
             width={roomWidth}
             height={roomHeight}
-            userId={'2'}
           />
           <div className='absolute top-0 left-0 w-full h-full opacity-0 pointer-events-none'>
             <CaptureCanvas

@@ -45,7 +45,7 @@ export default async function Page() {
   ));
   return (
     <>
-      <CarouselSlider slides={slidesJsx} />;
+      <CarouselSlider slides={slidesJsx} />
     </>
   );
 }
