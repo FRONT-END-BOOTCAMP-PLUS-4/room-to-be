@@ -4,6 +4,11 @@ export type SaveRoomDto = {
   height: number;
   thumbnailUrl: string;
   userId: string;
+  background: string;
+  isNightMode: boolean;
+  cameraX: number;
+  cameraY: number;
+  cameraZ: number;
   furnitures: {
     furnitureId: string;
     positionX: number;

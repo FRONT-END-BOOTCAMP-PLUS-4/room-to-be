@@ -30,6 +30,11 @@ model Room {
   created_at    DateTime          @default(now())
   furnitures    PlacedFurniture[]
   user          User              @relation(fields: [user_id], references: [id])
+  background      String?        
+  camera_pos_x    Float?          // 카메라 위치 X
+  camera_pos_y    Float?          // 카메라 위치 Y
+  camera_pos_z    Float?          // 카메라 위치 Z
+  is_night        Boolean?        // true: 밤, false: 낮)
 }
 
 model Furniture {

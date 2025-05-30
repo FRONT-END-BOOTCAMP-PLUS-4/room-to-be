@@ -35,7 +35,11 @@ export class PrismaRoomRepository implements RoomRepository {
           roomThumbnailUrl: prismaRoom.thumbnail_url,
           userId: prismaRoom.user_id,
           createdAt: prismaRoom.created_at,
-
+          background: prismaRoom.background,
+          isNightMode: prismaRoom.is_night,
+          cameraX: prismaRoom.camera_pos_x,
+          cameraY: prismaRoom.camera_pos_y,
+          cameraZ: prismaRoom.camera_pos_z,
           placedId: p.id,
           furnitureId: p.furniture_id,
           furnitureName: p.furniture.name,
@@ -63,6 +67,11 @@ export class PrismaRoomRepository implements RoomRepository {
         height: room.height,
         user_id: room.userId,
         thumbnail_url: room.thumbnailUrl,
+        background: room.background,
+        is_night: room.isNightMode,
+        camera_pos_x: room.cameraX,
+        camera_pos_y: room.cameraY,
+        camera_pos_z: room.cameraZ,
         furnitures: {
           create: room.furnitures.map(toPrismaPlacedFurnitureCreateInput),
         },
@@ -94,5 +103,33 @@ export class PrismaRoomRepository implements RoomRepository {
     }
 
     await prisma.room.delete({ where: { id } });
+  }
+  async update(room: Room): Promise<Room> {
+    await prisma.placedFurniture.deleteMany({
+      where: { room_id: room.id },
+    });
+
+    const updated = await prisma.room.update({
+      where: { id: room.id },
+      data: {
+        name: room.name,
+        width: room.width,
+        height: room.height,
+        thumbnail_url: room.thumbnailUrl,
+        background: room.background,
+        is_night: room.isNightMode,
+        camera_pos_x: room.cameraX,
+        camera_pos_y: room.cameraY,
+        camera_pos_z: room.cameraZ,
+        furnitures: {
+          create: room.furnitures.map(toPrismaPlacedFurnitureCreateInput),
+        },
+      },
+      include: {
+        furnitures: true,
+      },
+    });
+
+    return toDomainRoom(updated);
   }
 }

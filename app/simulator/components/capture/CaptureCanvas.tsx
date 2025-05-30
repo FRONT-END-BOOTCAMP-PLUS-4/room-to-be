@@ -10,7 +10,7 @@ import Lighting from '../room/Lighting';
 import Room from '../room/Room';
 
 interface CaptureCanvasProps {
-  furnitures: any[]; 
+  furnitures: any[];
   width: number;
   height: number;
   wallHeight: number;
@@ -57,7 +57,7 @@ const CaptureCanvas = forwardRef<HTMLCanvasElement, CaptureCanvasProps>(
             />
           ))}
           <Lighting />
-          <CameraController width={width} height={height} />
+          <CameraController width={width} height={height} isCaptureMode />
         </Suspense>
       </Canvas>
     );
