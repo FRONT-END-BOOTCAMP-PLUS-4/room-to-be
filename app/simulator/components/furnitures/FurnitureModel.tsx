@@ -105,12 +105,13 @@ export default function FurnitureModel({
       halfWidth,
       halfDepth,
       halfHeight,
-      onDragEnd: (pos) => {
+      onDragEnd: (pos,rot) => {
         setCurrentPosition([pos.x, pos.y, pos.z]);
         updateFurniture(id, {
           positionX: pos.x,
           positionY: pos.y,
           positionZ: pos.z,
+          rotationY: rot?.y,
         });
       },
     },
@@ -243,6 +244,7 @@ export default function FurnitureModel({
       object={clonedScene}
       scale={currentScale}
       position={currentPosition}
+      rotation={[0, currentRotationY, 0]} 
       onPointerOver={handlePointerOver}
       onPointerOut={handlePointerOut}
       onPointerDown={(e: any) => {

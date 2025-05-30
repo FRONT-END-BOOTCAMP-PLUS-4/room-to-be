@@ -56,21 +56,17 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
   const roomWidth = storeWidth;
   const roomHeight = storeHeight;
   const floorExtension = 0.1;
-  const wallExtension = 0.1;
-
-  const extendedWidth = roomWidth + wallExtension * 2;
-  const extendedHeight = roomHeight + wallExtension * 2;
 
   const roomBoundary = useMemo(
     () => ({
-      xMin: wallExtension,
-      xMax: extendedWidth - wallExtension,
-      zMin: wallExtension,
-      zMax: extendedHeight - wallExtension,
+      xMin: 0,
+      xMax: roomWidth,
+      zMin: 0,
+      zMax: roomHeight,
       yMin: 0,
       yMax: storeWallHeight || 2.5,
     }),
-    [extendedWidth, extendedHeight, storeWallHeight],
+    [roomWidth, roomHeight, storeWallHeight],
   );
 
   const furnitures = useFurnitureStore((state) => state.furnitures ?? []);
