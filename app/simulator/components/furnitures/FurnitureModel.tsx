@@ -244,6 +244,7 @@ export default function FurnitureModel({
       object={clonedScene}
       scale={currentScale}
       position={currentPosition}
+      rotation={[0, currentRotationY, 0]} 
       onPointerOver={handlePointerOver}
       onPointerOut={handlePointerOut}
       onPointerDown={(e: any) => {
