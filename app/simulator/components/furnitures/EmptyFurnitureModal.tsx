@@ -19,7 +19,7 @@ export default function EmptyFurnitureModal({ onClose }: Props) {
           <X size={20} />
         </button>
         <p className='text-white text-center text-lg font-semibold mb-4'>
-          ⚠️ 저장할 가구가 없습니다
+          ⚠️ 저장할 가구가 없습니다.
         </p>
         <p className='text-gray-300 text-center text-sm mb-6'>
           가구를 배치한 후 다시 시도해주세요.

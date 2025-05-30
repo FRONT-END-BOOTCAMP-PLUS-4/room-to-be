@@ -15,7 +15,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     // TODO: 네이버 로그인 설정(이메일부분 승인 수정하기)
     // Naver({
     //   profile(profile) {
-    //     console.log('NAVER PROFILE:', profile);
     //     return {
     //       name: profile.response.name ?? '',
     //       email: profile.response.email ?? 'naver Login',
@@ -25,7 +24,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     // }),
     // Kakao({
     //   profile(profile) {
-    //     console.log('KAKAO PROFILE:', profile);
+
     //     return {
     //       name: profile.properties?.nickname || profile.profile_nickname || '',
     //       email: profile.kakao_account?.email,

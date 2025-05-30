@@ -75,11 +75,9 @@ export default function RoomEditModal({
         };
 
         await updateRoom(roomId, dto);
-        console.log('방 수정 성공!');
         onClose();
         router.push('/list');
       } catch (error) {
-        console.log('방 수정 실패!', error);
       } finally {
         setIsSaving(false);
       }
