@@ -16,6 +16,7 @@ import { useLoginRedirectModalStore } from '@/stores/useLoginRedirectModalStore'
 import { useRoomSizeStore } from '@/stores/useRoomSizeStore';
 
 import CaptureCanvas from './components/capture/CaptureCanvas';
+import EmptyFurnitureModal from './components/furnitures/EmptyFurnitureModal';
 import FurnitureController from './components/furnitures/FurnitureController';
 import FurnitureModel from './components/furnitures/FurnitureModel';
 import BackgroundController from './components/room/BackgroundController';
@@ -27,7 +28,6 @@ import Room from './components/room/Room';
 import RoomEditModal from './components/room/RoomEditModal';
 import RoomSaveModal from './components/room/RoomSaveModal';
 import FurnitureSidebar from './components/sidebar/FurnitureSidebar';
-
 interface SimulatorPageProps {
   mode: 'create' | 'edit';
   roomId?: string;
@@ -51,7 +51,8 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
     height: storeHeight,
     wallHeight: storeWallHeight,
   } = useRoomSizeStore();
-
+  const [isEmptyFurnitureModalOpen, setIsEmptyFurnitureModalOpen] =
+    useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [hasLoaded, setHasLoaded] = useState(false);
   const roomWidth = storeWidth;
@@ -81,6 +82,13 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
   const cameraDistance = Math.max(roomWidth, roomHeight) * 1.4;
 
   const handleSaveClick = () => {
+    useFurnitureStore.getState().selectFurniture(null);
+
+    if (furnitures.length === 0) {
+      setIsEmptyFurnitureModalOpen(true);
+      return;
+    }
+
     if (mode === 'edit' && roomId) {
       setIsEditModalOpen(true);
     } else {
@@ -90,6 +98,7 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
 
   useEffect(() => {
     if (mode === 'create') {
+      useFurnitureStore.getState().selectFurniture(null);
       useFurnitureStore.getState().clearFurnitures();
       useFurnitureStore.getState().setRenderableIds([]);
     }
@@ -267,7 +276,11 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
           </div>
         </>
       )}
-
+      {isEmptyFurnitureModalOpen && (
+        <EmptyFurnitureModal
+          onClose={() => setIsEmptyFurnitureModalOpen(false)}
+        />
+      )}
       {isEditModalOpen && roomId && (
         <>
           <RoomEditModal
