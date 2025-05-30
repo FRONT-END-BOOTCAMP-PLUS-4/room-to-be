@@ -23,6 +23,7 @@ interface UseFurnitureCollisionProps {
 interface WallInfo {
   id: string;
   rotationY: number;
+
 }
 
 // 회전 각도 비교 시 허용되는 오차의 범위
@@ -116,7 +117,7 @@ export default function useFurnitureCollision({
     [roomBoundary, halfWidth, halfHeight, halfDepth],
   );
 
-  // 벽용 가구의 충돌 처리 (collisionUtils의 함수 활용)
+  // 벽용 가구의 충돌 처리 
   const handleWallCollision = useCallback(
     (newPos: Vector3, prevPos: Vector3, wallInfo: WallInfo): Vector3 => {
       if (!meshRef.current) return newPos;
@@ -161,10 +162,7 @@ export default function useFurnitureCollision({
     ],
   );
 
-  /**
-   * 현재 이동 중인 가구와 다른 가구 간의 충돌 체크 및 위치 조정
-   * collisionUtils의 개선된 함수들을 활용
-   */
+  // 현재 이동 중인 가구와 다른 가구 간의 충돌 체크 및 위치 조정
   const handleCollision = useCallback(
     (newPos: Vector3, prevPos: Vector3, wallInfo?: WallInfo): Vector3 => {
       if (!meshRef.current) return newPos;

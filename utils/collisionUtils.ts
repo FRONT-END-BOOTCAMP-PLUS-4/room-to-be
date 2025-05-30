@@ -107,7 +107,7 @@ function getWallMovementAxes(wallId: string): { primary: string; secondary: stri
   }
 }
 
-// 벽용 가구의 충돌 방향 계산 (개선된 버전)
+// 벽용 가구의 충돌 방향 계산 
 export function getWallCollisionDirection(
   movingBox: Box3,
   staticBox: Box3,
@@ -224,7 +224,7 @@ export function resolveWallCollision(
     }
   }
 
-  // 벽의 경계 내에서만 이동하도록 제한 (선택적)
+  // 벽의 경계 내에서만 이동하도록 제한 
   return clampToWallBounds(resolvedPos, wallId);
 }
 
@@ -297,7 +297,7 @@ export function resolveCollision(
   return resolvedPos;
 }
 
-// 벽용 가구의 충돌 응답 계산 (개선된 버전)
+// 벽용 가구의 충돌 응답 계산
 export function calculateWallCollisionResponse(
   movingBox: Box3,
   staticBox: Box3,
@@ -362,7 +362,7 @@ export function calculateCollisionResponse(
   return { collision, slidingDirection, resolvedPosition };
 }
 
-// 다중 가구와의 충돌 처리 (새로 추가)
+// 다중 가구와의 충돌 처리
 export function resolveMultipleCollisions(
   movingFurniture: FurnitureStoreInfo,
   movingBox: Box3,
