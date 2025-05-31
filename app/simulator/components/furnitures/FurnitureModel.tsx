@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -18,7 +18,7 @@ import type { FurnitureModelProps } from '@/app/types/furniture';
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
 import { useLightingStore } from '@/stores/useLightingStore';
 
-export default function FurnitureModel({
+function FurnitureModel({
   id,
   name,
   modelUrl,
@@ -105,7 +105,7 @@ export default function FurnitureModel({
       halfWidth,
       halfDepth,
       halfHeight,
-      onDragEnd: (pos,rot) => {
+      onDragEnd: (pos, rot) => {
         setCurrentPosition([pos.x, pos.y, pos.z]);
         updateFurniture(id, {
           positionX: pos.x,
@@ -254,3 +254,4 @@ export default function FurnitureModel({
     />
   );
 }
+export default memo(FurnitureModel);

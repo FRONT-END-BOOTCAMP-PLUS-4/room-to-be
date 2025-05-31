@@ -93,7 +93,7 @@ export default function FurnitureGroupList({
             <Button
               variant='link'
               className='text-xs text-white/70 px-0 h-auto'
-              onClick={() => setExpandedCategory(category)} // ← 이게 핵심
+              onClick={() => setExpandedCategory(category)} 
             >
               See All
             </Button>
