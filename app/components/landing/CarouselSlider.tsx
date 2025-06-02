@@ -117,16 +117,42 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
         }}
         onTransitionEnd={handleTransitionEnd}
       >
-        {renderSlides.map((jsx, idx) => (
-          <div key={`${current}-${idx}`}>{jsx}</div>
-        ))}
+        {renderSlides.map((jsx, idx) => {
+          // 실제 슬라이드 인덱스 계산 (무한루프 고려)
+          let slideIndex = idx - 1;
+          if (slideIndex < 0) slideIndex = SLIDE_COUNT - 1;
+          if (slideIndex >= SLIDE_COUNT) slideIndex = 0;
+
+          // 배경 클래스명들
+          const bgClasses = [
+            'gradient-01',
+            'gradient-02',
+            'gradient-03',
+            'gradient-04',
+          ];
+
+          return (
+            <div
+              key={`${current}-${idx}`}
+              className={`
+                w-screen h-full 
+                px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 2xl:px-32
+                box-border
+                ${bgClasses[slideIndex] || 'gradient-01'}
+              `}
+            >
+              {jsx}
+            </div>
+          );
+        })}
       </div>
+
       {/* Progress Bar & Play Button */}
-      <div className='absolute left-4 md:left-12 bottom-4 mt-8 flex items-center gap-2 w-[85vw] max-w-xs z-30'>
+      <div className='absolute left-6 md:left-24 bottom-6 mt-8 flex items-center gap-2 w-[85vw] max-w-xs z-30'>
         <Progress
           value={progress}
           className='
-            w-full h-2
+            w-full h-1
             bg-white/30
             rounded-full
             overflow-hidden
@@ -154,6 +180,7 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
           )}
         </button>
       </div>
+
       {/* 좌우 버튼 */}
       <IconButton
         height={46}

@@ -3,8 +3,8 @@ import CarouselSlider from './components/landing/CarouselSlider';
 
 const slidesData = [
   {
-    title: 'Draw the Space,Fill the Home',
-    desc: 'RoomToBe lets you design your future room in 3D — drag, drop, and plan your space before you move in.',
+    title: '내 방이 될 공간을 쉽게 그리다',
+    desc: '자취를 시작하거나 이사를 준비 중인 사용자들이 가구 배치를 간편하게 시뮬레이션 할 수 있는 웹 애플리케이션.',
     image: '/assets/images/main-room01.png',
     image2: '/assets/images/room01-box.png',
     bg: 'gradient-01',
