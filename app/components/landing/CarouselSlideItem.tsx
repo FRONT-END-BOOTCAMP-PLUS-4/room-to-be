@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 
-import Preview3DButton from './Preview3DButton';
+import BoxTextButton from '../buttons/BoxTextButton';
 
 type CarouselSlideItemProps = {
   slide: {
@@ -15,12 +15,14 @@ type CarouselSlideItemProps = {
   };
   idx: number;
   SLIDE_COUNT: number;
+  onOpenModal?: () => void;
 };
 
 export default function CarouselSlideItem({
   slide,
   idx,
   SLIDE_COUNT,
+  onOpenModal,
 }: CarouselSlideItemProps) {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -58,9 +60,13 @@ export default function CarouselSlideItem({
           <p className='text-white/90 text-sm lg:text-lg font-normal leading-relaxed mb-0 mb:mb-6 2xl:mb-8'>
             {slide.desc}
           </p>
-          <Preview3DButton href='/simulator'>
-            3D 인테리어 미리보기
-          </Preview3DButton>
+          <BoxTextButton
+            showImg={true}
+            className='w-[240px] sm:w-[236px] mt-2'
+            onClick={onOpenModal}
+          >
+            3D 인테리어 하러 가기
+          </BoxTextButton>
         </div>
       </div>
 

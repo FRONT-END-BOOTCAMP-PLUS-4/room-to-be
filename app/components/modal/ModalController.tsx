@@ -8,7 +8,11 @@ import TemplateSelectModal from './TemplateSelectModal';
 
 type ModalType = 'start' | 'template' | 'roomSize';
 
-export default function ModalController() {
+interface ModalControllerProps {
+  onClose?: () => void;
+}
+
+export default function ModalController({ onClose }: ModalControllerProps) {
   const [currentModal, setCurrentModal] = useState<ModalType>('start');
 
   return (
@@ -17,15 +21,22 @@ export default function ModalController() {
         <InteriorStartModal
           onSelectTemplate={() => setCurrentModal('template')}
           onSelectRoomSize={() => setCurrentModal('roomSize')}
+          onClose={onClose}
         />
       )}
 
       {currentModal === 'template' && (
-        <TemplateSelectModal onBack={() => setCurrentModal('start')} />
+        <TemplateSelectModal
+          onBack={() => setCurrentModal('start')}
+          onClose={onClose}
+        />
       )}
 
       {currentModal === 'roomSize' && (
-        <RoomSizeModal onBack={() => setCurrentModal('start')} />
+        <RoomSizeModal
+          onBack={() => setCurrentModal('start')}
+          onClose={onClose}
+        />
       )}
     </>
   );

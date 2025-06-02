@@ -9,6 +9,7 @@ interface ModalProps {
   width: string;
   height?: string;
   onBack?: () => void;
+  onClose?: () => void;
   showBackIconOnly?: boolean;
   onBackdropClick?: () => void;
   children: React.ReactNode;
@@ -18,13 +19,19 @@ export default function Modal({
   width,
   height,
   onBack,
+  onClose,
   showBackIconOnly = false,
   onBackdropClick,
   children,
 }: ModalProps) {
   const router = useRouter();
-  const onClose = () => {
-    router.push('/');
+
+  const handleClose = () => {
+    if (onClose) {
+      onClose();
+    } else {
+      router.push('/');
+    }
   };
 
   const handleBackgroundClick = (e: React.MouseEvent) => {
@@ -50,7 +57,7 @@ export default function Modal({
                   imageSrc='/assets/icons/left.svg'
                   width={23}
                   height={36}
-                  onClick={onBack}
+                  onClick={handleClose}
                 />
                 {!showBackIconOnly && (
                   <span className='ml-[26px] text-white text-[30px] font-semibold'>
