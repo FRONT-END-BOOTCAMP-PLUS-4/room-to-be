@@ -56,23 +56,20 @@ function FurnitureModel({
 
   const isDay = useLightingStore((state) => state.isDay);
   const glassMaterialRef = useRef<THREE.MeshStandardMaterial | null>(null);
-  // 선택 가구 하이라이트 처리
+
   useHighlightMaterial({ scene: clonedScene, isSelected });
-  // 스토어 포지션 동기화
   useSyncPositionFromStore({
     isSelected,
     selected: selectedFurniture,
     current: currentPosition,
     set: setCurrentPosition,
   });
-  // 스토어 스케일 동기화
   useSyncScaleFromStore({
     isSelected,
     selected: selectedFurniture,
     current: currentScale,
     set: setCurrentScale,
   });
-  // 회전 동기화
   useSyncRotationFromStore({
     isSelected,
     selected: selectedFurniture,
@@ -117,7 +114,7 @@ function FurnitureModel({
       },
     },
   );
-  // 드래그 커서 관리
+
   useCursorOnDrag(isDragging, setIsDragging);
 
   const handlePointerOver = () => {
@@ -133,42 +130,7 @@ function FurnitureModel({
     document.body.style.cursor = 'grabbing';
     selectFurniture(id);
   };
-  if (baseSizeWithScale) {
-    const curScaleX = currentScale[0];
-    const curScaleY = currentScale[1];
-    const curScaleZ = currentScale[2];
 
-    const baseX = Math.round(baseSizeWithScale[0] * (curScaleX / scaleX));
-    const baseY = Math.round(baseSizeWithScale[1] * (curScaleY / scaleY));
-    const baseZ = Math.round(baseSizeWithScale[2] * (curScaleZ / scaleZ));
-    // 기존 가구 정보 가져오기 (원본 값 존재 여부 확인용)
-    const furniture = furnitures.find((f) => f.id === id);
-
-    updateFurniture(id, {
-      positionX: currentPosition[0],
-      positionY: currentPosition[1],
-      positionZ: currentPosition[2],
-      rotationY: currentRotationY,
-      scaleX: curScaleX,
-      scaleY: curScaleY,
-      scaleZ: curScaleZ,
-      baseX,
-      baseY,
-      baseZ,
-      // originalXXX 값은 기존에 없을 때만 설정해서 한번만 저장되도록
-      originalPositionX: furniture?.originalPositionX ?? positionX,
-      originalPositionY: furniture?.originalPositionY ?? positionY,
-      originalPositionZ: furniture?.originalPositionZ ?? positionZ,
-      originalScaleX: furniture?.originalScaleX ?? scaleX,
-      originalScaleY: furniture?.originalScaleY ?? scaleY,
-      originalScaleZ: furniture?.originalScaleZ ?? scaleZ,
-      originalRotationY: furniture?.originalRotationY ?? rotationY,
-      originalBaseX: furniture?.originalBaseX ?? baseSizeWithScale[0],
-      originalBaseY: furniture?.originalBaseY ?? baseSizeWithScale[1],
-      originalBaseZ: furniture?.originalBaseZ ?? baseSizeWithScale[2],
-    });
-  }
-  // 창문 배경(유리) 생성
   useEffect(() => {
     if (
       name.toLowerCase().includes('window') ||
@@ -222,6 +184,45 @@ function FurnitureModel({
   useEffect(() => {
     updateGlassMaterial(isDay);
   }, [isDay]);
+
+  useEffect(() => {
+    if (!isSelected || !baseSizeWithScale) return;
+
+    const curScaleX = currentScale[0];
+    const curScaleY = currentScale[1];
+    const curScaleZ = currentScale[2];
+
+    const baseX = Math.round(baseSizeWithScale[0] * (curScaleX / scaleX));
+    const baseY = Math.round(baseSizeWithScale[1] * (curScaleY / scaleY));
+    const baseZ = Math.round(baseSizeWithScale[2] * (curScaleZ / scaleZ));
+
+    const furniture = furnitures.find((f) => f.id === id);
+
+    if (furniture && furniture.originalPositionX === undefined) {
+      updateFurniture(id, {
+        positionX: currentPosition[0],
+        positionY: currentPosition[1],
+        positionZ: currentPosition[2],
+        rotationY: currentRotationY,
+        scaleX: curScaleX,
+        scaleY: curScaleY,
+        scaleZ: curScaleZ,
+        baseX,
+        baseY,
+        baseZ,
+        originalPositionX: positionX,
+        originalPositionY: positionY,
+        originalPositionZ: positionZ,
+        originalScaleX: scaleX,
+        originalScaleY: scaleY,
+        originalScaleZ: scaleZ,
+        originalRotationY: rotationY,
+        originalBaseX: baseSizeWithScale[0],
+        originalBaseY: baseSizeWithScale[1],
+        originalBaseZ: baseSizeWithScale[2],
+      });
+    }
+  }, [isSelected, baseSizeWithScale]);
 
   return (
     <primitive
