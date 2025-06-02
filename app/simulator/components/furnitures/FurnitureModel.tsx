@@ -56,6 +56,7 @@ function FurnitureModel({
 
   const isDay = useLightingStore((state) => state.isDay);
   const glassMaterialRef = useRef<THREE.MeshStandardMaterial | null>(null);
+  const hasInitialized = useRef(false);
 
   useHighlightMaterial({ scene: clonedScene, isSelected });
   useSyncPositionFromStore({
@@ -186,7 +187,7 @@ function FurnitureModel({
   }, [isDay]);
 
   useEffect(() => {
-    if (!isSelected || !baseSizeWithScale) return;
+    if (!isSelected || !baseSizeWithScale || hasInitialized.current) return;
 
     const curScaleX = currentScale[0];
     const curScaleY = currentScale[1];
@@ -196,32 +197,30 @@ function FurnitureModel({
     const baseY = Math.round(baseSizeWithScale[1] * (curScaleY / scaleY));
     const baseZ = Math.round(baseSizeWithScale[2] * (curScaleZ / scaleZ));
 
-    const furniture = furnitures.find((f) => f.id === id);
+    updateFurniture(id, {
+      positionX: currentPosition[0],
+      positionY: currentPosition[1],
+      positionZ: currentPosition[2],
+      rotationY: currentRotationY,
+      scaleX: curScaleX,
+      scaleY: curScaleY,
+      scaleZ: curScaleZ,
+      baseX,
+      baseY,
+      baseZ,
+      originalPositionX: positionX,
+      originalPositionY: positionY,
+      originalPositionZ: positionZ,
+      originalScaleX: scaleX,
+      originalScaleY: scaleY,
+      originalScaleZ: scaleZ,
+      originalRotationY: rotationY,
+      originalBaseX: baseSizeWithScale[0],
+      originalBaseY: baseSizeWithScale[1],
+      originalBaseZ: baseSizeWithScale[2],
+    });
 
-    if (furniture && furniture.originalPositionX === undefined) {
-      updateFurniture(id, {
-        positionX: currentPosition[0],
-        positionY: currentPosition[1],
-        positionZ: currentPosition[2],
-        rotationY: currentRotationY,
-        scaleX: curScaleX,
-        scaleY: curScaleY,
-        scaleZ: curScaleZ,
-        baseX,
-        baseY,
-        baseZ,
-        originalPositionX: positionX,
-        originalPositionY: positionY,
-        originalPositionZ: positionZ,
-        originalScaleX: scaleX,
-        originalScaleY: scaleY,
-        originalScaleZ: scaleZ,
-        originalRotationY: rotationY,
-        originalBaseX: baseSizeWithScale[0],
-        originalBaseY: baseSizeWithScale[1],
-        originalBaseZ: baseSizeWithScale[2],
-      });
-    }
+    hasInitialized.current = true;
   }, [isSelected, baseSizeWithScale]);
 
   return (

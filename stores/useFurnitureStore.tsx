@@ -8,6 +8,7 @@ interface FurnitureStore {
   prevFurnitureStates: Record<string, FurnitureStoreInfo | null>;
   renderableFurnitureIds: string[];
   isCreating: boolean;
+
   selectFurniture: (id: string | null) => void;
   clearSelection: () => void;
 
@@ -30,8 +31,11 @@ export const useFurnitureStore = create<FurnitureStore>((set) => ({
   prevFurnitureStates: {},
   renderableFurnitureIds: [],
   isCreating: false,
+
   setIsCreating: (value) => set({ isCreating: value }),
+
   selectFurniture: (id: string | null) => set({ selectedFurnitureId: id }),
+
   clearSelection: () => set({ selectedFurnitureId: null }),
 
   addFurniture: (info) =>
@@ -49,10 +53,12 @@ export const useFurnitureStore = create<FurnitureStore>((set) => ({
       const current = state.furnitures.find((f) => f.id === id);
       if (!current) return {};
 
+      const alreadySaved = state.prevFurnitureStates[id];
+
       return {
         prevFurnitureStates: {
           ...state.prevFurnitureStates,
-          [id]: { ...current },
+          [id]: alreadySaved ?? { ...current }, // 최초 한 번만 저장
         },
         furnitures: state.furnitures.map((f) =>
           f.id === id ? { ...f, ...updated } : f,
@@ -73,20 +79,21 @@ export const useFurnitureStore = create<FurnitureStore>((set) => ({
     })),
 
   setFurnitures: (items) => set({ furnitures: items }),
-  //전체 가구 초기화
+
   clearFurnitures: () =>
     set({
       furnitures: [],
       renderableFurnitureIds: [],
       selectedFurnitureId: null,
     }),
-  //여러개 렌더링
+
   setRenderableIds: (ids: string[]) => set({ renderableFurnitureIds: ids }),
 
   undoFurniture: (id) =>
     set((state) => {
       const prev = state.prevFurnitureStates[id];
       if (!prev) return {};
+
       return {
         furnitures: state.furnitures.map((f) => (f.id === id ? prev : f)),
         prevFurnitureStates: {
