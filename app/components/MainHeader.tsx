@@ -23,7 +23,7 @@ export default function MainHeader() {
       </Link>
       {session.data ? (
         <div className='flex items-center gap-2'>
-          <OnlyTextButton onClick={() => router.push('/list')}>
+          <OnlyTextButton onClick={() => router.push('/rooms')}>
             My Page
           </OnlyTextButton>
           <OnlyTextButton onClick={() => signOut()}>Logout</OnlyTextButton>

@@ -78,7 +78,7 @@ export default function RoomSaveModal({
 
       onClose();
       await new Promise((res) => setTimeout(res, 300));
-      router.push('/list');
+      router.push('/rooms');
     } catch (error) {
       console.error('방 저장 실패:', error);
     } finally {
