@@ -108,18 +108,23 @@ function FurnitureModel({
       onDrag: (pos, rot) => {
         const movingFurniture = furnitures.find((f) => f.id === id);
         if (!movingFurniture) return;
+
+        const simulatedFurniture = {
+          ...movingFurniture,
+          positionX: pos.x,
+          positionY: pos.y,
+          positionZ: pos.z,
+        };
         const staticFurnitures = furnitures.filter((f) => f.id !== id);
+        const targetPosition = new THREE.Vector3(pos.x, pos.y, pos.z);
+        const previousPosition = new THREE.Vector3(...currentPosition);
 
         const newPos = resolveMultipleCollisions(
-          movingFurniture,
-          createBoundingBox(
-            movingFurniture,
-            undefined,
-            new THREE.Vector3(pos.x, pos.y, pos.z),
-          ),
+          simulatedFurniture,
+          createBoundingBox(simulatedFurniture, undefined, targetPosition),
           staticFurnitures,
-          new THREE.Vector3(pos.x, pos.y, pos.z),
-          new THREE.Vector3(...currentPosition),
+          targetPosition,
+          previousPosition,
         );
 
         setCurrentPosition([newPos.x, newPos.y, newPos.z]);
