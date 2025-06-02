@@ -16,6 +16,7 @@ import { useRoomSizeStore } from '@/stores/useRoomSizeStore';
 
 import CameraModeButtons from './components/buttons/CameraModeButtons';
 import CaptureCanvas from './components/capture/CaptureCanvas';
+import DistanceVisualizer from './components/furnitures/DistanceVisualizer';
 import EmptyFurnitureModal from './components/furnitures/EmptyFurnitureModal';
 import FurnitureController from './components/furnitures/FurnitureController';
 import FurnitureModel from './components/furnitures/FurnitureModel';
@@ -57,57 +58,6 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
   const roomWidth = storeWidth;
   const roomHeight = storeHeight;
   const floorExtension = 0.1;
-  // 에셋들 퍼블릭에 넣고 여기에 추가해두면 받아온 에셋들 한번에 테스트 해볼 수 있어요
-  const testFurnitureItems = [
-    {
-      id: 'test-1',
-      furnitureId: 'test-1',
-      name: 'wardrobe1',
-      category: 'test',
-      thumbnailUrl: '/test/wardrobe1.png',
-      modelUrl: '/test/wardrobe1.glb',
-      positionX: roomWidth / 2,
-      positionY: 0,
-      positionZ: roomHeight / 2,
-      rotationY: 0,
-      scaleX: 0.001,
-      scaleY: 0.001,
-      scaleZ: 0.001,
-      placementType: 'floor',
-    },
-    {
-      id: 'test-2',
-      furnitureId: 'test-2',
-      name: 'wardrobe2',
-      category: 'test',
-      thumbnailUrl: '/test/wardrobe1.png',
-      modelUrl: '/test/wardrobe10.glb',
-      positionX: roomWidth / 2,
-      positionY: 0,
-      positionZ: roomHeight / 2,
-      rotationY: 0,
-      scaleX: 0.01,
-      scaleY: 0.01,
-      scaleZ: 0.01,
-      placementType: 'floor',
-    },
-    {
-      id: 'test-3',
-      furnitureId: 'test-3',
-      name: 'wardrobe3',
-      category: 'test',
-      thumbnailUrl: '/test/wardrobe1.png',
-      modelUrl: '/test/wardrobe11.glb',
-      positionX: roomWidth / 2,
-      positionY: 0,
-      positionZ: roomHeight / 2,
-      rotationY: 0,
-      scaleX: 0.1,
-      scaleY: 0.1,
-      scaleZ: 0.1,
-      placementType: 'floor',
-    },
-  ];
 
   const roomBoundary = useMemo(
     () => ({
@@ -147,10 +97,6 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
       useFurnitureStore.getState().selectFurniture(null);
       useFurnitureStore.getState().clearFurnitures();
       useFurnitureStore.getState().setRenderableIds([]);
-      useFurnitureStore.getState().setFurnitures(testFurnitureItems);
-      useFurnitureStore
-        .getState()
-        .setRenderableIds(testFurnitureItems.map((f) => f.id));
     }
   }, [mode]);
 
@@ -263,6 +209,11 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
                   {...furniture}
                 />
               ))}
+            <DistanceVisualizer
+              maxDistance={1.5}
+              roomWidth={roomWidth}
+              roomHeight={roomHeight}
+            />
           </Suspense>
           <Lighting />
           <CameraController
