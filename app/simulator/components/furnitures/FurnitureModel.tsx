@@ -15,6 +15,12 @@ import useSyncRotationFromStore from '@/app/hooks/useSyncRotationFromStore';
 import useSyncScaleFromStore from '@/app/hooks/useSyncScaleFromStore';
 import type { FurnitureModelProps } from '@/app/types/furniture';
 
+import { centerizeModel } from '@/utils/boundingBoxUtils';
+import {
+  createBoundingBox,
+  resolveMultipleCollisions,
+} from '@/utils/collisionUtils';
+
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
 import { useLightingStore } from '@/stores/useLightingStore';
 
@@ -33,9 +39,13 @@ function FurnitureModel({
   roomBoundary,
 }: FurnitureModelProps) {
   const gltf = useGLTF(modelUrl);
-  const clonedScene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
-  const meshRef = useRef<THREE.Group>(null);
+  const clonedScene = useMemo(() => {
+    const scene = gltf.scene.clone(true);
+    centerizeModel(scene);
+    return scene;
+  }, [gltf.scene]);
 
+  const meshRef = useRef<THREE.Group>(null);
   const { furnitures, selectedFurnitureId, selectFurniture, updateFurniture } =
     useFurnitureStore();
 
@@ -96,11 +106,27 @@ function FurnitureModel({
       halfDepth,
       halfHeight,
       onDrag: (pos, rot) => {
-        setCurrentPosition([pos.x, pos.y, pos.z]);
+        const movingFurniture = furnitures.find((f) => f.id === id);
+        if (!movingFurniture) return;
+        const staticFurnitures = furnitures.filter((f) => f.id !== id);
+
+        const newPos = resolveMultipleCollisions(
+          movingFurniture,
+          createBoundingBox(
+            movingFurniture,
+            undefined,
+            new THREE.Vector3(pos.x, pos.y, pos.z),
+          ),
+          staticFurnitures,
+          new THREE.Vector3(pos.x, pos.y, pos.z),
+          new THREE.Vector3(...currentPosition),
+        );
+
+        setCurrentPosition([newPos.x, newPos.y, newPos.z]);
         updateFurniture(id, {
-          positionX: pos.x,
-          positionY: pos.y,
-          positionZ: pos.z,
+          positionX: newPos.x,
+          positionY: newPos.y,
+          positionZ: newPos.z,
           rotationY: rot?.y,
         });
       },
@@ -133,6 +159,14 @@ function FurnitureModel({
   };
 
   useEffect(() => {
+    if (!baseSizeRaw) return;
+    const [x, , z] = baseSizeRaw;
+    const baseX = Math.round(x * 1000);
+    const baseZ = Math.round(z * 1000);
+    useFurnitureStore.getState().updateBaseSize(id, { baseX, baseZ });
+  }, [baseSizeRaw]);
+
+  useEffect(() => {
     if (
       name.toLowerCase().includes('window') ||
       name.toLowerCase().includes('창문')
@@ -156,7 +190,6 @@ function FurnitureModel({
 
       const glassMesh = new THREE.Mesh(glassGeometry, glassMaterial);
       glassMesh.userData._isWindowGlass = true;
-
       glassMesh.position.set(
         center.x - clonedScene.position.x,
         center.y - clonedScene.position.y,
@@ -188,7 +221,6 @@ function FurnitureModel({
 
   useEffect(() => {
     if (!isSelected || !baseSizeWithScale || hasInitialized.current) return;
-
     const curScaleX = currentScale[0];
     const curScaleY = currentScale[1];
     const curScaleZ = currentScale[2];
