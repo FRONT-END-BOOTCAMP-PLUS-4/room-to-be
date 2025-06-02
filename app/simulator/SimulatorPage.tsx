@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 
 import { Button } from '@/components/ui/button';
 
@@ -42,6 +43,7 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const captureCanvasRef = useRef<HTMLCanvasElement>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const session = useSession();
   const [roomCameraPosition, setRoomCameraPosition] = useState<
     [number, number, number] | undefined
   >(undefined);
@@ -78,6 +80,10 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
   const cameraDistance = Math.max(roomWidth, roomHeight) * 1.4;
 
   const handleSaveClick = () => {
+    if (!session.data) {
+      openModal();
+      return;
+    }
     useFurnitureStore.getState().selectFurniture(null);
 
     if (furnitures.length === 0) {

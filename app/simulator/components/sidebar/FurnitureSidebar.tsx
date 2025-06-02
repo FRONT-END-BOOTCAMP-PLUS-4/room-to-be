@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
 
 import type { Furnitures } from '@/app/types/furniture';
 
@@ -61,13 +63,18 @@ export default function FurnitureSidebar({
       `}
     >
       {/* 로고 */}
-      <div className='mb-3'>
-        <img
+      <Link
+        href='/'
+        className='mb-3 w-[80px] h-[33px] flex items-center justify-center'
+      >
+        <Image
           src='/assets/icons/roomtobe-logo.svg'
+          width={80}
+          height={33}
           alt='RoomToBe Logo'
           className='w-20 h-auto ml-1'
         />
-      </div>
+      </Link>
 
       {!expandedCategory && (
         <>
