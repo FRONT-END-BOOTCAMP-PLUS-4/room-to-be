@@ -1,54 +1,25 @@
-import { useEffect, useState } from 'react';
-import * as THREE from 'three';
+import { useMemo } from 'react';
+import { Box3, Object3D, Vector3 } from 'three';
 
-import useFormatToThreeDigitInt from './useFormatToThreeDigitInt';
+// 실제 Object3D 기준 바운딩 박스를 통해 baseSize 계산
+export default function useGetBaseSize(object?: Object3D) {
+  return useMemo(() => {
+    if (!object) return { baseSizeWithScale: null, baseSizeRaw: null };
 
-// 주어진 씬에서 무시할 메시 제외하고 박스 크기 계산하는 훅 (세 자리 정수 mm)
-export default function useGetBaseSize(scene: THREE.Object3D | null) {
-  // 포맷 적용 전 원본값 (scale 곱하기 전 값)
-  const [baseSizeRaw, setBaseSizeRaw] = useState<
-    [number, number, number] | null
-  >(null);
-  // 포맷 적용된 값
-  const [baseSizeWithScale, setBaseSizeWithScale] = useState<
-    [number, number, number] | null
-  >(null);
+    const box = new Box3().setFromObject(object);
+    const size = box.getSize(new Vector3());
 
-  useEffect(() => {
-    if (!scene) return;
+    // scale을 고려하지 않은 순수 base size (m 단위)
+    const baseSizeRaw: [number, number, number] = [size.x, size.y, size.z];
 
-    const ignoredNames = ['FLOOR', 'WALL', 'CEILING', 'GLASS'];
-    const boundingBox = new THREE.Box3();
-    const tempBox = new THREE.Box3();
+    // object.scale은 group에 적용된 경우가 많기 때문에 직접 곱해줌
+    const scale = object.scale;
+    const baseSizeWithScale: [number, number, number] = [
+      size.x * scale.x,
+      size.y * scale.y,
+      size.z * scale.z,
+    ];
 
-    boundingBox.makeEmpty();
-
-    scene.traverse((child: any) => {
-      if (!child.isMesh) return;
-
-      const name = child.name?.toUpperCase?.() ?? '';
-      if (ignoredNames.includes(name)) return;
-
-      tempBox.setFromObject(child);
-      boundingBox.union(tempBox);
-    });
-
-    const size = new THREE.Vector3();
-    boundingBox.getSize(size);
-
-    // 포맷 적용 전 사이즈 (scale 곱하기 전, raw 값)
-    setBaseSizeRaw([size.x, size.y, size.z]);
-
-    // scale과 size를 이용해 포맷 적용
-    setBaseSizeWithScale([
-      useFormatToThreeDigitInt(scene.scale.x, size.x),
-      useFormatToThreeDigitInt(scene.scale.y, size.y),
-      useFormatToThreeDigitInt(scene.scale.z, size.z),
-    ]);
-  }, [scene]);
-
-  return {
-    baseSizeWithScale,
-    baseSizeRaw,
-  };
+    return { baseSizeRaw, baseSizeWithScale };
+  }, [object]);
 }
