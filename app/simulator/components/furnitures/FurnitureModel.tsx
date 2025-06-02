@@ -109,13 +109,15 @@ function FurnitureModel({
         const movingFurniture = furnitures.find((f) => f.id === id);
         if (!movingFurniture) return;
 
+        const staticFurnitures = furnitures.filter((f) => f.id !== id);
+
         const simulatedFurniture = {
           ...movingFurniture,
           positionX: pos.x,
           positionY: pos.y,
           positionZ: pos.z,
         };
-        const staticFurnitures = furnitures.filter((f) => f.id !== id);
+
         const targetPosition = new THREE.Vector3(pos.x, pos.y, pos.z);
         const previousPosition = new THREE.Vector3(...currentPosition);
 
