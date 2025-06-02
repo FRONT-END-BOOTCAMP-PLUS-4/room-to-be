@@ -7,15 +7,22 @@ interface InteriorStartModalProps {
   onSelectTemplate: () => void;
   onSelectRoomSize: () => void;
   onClose?: () => void;
+  shouldAnimate?: boolean;
 }
 
 export default function InteriorStartModal({
   onSelectTemplate,
   onSelectRoomSize,
   onClose,
+  shouldAnimate = false,
 }: InteriorStartModalProps) {
   return (
-    <Modal width='864px' height='564px' onClose={onClose}>
+    <Modal
+      width='864px'
+      height='564px'
+      onClose={onClose}
+      shouldAnimate={shouldAnimate}
+    >
       <div className='flex justify-around w-full'>
         <StartModalItem
           alt='빈 프로젝트 이미지'

@@ -14,11 +14,18 @@ interface ModalControllerProps {
 
 export default function ModalController({ onClose }: ModalControllerProps) {
   const [currentModal, setCurrentModal] = useState<ModalType>('start');
+  const [isInitialStart, setIsInitialStart] = useState(true);
+
+  const handleBackToStart = () => {
+    setIsInitialStart(false);
+    setCurrentModal('start');
+  };
 
   return (
     <>
       {currentModal === 'start' && (
         <InteriorStartModal
+          shouldAnimate={isInitialStart}
           onSelectTemplate={() => setCurrentModal('template')}
           onSelectRoomSize={() => setCurrentModal('roomSize')}
           onClose={onClose}
@@ -26,17 +33,11 @@ export default function ModalController({ onClose }: ModalControllerProps) {
       )}
 
       {currentModal === 'template' && (
-        <TemplateSelectModal
-          onBack={() => setCurrentModal('start')}
-          onClose={onClose}
-        />
+        <TemplateSelectModal onBack={handleBackToStart} onClose={onClose} />
       )}
 
       {currentModal === 'roomSize' && (
-        <RoomSizeModal
-          onBack={() => setCurrentModal('start')}
-          onClose={onClose}
-        />
+        <RoomSizeModal onBack={handleBackToStart} onClose={onClose} />
       )}
     </>
   );
