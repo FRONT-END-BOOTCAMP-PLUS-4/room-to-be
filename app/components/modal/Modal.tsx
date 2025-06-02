@@ -57,7 +57,7 @@ export default function Modal({
                   imageSrc='/assets/icons/left.svg'
                   width={23}
                   height={36}
-                  onClick={handleClose}
+                  onClick={onBack}
                 />
                 {!showBackIconOnly && (
                   <span className='ml-[26px] text-white text-[30px] font-semibold'>
@@ -72,7 +72,7 @@ export default function Modal({
             imageSrc='/assets/icons/cross.svg'
             width={28}
             height={28}
-            onClick={onClose}
+            onClick={handleClose}
           />
         </div>
 
