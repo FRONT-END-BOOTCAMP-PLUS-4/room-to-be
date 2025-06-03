@@ -1,3 +1,5 @@
+import path from 'path';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -13,6 +15,10 @@ const nextConfig = {
         pathname: '/storage/v1/object/public/r2b/**',
       },
     ],
+  },
+  webpack: (config) => {
+    config.resolve.alias['@'] = path.resolve(__dirname);
+    return config;
   },
 };
 
