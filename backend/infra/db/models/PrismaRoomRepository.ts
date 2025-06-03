@@ -27,7 +27,7 @@ export class PrismaRoomRepository implements RoomRepository {
     return prismaRoom.furnitures
       .filter((p: { furniture: any }) => p.furniture)
       .map(
-        (p): GetRoomByIdDto => ({
+        (p: any): GetRoomByIdDto => ({
           roomId: prismaRoom.id,
           roomName: prismaRoom.name,
           roomWidth: prismaRoom.width,
