@@ -1,8 +1,8 @@
-import { v4 as uuidv4 } from 'uuid';
-
 import type { Furnitures } from '@/app/types/furniture';
 
 import { Button } from '@/components/ui/button';
+
+import FurnitureThumbnail from './FurnitureThumbnail';
 
 interface Props {
   grouped: Record<string, Furnitures[]>;
@@ -50,34 +50,7 @@ export default function FurnitureGroupList({
 
         <div className='grid grid-cols-3 gap-2'>
           {items.map((item) => (
-            <div
-              key={item.id}
-              className='bg-white rounded-md overflow-hidden aspect-square cursor-pointer'
-              onClick={async () => {
-                await onSelect({
-                  id: uuidv4(),
-                  furnitureId: item.id,
-                  name: item.name,
-                  category: item.category,
-                  thumbnailUrl: item.thumbnailUrl,
-                  modelUrl: item.modelUrl,
-                  positionX: Math.random() * 2 + 1,
-                  positionY: 0,
-                  positionZ: Math.random() * 2 + 1,
-                  rotationY: 0,
-                  scaleX: item.scaleX,
-                  scaleY: item.scaleY,
-                  scaleZ: item.scaleZ,
-                  placementType: item.placementType as 'wall' | 'floor',
-                });
-              }}
-            >
-              <img
-                src={item.thumbnailUrl}
-                alt={item.name}
-                className='object-cover w-full h-full'
-              />
-            </div>
+            <FurnitureThumbnail key={item.id} item={item} onSelect={onSelect} />
           ))}
         </div>
       </div>
@@ -93,7 +66,7 @@ export default function FurnitureGroupList({
             <Button
               variant='link'
               className='text-xs text-white/70 px-0 h-auto'
-              onClick={() => setExpandedCategory(category)} // ← 이게 핵심
+              onClick={() => setExpandedCategory(category)}
             >
               See All
             </Button>
@@ -101,34 +74,11 @@ export default function FurnitureGroupList({
 
           <div className='grid grid-cols-3 gap-2'>
             {items.slice(0, 3).map((item) => (
-              <div
+              <FurnitureThumbnail
                 key={item.id}
-                className='bg-white rounded-md overflow-hidden aspect-square cursor-pointer'
-                onClick={async () => {
-                  await onSelect({
-                    id: uuidv4(),
-                    furnitureId: item.id,
-                    name: item.name,
-                    category: item.category,
-                    thumbnailUrl: item.thumbnailUrl,
-                    modelUrl: item.modelUrl,
-                    positionX: Math.random() * 2 + 1,
-                    positionY: 0,
-                    positionZ: Math.random() * 2 + 1,
-                    rotationY: 0,
-                    scaleX: item.scaleX,
-                    scaleY: item.scaleY,
-                    scaleZ: item.scaleZ,
-                    placementType: item.placementType as 'wall' | 'floor',
-                  });
-                }}
-              >
-                <img
-                  src={item.thumbnailUrl}
-                  alt={item.name}
-                  className='object-cover w-full h-full'
-                />
-              </div>
+                item={item}
+                onSelect={onSelect}
+              />
             ))}
           </div>
         </div>
