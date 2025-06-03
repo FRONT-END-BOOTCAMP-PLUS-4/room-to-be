@@ -16,7 +16,6 @@ interface Props {
   maxDistance?: number;
 }
 
-// 바운딩 박스 간 최소 거리 계산 (겉면 기준)
 function getMinDistanceBetweenBoxes(box1: Box3, box2: Box3): number {
   const pointA = box1.clampPoint(box2.getCenter(new Vector3()), new Vector3());
   const pointB = box2.clampPoint(box1.getCenter(new Vector3()), new Vector3());
@@ -33,7 +32,7 @@ export default function DistanceVisualizer({
   const [tick, setTick] = useState(0);
 
   useFrame(() => {
-    setTick((t) => (t + 1) % 10000); // 강제 리렌더
+    setTick((t) => (t + 1) % 10000);
   });
 
   const selected = useMemo(
@@ -52,9 +51,12 @@ export default function DistanceVisualizer({
 
   const lines = [];
 
-  // 선택된 가구의 바운딩 박스
   const selectedBox = createBoundingBox(selected);
+  const selectedCenter = selectedBox.getCenter(new Vector3());
+  const selectedMin = selectedBox.min;
+  const selectedMax = selectedBox.max;
 
+  // 가구와 가구 간 거리
   for (const f of others) {
     const otherBox = createBoundingBox(f);
     const distance = getMinDistanceBetweenBoxes(selectedBox, otherBox);
@@ -81,36 +83,37 @@ export default function DistanceVisualizer({
   }
 
   // 벽과의 거리
-  const selectedPos: [number, number, number] = [
-    selected.positionX,
-    selected.positionY,
-    selected.positionZ,
-  ];
-  const wallThickness = 0.1;
-
-  const wallPoints: [string, [number, number, number]][] = [
-    ['left', [wallThickness / 2, selected.positionY, selected.positionZ]],
+  const wallPoints: [string, Vector3, Vector3][] = [
+    [
+      'left',
+      new Vector3(selectedMin.x, selectedCenter.y, selectedCenter.z),
+      new Vector3(0, selectedCenter.y, selectedCenter.z),
+    ],
     [
       'right',
-      [roomWidth - wallThickness / 2, selected.positionY, selected.positionZ],
+      new Vector3(selectedMax.x, selectedCenter.y, selectedCenter.z),
+      new Vector3(roomWidth, selectedCenter.y, selectedCenter.z),
     ],
-    ['front', [selected.positionX, selected.positionY, wallThickness / 2]],
+    [
+      'front',
+      new Vector3(selectedCenter.x, selectedCenter.y, selectedMin.z),
+      new Vector3(selectedCenter.x, selectedCenter.y, 0),
+    ],
     [
       'back',
-      [selected.positionX, selected.positionY, roomHeight - wallThickness / 2],
+      new Vector3(selectedCenter.x, selectedCenter.y, selectedMax.z),
+      new Vector3(selectedCenter.x, selectedCenter.y, roomHeight),
     ],
   ];
 
-  for (const [label, wallPos] of wallPoints) {
-    const distance = new Vector3(...selectedPos).distanceTo(
-      new Vector3(...wallPos),
-    );
+  for (const [label, from, to] of wallPoints) {
+    const distance = from.distanceTo(to);
     if (distance < maxDistance) {
       lines.push(
         <DistanceLine
           key={`wall-${label}`}
-          from={selectedPos}
-          to={wallPos}
+          from={[from.x, from.y, from.z]}
+          to={[to.x, to.y, to.z]}
           color='red'
         />,
       );
