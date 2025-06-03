@@ -3,6 +3,9 @@ import { useThree } from '@react-three/fiber';
 import { Euler, Object3D, Plane, Raycaster, Vector2, Vector3 } from 'three';
 import * as THREE from 'three';
 
+import { startFloating, stopFloating } from '@/utils/floating';
+import { startShakeAnimation, stopShakeAnimation } from '@/utils/shake';
+
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
 import { useViewStore } from '@/stores/useViewStore';
 
@@ -199,14 +202,12 @@ export default function useDragPosition(
       const intersect = getPlaneIntersection(event);
       if (intersect && meshRef.current) {
         offset.current.subVectors(meshRef.current.position, intersect.point);
-        if (placementType === 'floor') {
-          meshRef.current.position.y += 0.15;
-        }
         setInternalDragging(true);
         setDragging?.(true);
+        startFloating(meshRef.current); // floating 효과만 부여
       }
     },
-    [getPlaneIntersection, meshRef, setDragging, placementType],
+    [getPlaneIntersection, meshRef, setDragging],
   );
 
   const handlePointerMove = useCallback(
@@ -227,11 +228,18 @@ export default function useDragPosition(
             roomBoundary.zMax - halfDepth,
             Math.max(roomBoundary.zMin + halfDepth, newPos.z),
           );
-          newPos.y = roomBoundary.yMin + 0.05; // 드래그 중 띄우기 유지
+
           const prevPos = meshRef.current.position.clone();
           const adjusted = handleCollision(newPos, prevPos);
-          meshRef.current.position.copy(adjusted);
-          options?.onDrag?.(adjusted.clone(), meshRef.current.rotation.clone());
+
+          // ✅ floating 애니메이션이 덮어쓸 y값을 유지하기 위해 x, z만 반영
+          meshRef.current.position.x = adjusted.x;
+          meshRef.current.position.z = adjusted.z;
+
+          options?.onDrag?.(
+            new Vector3(adjusted.x, meshRef.current.position.y, adjusted.z),
+            meshRef.current.rotation.clone(),
+          );
         } else if (placementType === 'wall' && intersect.wall) {
           const prevPos = meshRef.current.position.clone();
           const wallInfo = {
@@ -265,12 +273,15 @@ export default function useDragPosition(
     if (isDragging) {
       setInternalDragging(false);
       setDragging?.(false);
+      if (meshRef.current) {
+        stopFloating();
+      }
       if (meshRef.current && onDragEnd) {
         let final = meshRef.current.position.clone();
         let finalRotation = meshRef.current.rotation.y;
         if (placementType === 'floor') {
           final = checkFinalPosition(final);
-          final.y = roomBoundary.yMin; // 바닥에 착 붙게
+          final.y = roomBoundary.yMin;
           meshRef.current.position.copy(final);
         } else if (placementType === 'wall') {
           final = checkFinalPosition(final, finalRotation);
