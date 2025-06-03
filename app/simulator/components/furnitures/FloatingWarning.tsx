@@ -22,7 +22,7 @@ export default function FloatingWarning({ position, color = 'orange' }: Props) {
 
       if (color === 'red') {
         //math.sin(t*) 이쪽 조절로 shine 속도조절
-        const alpha = 0.65 + 0.35 * Math.sin(t * 10);
+        const alpha = 0.65 + 0.35 * Math.sin(t * 12);
         opacityRef.current = alpha;
       } else {
         opacityRef.current = 1;

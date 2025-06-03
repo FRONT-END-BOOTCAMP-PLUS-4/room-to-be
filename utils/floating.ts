@@ -6,7 +6,7 @@ let floatingTimeline: gsap.core.Tween | null = null;
 export function startFloating(object: Object3D) {
   stopFloating();
   floatingTimeline = gsap.to(object.position, {
-    y: '+=0.1',
+    y: '+=0.2',
     duration: 1,
     repeat: -2,
     yoyo: true,
