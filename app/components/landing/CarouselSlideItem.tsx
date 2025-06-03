@@ -96,7 +96,7 @@ export default function CarouselSlideItem({
           <div>
             <BoxTextButton
               showImg={true}
-              className='w-[200px] h-[48px] text-[0.8rem] rounded-2xl lg:text-[0.9rem] lg:w-[216px] lg:h-[52px] 2xl:w-[268px] 2xl:h-[64px] 2xl:text-[1.1rem]'
+              className='!w-[200px] !h-[48px] !text-[0.8rem] rounded-2xl lg:text-[0.9rem] lg:w-[216px] lg:h-[52px] 2xl:w-[268px] 2xl:h-[64px] 2xl:text-[1.1rem]'
               onClick={onOpenModal}
             >
               3D 인테리어 하러 가기
@@ -139,8 +139,8 @@ export default function CarouselSlideItem({
                 absolute bottom-[-6rem] left-1/2 -translate-x-1/2
                 w-full h-auto
                 md:bottom-[-10rem] lg:bottom-[-10rem] 2xl:bottom-[-12rem]
-                ${isVisible ? 'animate-[slideUpFromBottom_1s_ease-out_0.3s_both]' : 'opacity-0 translate-y-[100px]'}
-                ${showFloating ? 'animate-[floatingHorizontal_5s_ease-in-out_infinite]' : ''}
+                ${isVisible ? 'animate-[slideUpFromBottom_0.8s_ease-out_0.3s_both]' : 'opacity-0 translate-y-[100px]'}
+                ${showFloating ? 'animate-floating-horizontal' : ''}
               `}
               style={{
                 maxWidth: '100%',
@@ -159,8 +159,8 @@ export default function CarouselSlideItem({
             className={`
               absolute bottom-14 md:bottom-24 lg:bottom-28 2xl:bottom-38 left-1/2 -translate-x-1/2
               w-[85%] h-auto
-              ${isVisible ? 'animate-[slideDownFromTop_1.2s_ease-out_0.1s_both]' : 'opacity-0 -translate-y-[100px]'}
-              ${showFloating ? 'animate-[floatingHorizontal_5s_ease-in-out_infinite]' : ''}
+              ${isVisible ? 'animate-[slideDownFromTop_1s_ease-out_0.1s_both]' : 'opacity-0 -translate-y-[100px]'}
+              ${showFloating ? 'animate-floating-horizontal' : ''}
             `}
             style={{
               maxWidth: '90%',
@@ -221,21 +221,6 @@ export default function CarouselSlideItem({
           100% {
             transform: translate(-50%, 0);
             opacity: 1;
-          }
-        }
-
-        @keyframes floatingHorizontal {
-          0% {
-            transform: translate(-50%, 0) translateX(0px);
-          }
-          25% {
-            transform: translate(-50%, 0) translateX(5px);
-          }
-          75% {
-            transform: translate(-50%, 0) translateX(-5px);
-          }
-          100% {
-            transform: translate(-50%, 0) translateX(0px);
           }
         }
       `}</style>
