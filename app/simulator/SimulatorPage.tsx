@@ -221,6 +221,11 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
               roomHeight={roomHeight}
             />
           </Suspense>
+          <DistanceVisualizer
+            roomWidth={roomWidth}
+            roomHeight={roomHeight}
+            maxDistance={1.5}
+          />
           <Lighting />
           <CameraController
             width={roomWidth}
