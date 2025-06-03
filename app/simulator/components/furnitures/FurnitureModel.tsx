@@ -105,8 +105,19 @@ export default function FurnitureModel({
       halfWidth,
       halfDepth,
       halfHeight,
-      onDragEnd: (pos,rot) => {
+      onDrag: (pos, rot) => {
         setCurrentPosition([pos.x, pos.y, pos.z]);
+
+        updateFurniture(id, {
+          positionX: pos.x,
+          positionY: pos.y,
+          positionZ: pos.z,
+          rotationY: rot?.y,
+        });
+      },
+      onDragEnd: (pos, rot) => {
+        setCurrentPosition([pos.x, pos.y, pos.z]);
+
         updateFurniture(id, {
           positionX: pos.x,
           positionY: pos.y,
