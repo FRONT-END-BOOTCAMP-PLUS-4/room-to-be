@@ -12,9 +12,10 @@ import Modal from './Modal';
 
 interface RoomSizeModalProps {
   onBack: () => void;
+  onClose?: () => void;
 }
 
-export default function RoomSizeModal({ onBack }: RoomSizeModalProps) {
+export default function RoomSizeModal({ onBack, onClose }: RoomSizeModalProps) {
   const router = useRouter();
   const { loading } = useLoading();
   const {
@@ -64,6 +65,7 @@ export default function RoomSizeModal({ onBack }: RoomSizeModalProps) {
     <Modal
       width='340px'
       onBack={onBack}
+      onClose={onClose}
       showBackIconOnly
       onBackdropClick={handleBackgroundClick}
     >

@@ -38,8 +38,11 @@ interface SimulatorPageProps {
 export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
   const { openModal } = useLoginRedirectModalStore();
   const { setLoading } = useLoadingStore();
+
   const [canvasCreated, setCanvasCreated] = useState(false);
-  const [sceneLoaded, setSceneLoaded] = useState(false);
+  const [dataLoaded, setDataLoaded] = useState(false);
+  const [allResourcesReady, setAllResourcesReady] = useState(false);
+
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const captureCanvasRef = useRef<HTMLCanvasElement>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -56,7 +59,6 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
   const [isEmptyFurnitureModalOpen, setIsEmptyFurnitureModalOpen] =
     useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [hasLoaded, setHasLoaded] = useState(false);
   const roomWidth = storeWidth;
   const roomHeight = storeHeight;
   const floorExtension = 0.1;
@@ -107,18 +109,22 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
   }, [mode]);
 
   useEffect(() => {
-    if (canvasCreated && sceneLoaded) {
+    setLoading(true, '3D 공간을 준비하고 있습니다...');
+  }, []);
+
+  useEffect(() => {
+    if (canvasCreated && dataLoaded && !allResourcesReady) {
       const timer = setTimeout(() => {
+        setAllResourcesReady(true);
         setLoading(false);
       }, 300);
       return () => clearTimeout(timer);
     }
-  }, [canvasCreated, sceneLoaded, setLoading]);
+  }, [canvasCreated, dataLoaded, allResourcesReady, setLoading]);
 
   useEffect(() => {
-    if (mode === 'edit' && roomId && !hasLoaded) {
+    if (mode === 'edit' && roomId && !dataLoaded) {
       const load = async () => {
-        const { setLoading } = useLoadingStore.getState();
         setLoading(true);
         try {
           const room = await getRoomById(roomId);
@@ -159,17 +165,22 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
           useFurnitureStore
             .getState()
             .setRenderableIds(validFurnitures.map((f) => f.id));
-          setHasLoaded(true);
+
+          setDataLoaded(true);
         } catch (e) {
           console.error(e);
-        } finally {
           setLoading(false);
         }
       };
 
       load();
+    } else if (mode === 'create') {
+      useFurnitureStore.getState().selectFurniture(null);
+      useFurnitureStore.getState().clearFurnitures();
+      useFurnitureStore.getState().setRenderableIds([]);
+      setDataLoaded(true);
     }
-  }, [mode, roomId, hasLoaded]);
+  }, [mode, roomId, dataLoaded]);
 
   const roomComponent = useMemo(() => {
     if (isNaN(roomWidth) || isNaN(roomHeight)) return null;
@@ -231,13 +242,13 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
             width={roomWidth}
             height={roomHeight}
             initialCameraPosition={roomCameraPosition}
-            onIntroEnd={() => setSceneLoaded(true)}
+            shouldStartIntro={allResourcesReady}
           />
           <CameraTracker />
         </Canvas>
       </div>
 
-      {sceneLoaded && (
+      {allResourcesReady && (
         <>
           <div
             className={`
@@ -257,12 +268,12 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
             variant='ghost'
             size='icon'
             className={`
-    absolute top-1/2 z-40 -translate-y-1/2 transition-all
-    ${isSidebarOpen ? 'left-[320px]' : 'left-2'}
-    w-[28px] h-[60px] bg-white/10 text-white backdrop-blur-sm
-    border border-white/20 shadow-md hover:bg-white/20
-    flex items-center justify-center
-  `}
+              absolute top-1/2 z-40 -translate-y-1/2 transition-all
+              ${isSidebarOpen ? 'left-[320px]' : 'left-2'}
+              w-[28px] h-[60px] bg-white/10 text-white backdrop-blur-sm
+              border border-white/20 shadow-md hover:bg-white/20
+              flex items-center justify-center
+            `}
           >
             {isSidebarOpen ? (
               <ChevronLeft size={16} />

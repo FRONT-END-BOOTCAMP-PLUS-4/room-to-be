@@ -1,15 +1,16 @@
 'use client';
 
-import BoxTextButton from '../buttons/BoxTextButton';
 import TemplateList from '../list/TemplateCard';
 import Modal from './Modal';
 
 interface TemplateSelectModalProps {
   onBack: () => void;
+  onClose?: () => void;
 }
 
 export default function TemplateSelectModal({
   onBack,
+  onClose,
 }: TemplateSelectModalProps) {
   const templates = [
     {
@@ -44,7 +45,7 @@ export default function TemplateSelectModal({
     },
   ];
   return (
-    <Modal width='1280px' height='773px' onBack={onBack}>
+    <Modal width='1280px' height='773px' onBack={onBack} onClose={onClose}>
       <div className='flex flex-wrap justify-center'>
         {templates.map(({ id, imageUrl, tags }) => (
           <div

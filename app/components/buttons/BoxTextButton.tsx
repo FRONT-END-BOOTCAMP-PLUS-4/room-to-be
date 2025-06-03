@@ -27,7 +27,7 @@ export default function BoxTextButton({
     <button
       type={type ?? 'button'}
       className={clsx(
-        'flex px-4  items-center justify-center gap-2  border border-white bg-white/20 text-white text-lg  hover:bg-white/30 transition active:scale-95',
+        'flex px-4  items-center justify-center gap-2  border border-white bg-white/20 text-white text-lg  hover:bg-white/30 transition active:scale-95 focus:outline-none',
         showImg
           ? 'py-4 h-[58px] font-normal rounded-[20px]'
           : 'py-2 h-[34px] text-sm rounded-[10px]',
