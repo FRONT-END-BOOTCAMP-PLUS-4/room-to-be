@@ -118,24 +118,41 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
 
   // 수동 프로그레스 관리
   const [progress, setProgress] = useState(0);
+  const progressStartTimeRef = useRef<number | null>(null);
+  const pausedElapsedRef = useRef<number>(0);
+  const lastSlideChangeRef = useRef(current);
 
   useEffect(() => {
-    if (!playing || isResizing || isSliding) {
+    if (!playing) {
       return;
     }
 
-    let startTime: number;
+    // 슬라이드가 변경되었을 때만 progress 리셋
+    if (lastSlideChangeRef.current !== current) {
+      lastSlideChangeRef.current = current;
+      setProgress(0);
+      progressStartTimeRef.current = null;
+      pausedElapsedRef.current = 0;
+      return;
+    }
+
+    // isResizing이나 isSliding 상태가 변경되어도 progress는 유지
     let animationId: number;
 
     const animate = (currentTime: number) => {
-      if (!startTime) startTime = currentTime;
+      if (!progressStartTimeRef.current) {
+        progressStartTimeRef.current = currentTime;
+      }
 
-      const elapsed = currentTime - startTime;
-      const newProgress = (elapsed / AUTO_PLAY_INTERVAL) * 100;
+      const elapsed =
+        currentTime - progressStartTimeRef.current + pausedElapsedRef.current;
+      const newProgress = Math.min((elapsed / AUTO_PLAY_INTERVAL) * 100, 100);
 
       if (newProgress >= 100) {
         // 프로그레스 완료 - 슬라이드 변경
         setProgress(0);
+        progressStartTimeRef.current = null;
+        pausedElapsedRef.current = 0;
         setSlideDirection('right');
         previousCurrentRef.current = current;
         setCurrent((prev) => prev + 1);
@@ -143,24 +160,36 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
         setIsSliding(true);
       } else {
         setProgress(newProgress);
-        animationId = requestAnimationFrame(animate);
+        if (playing && !isSliding) {
+          animationId = requestAnimationFrame(animate);
+        }
       }
     };
 
-    animationId = requestAnimationFrame(animate);
+    // isResizing 중이 아닐 때만 애니메이션 시작/재개
+    if (!isSliding) {
+      animationId = requestAnimationFrame(animate);
+    }
 
     return () => {
       if (animationId) {
         cancelAnimationFrame(animationId);
       }
     };
-  }, [playing, isResizing, isSliding, current]);
+  }, [playing, isSliding, current]);
 
-  useEffect(() => {
-    setProgress(0);
-  }, [current]);
-
-  const handlePlayToggle = () => setPlaying((prev) => !prev);
+  const handlePlayToggle = () => {
+    if (playing) {
+      if (progressStartTimeRef.current) {
+        pausedElapsedRef.current +=
+          performance.now() - progressStartTimeRef.current;
+      }
+      progressStartTimeRef.current = null;
+    } else {
+      progressStartTimeRef.current = null;
+    }
+    setPlaying((prev) => !prev);
+  };
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);

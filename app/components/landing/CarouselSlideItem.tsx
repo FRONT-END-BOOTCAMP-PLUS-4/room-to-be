@@ -31,10 +31,14 @@ export default function CarouselSlideItem({
 }: CarouselSlideItemProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
+  const [showFloating, setShowFloating] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(true);
+      setTimeout(() => {
+        setShowFloating(true);
+      }, 1200);
     }, 100);
 
     return () => clearTimeout(timer);
@@ -59,7 +63,7 @@ export default function CarouselSlideItem({
     animate: (direction: string) => {
       if (direction === 'right') {
         return {
-          x: [0, 100, 0], // 오른쪽으로 갔다가 다시 제자리로
+          x: [0, 100, 0],
           opacity: [1, 0.3, 1],
           transition: {
             duration: 0.8,
@@ -69,7 +73,7 @@ export default function CarouselSlideItem({
         };
       } else if (direction === 'left') {
         return {
-          x: [0, -100, 0], // 왼쪽으로 갔다가 다시 제자리로
+          x: [0, -100, 0],
           opacity: [1, 0.3, 1],
           transition: {
             duration: 0.8,
@@ -134,7 +138,7 @@ export default function CarouselSlideItem({
       </div>
 
       {/* 숫자 */}
-      <div className='absolute top-[10%] md:top-auto md:bottom-[26rem] lg:bottom-[28rem] xl:bottom-[32rem] 2xl:bottom-[35rem] right-8 md:right-12 lg:right-10 xl:right-14 2xl:right-24 z-10'>
+      <div className='absolute top-[10%] md:top-auto md:bottom-[28rem] lg:bottom-[32rem] 2xl:bottom-[35rem] right-8 md:right-14 2xl:right-24 z-10'>
         <AnimatePresence mode='wait'>
           <motion.div
             key={`number-${animationKey}`}
@@ -163,7 +167,7 @@ export default function CarouselSlideItem({
         md:left-auto md:translate-x-0 md:right-12 
         lg:right-10 xl:right-14 2xl:right-24'
       >
-        <div className='relative w-[300px] md:w-[450px] lg:w-[500px] xl:w-[550px] 2xl:w-[600px] h-[200px] md:h-[250px] lg:h-[300px] xl:h-[350px] 2xl:h-[400px]'>
+        <div className='relative w-[300px] md:w-[500px] lg:w-[550px] 2xl:w-[600px] h-[200px] md:h-[300px] lg:h-[350px] 2xl:h-[400px]'>
           {/* 받침 이미지 */}
           {slide?.image2 && (
             <Image
@@ -174,8 +178,9 @@ export default function CarouselSlideItem({
               className={`
                 absolute bottom-[-6rem] left-1/2 -translate-x-1/2
                 w-full h-auto
-                md:bottom-[-8rem] lg:bottom-[-10rem] 2xl:bottom-[-12rem]
+                md:bottom-[-10rem] lg:bottom-[-10rem] 2xl:bottom-[-12rem]
                 ${isVisible ? 'animate-[slideUpFromBottom_1s_ease-out_0.3s_both]' : 'opacity-0 translate-y-[100px]'}
+                ${showFloating ? 'animate-[floatingHorizontal_5s_ease-in-out_infinite]' : ''}
               `}
               style={{
                 maxWidth: '100%',
@@ -192,9 +197,10 @@ export default function CarouselSlideItem({
             width={720}
             height={720}
             className={`
-              absolute bottom-14 md:bottom-24 lg:bottom-24 xl:bottom-28 2xl:bottom-38 left-1/2 -translate-x-1/2
+              absolute bottom-14 md:bottom-24 lg:bottom-28 2xl:bottom-38 left-1/2 -translate-x-1/2
               w-[85%] h-auto
               ${isVisible ? 'animate-[slideDownFromTop_1.2s_ease-out_0.1s_both]' : 'opacity-0 -translate-y-[100px]'}
+              ${showFloating ? 'animate-[floatingHorizontal_5s_ease-in-out_infinite]' : ''}
             `}
             style={{
               maxWidth: '90%',
@@ -225,6 +231,21 @@ export default function CarouselSlideItem({
           100% {
             transform: translate(-50%, 0);
             opacity: 1;
+          }
+        }
+
+        @keyframes floatingHorizontal {
+          0% {
+            transform: translate(-50%, 0) translateX(0px);
+          }
+          25% {
+            transform: translate(-50%, 0) translateX(5px);
+          }
+          75% {
+            transform: translate(-50%, 0) translateX(-5px);
+          }
+          100% {
+            transform: translate(-50%, 0) translateX(0px);
           }
         }
       `}</style>
