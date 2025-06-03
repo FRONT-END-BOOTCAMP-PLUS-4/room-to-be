@@ -71,7 +71,7 @@ export default function CarouselSlideItem({
       </div>
 
       {/* 숫자 */}
-      <div className='absolute right-8 md:right-12 lg:right-16 xl:right-16 2xl:right-24 top-[10%] md:top-[20%] lg:top-[15%] xl:top-[8%]'>
+      <div className='absolute top-[10%] md:top-auto md:bottom-[26rem] lg:bottom-[28rem] xl:bottom-[32rem] 2xl:bottom-[35rem] right-8 md:right-12 lg:right-10 xl:right-14 2xl:right-24 z-10'>
         <span
           className='
             text-[60px] md:text-[80px] lg:text-[90px] xl:text-[100px] 2xl:text-[140px]
