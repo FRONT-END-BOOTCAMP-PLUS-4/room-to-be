@@ -30,6 +30,11 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
   >('none');
   const previousCurrentRef = useRef(current);
 
+  const [progress, setProgress] = useState(0);
+  const animationIdRef = useRef<number | null>(null);
+  const startTimeRef = useRef<number | null>(null);
+  const pausedTimeRef = useRef<number>(0);
+
   // 무한루프용 렌더 슬라이드
   const renderSlides = [slides[SLIDE_COUNT - 1], ...slides, slides[0]];
 
@@ -60,9 +65,18 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
       setIsSliding(true);
       setCurrent(idx);
       setTransition(true);
+
+      setProgress(0);
+      startTimeRef.current = null;
+      pausedTimeRef.current = 0;
+      if (animationIdRef.current) {
+        cancelAnimationFrame(animationIdRef.current);
+        animationIdRef.current = null;
+      }
     },
     [isSliding, isResizing, SLIDE_COUNT],
   );
+
   const nextSlide = useCallback(() => goTo(current + 1), [current, goTo]);
   const prevSlide = useCallback(() => goTo(current - 1), [current, goTo]);
 
@@ -116,80 +130,87 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
     }
   }, [transition, isResizing]);
 
-  // 수동 프로그레스 관리
-  const [progress, setProgress] = useState(0);
-  const progressStartTimeRef = useRef<number | null>(null);
-  const pausedElapsedRef = useRef<number>(0);
-  const lastSlideChangeRef = useRef(current);
-
+  // 프로그레스바 애니메이션
   useEffect(() => {
-    if (!playing) {
+    if (!playing || isSliding) {
+      if (animationIdRef.current) {
+        cancelAnimationFrame(animationIdRef.current);
+        animationIdRef.current = null;
+      }
       return;
     }
 
-    // 슬라이드가 변경되었을 때만 progress 리셋
-    if (lastSlideChangeRef.current !== current) {
-      lastSlideChangeRef.current = current;
-      setProgress(0);
-      progressStartTimeRef.current = null;
-      pausedElapsedRef.current = 0;
-      return;
-    }
-
-    // isResizing이나 isSliding 상태가 변경되어도 progress는 유지
-    let animationId: number;
-
+    // 애니메이션 시작/재개
     const animate = (currentTime: number) => {
-      if (!progressStartTimeRef.current) {
-        progressStartTimeRef.current = currentTime;
+      if (!startTimeRef.current) {
+        startTimeRef.current = currentTime;
       }
 
       const elapsed =
-        currentTime - progressStartTimeRef.current + pausedElapsedRef.current;
+        currentTime - startTimeRef.current + pausedTimeRef.current;
       const newProgress = Math.min((elapsed / AUTO_PLAY_INTERVAL) * 100, 100);
 
+      setProgress(newProgress);
+
       if (newProgress >= 100) {
-        // 프로그레스 완료 - 슬라이드 변경
-        setProgress(0);
-        progressStartTimeRef.current = null;
-        pausedElapsedRef.current = 0;
+        // 자동 슬라이드 변경
         setSlideDirection('right');
         previousCurrentRef.current = current;
         setCurrent((prev) => prev + 1);
         setTransition(true);
         setIsSliding(true);
-      } else {
-        setProgress(newProgress);
-        if (playing && !isSliding) {
-          animationId = requestAnimationFrame(animate);
-        }
+
+        // 프로그레스 리셋 (자동 변경시)
+        setProgress(0);
+        startTimeRef.current = null;
+        pausedTimeRef.current = 0;
+        return;
+      }
+
+      // 계속 진행 (리사이즈 중에도 진행)
+      if (playing && !isSliding) {
+        animationIdRef.current = requestAnimationFrame(animate);
       }
     };
 
-    // isResizing 중이 아닐 때만 애니메이션 시작/재개
-    if (!isSliding) {
-      animationId = requestAnimationFrame(animate);
-    }
+    animationIdRef.current = requestAnimationFrame(animate);
 
     return () => {
-      if (animationId) {
-        cancelAnimationFrame(animationId);
+      if (animationIdRef.current) {
+        cancelAnimationFrame(animationIdRef.current);
+        animationIdRef.current = null;
       }
     };
   }, [playing, isSliding, current]);
 
   const handlePlayToggle = () => {
     if (playing) {
-      if (progressStartTimeRef.current) {
-        pausedElapsedRef.current +=
-          performance.now() - progressStartTimeRef.current;
+      // 정지: 현재까지의 진행시간 저장
+      if (startTimeRef.current) {
+        pausedTimeRef.current += performance.now() - startTimeRef.current;
       }
-      progressStartTimeRef.current = null;
+      startTimeRef.current = null;
+
+      if (animationIdRef.current) {
+        cancelAnimationFrame(animationIdRef.current);
+        animationIdRef.current = null;
+      }
     } else {
-      progressStartTimeRef.current = null;
+      // 재생: startTime 리셋 (pausedTime은 유지)
+      startTimeRef.current = null;
     }
-    setPlaying((prev) => !prev);
+
+    setPlaying(!playing);
   };
+
+  // 컴포넌트 언마운트 시 클린업
+  useEffect(() => {
+    return () => {
+      if (animationIdRef.current) {
+        cancelAnimationFrame(animationIdRef.current);
+      }
+    };
+  }, []);
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
