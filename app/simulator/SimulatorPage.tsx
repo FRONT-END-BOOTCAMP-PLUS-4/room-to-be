@@ -16,6 +16,7 @@ import { useRoomSizeStore } from '@/stores/useRoomSizeStore';
 
 import CameraModeButtons from './components/buttons/CameraModeButtons';
 import CaptureCanvas from './components/capture/CaptureCanvas';
+import DistanceVisualizer from './components/furnitures/DistanceVisualizer';
 import EmptyFurnitureModal from './components/furnitures/EmptyFurnitureModal';
 import FurnitureController from './components/furnitures/FurnitureController';
 import FurnitureModel from './components/furnitures/FurnitureModel';
@@ -209,6 +210,11 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
                 />
               ))}
           </Suspense>
+          <DistanceVisualizer
+            roomWidth={roomWidth}
+            roomHeight={roomHeight}
+            maxDistance={1.5}
+          />
           <Lighting />
           <CameraController
             width={roomWidth}
