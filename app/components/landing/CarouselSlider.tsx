@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import React from 'react';
 import clsx from 'clsx';
 
@@ -9,8 +9,6 @@ import MainHeader from '@/app/components/MainHeader';
 import ModalController from '@/app/components/modal/ModalController';
 
 import { Progress } from '@/components/ui/progress';
-
-import { useSliderProgress } from '@/hooks/useSliderProgress';
 
 type CarouselSliderProps = {
   slides: React.ReactNode[];
@@ -27,17 +25,43 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
   const [isResizing, setIsResizing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const [slideDirection, setSlideDirection] = useState<
+    'left' | 'right' | 'none'
+  >('none');
+  const previousCurrentRef = useRef(current);
+
   // 무한루프용 렌더 슬라이드
   const renderSlides = [slides[SLIDE_COUNT - 1], ...slides, slides[0]];
 
   const goTo = useCallback(
     (idx: number) => {
       if (isSliding || isResizing) return;
+
+      // 방향 감지
+      const prevCurrent = previousCurrentRef.current;
+      let direction: 'left' | 'right' | 'none' = 'none';
+
+      if (idx > prevCurrent) {
+        direction = 'right';
+      } else if (idx < prevCurrent) {
+        direction = 'left';
+      }
+
+      // 무한루프 경계에서의 방향 처리
+      if (prevCurrent === 1 && idx === SLIDE_COUNT + 1) {
+        direction = 'right';
+      } else if (prevCurrent === SLIDE_COUNT && idx === 0) {
+        direction = 'left';
+      }
+
+      setSlideDirection(direction);
+      previousCurrentRef.current = idx;
+
       setIsSliding(true);
       setCurrent(idx);
       setTransition(true);
     },
-    [isSliding, isResizing],
+    [isSliding, isResizing, SLIDE_COUNT],
   );
   const nextSlide = useCallback(() => goTo(current + 1), [current, goTo]);
   const prevSlide = useCallback(() => goTo(current - 1), [current, goTo]);
@@ -47,10 +71,16 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
     if (current === SLIDE_COUNT + 1) {
       setTransition(false);
       setCurrent(1);
+      previousCurrentRef.current = 1;
     } else if (current === 0) {
       setTransition(false);
       setCurrent(SLIDE_COUNT);
+      previousCurrentRef.current = SLIDE_COUNT;
     }
+
+    setTimeout(() => {
+      setSlideDirection('none');
+    }, 100);
   };
 
   // resize 이벤트 핸들러
@@ -106,6 +136,8 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
       if (newProgress >= 100) {
         // 프로그레스 완료 - 슬라이드 변경
         setProgress(0);
+        setSlideDirection('right');
+        previousCurrentRef.current = current;
         setCurrent((prev) => prev + 1);
         setTransition(true);
         setIsSliding(true);
@@ -157,6 +189,8 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
             if (slideIndex < 0) slideIndex = SLIDE_COUNT - 1;
             if (slideIndex >= SLIDE_COUNT) slideIndex = 0;
 
+            const isActiveSlide = idx === current;
+
             // 배경 클래스명들
             const bgClasses = [
               'gradient-01',
@@ -167,6 +201,8 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
 
             const slideElement = React.cloneElement(jsx as React.ReactElement, {
               onOpenModal: handleOpenModal,
+              slideDirection: isActiveSlide ? slideDirection : 'none',
+              isActive: isActiveSlide,
             });
 
             return (
