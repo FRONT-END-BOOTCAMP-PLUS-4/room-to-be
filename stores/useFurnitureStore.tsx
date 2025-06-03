@@ -23,7 +23,6 @@ interface FurnitureStore {
   setRenderableIds: (ids: string[]) => void;
 
   setIsCreating: (value: boolean) => void;
-  updateBaseSize: (id: string, size: { baseX: number; baseZ: number }) => void;
 }
 
 export const useFurnitureStore = create<FurnitureStore>((set) => ({
@@ -59,7 +58,7 @@ export const useFurnitureStore = create<FurnitureStore>((set) => ({
       return {
         prevFurnitureStates: {
           ...state.prevFurnitureStates,
-          [id]: alreadySaved ?? { ...current },
+          [id]: alreadySaved ?? { ...current }, // 최초 한 번만 저장
         },
         furnitures: state.furnitures.map((f) =>
           f.id === id ? { ...f, ...updated } : f,
@@ -80,13 +79,6 @@ export const useFurnitureStore = create<FurnitureStore>((set) => ({
     })),
 
   setFurnitures: (items) => set({ furnitures: items }),
-
-  updateBaseSize: (id: string, size: { baseX: number; baseZ: number }) =>
-    set((state) => ({
-      furnitures: state.furnitures.map((f) =>
-        f.id === id ? { ...f, baseX: size.baseX, baseZ: size.baseZ } : f,
-      ),
-    })),
 
   clearFurnitures: () =>
     set({
