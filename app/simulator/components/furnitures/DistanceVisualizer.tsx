@@ -41,10 +41,13 @@ export default function DistanceVisualizer({
     [furnitures, selectedId],
   );
   const others = useMemo(
-    () => furnitures.filter((f) => f.id !== selectedId),
+    () =>
+      furnitures.filter(
+        (f) => f.id !== selectedId && f.placementType === 'floor',
+      ),
     [furnitures, selectedId],
   );
-
+  if (!selected || selected.placementType === 'wall') return null;
   if (!selected) return null;
 
   const lines = [];
