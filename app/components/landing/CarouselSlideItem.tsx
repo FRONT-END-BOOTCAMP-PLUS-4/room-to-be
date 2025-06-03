@@ -50,19 +50,19 @@ export default function CarouselSlideItem({
         xl:left-14 
         2xl:left-32'
       >
-        <div className='flex flex-col gap-6 2xl:gap-8 w-[280px] text-center md:text-left  md:w-[300px] lg:w-[420px] xl:w-[460px] 2xl:w-[580px]'>
+        <div className='flex flex-col gap-6 2xl:gap-8 w-[280px] text-center items-center md:items-start md:text-left  md:w-[300px] lg:w-[420px] xl:w-[460px] 2xl:w-[580px]'>
           <h2
             className='text-white text-2xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-extrabold'
             style={{ lineHeight: '1.2' }}
           >
             {slide.title}
           </h2>
-          <p className='text-white/90 text-sm lg:text-lg font-normal leading-relaxed mb-0 mb:mb-6 2xl:mb-8'>
+          <p className='text-white/90 text-sm lg:text-lg font-normal leading-relaxed mb-0 md:mb-2 lg:mb-4 2xl:mb-6'>
             {slide.desc}
           </p>
           <BoxTextButton
             showImg={true}
-            className='w-[240px] sm:w-[236px] mt-2'
+            className='w-[200px] h-[48px] text-[0.8rem] rounded-2xl lg:text-[0.9rem] lg:w-[216px] lg:h-[52px] 2xl:w-[268px] 2xl:h-[64px] 2xl:text-[1.1rem]'
             onClick={onOpenModal}
           >
             3D 인테리어 하러 가기

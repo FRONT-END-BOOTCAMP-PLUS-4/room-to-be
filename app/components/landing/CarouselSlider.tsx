@@ -159,7 +159,7 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
         </div>
 
         {/* Progress Bar & Play Button */}
-        <div className='absolute left-6 md:left-24 bottom-6 mt-8 flex items-center gap-2 w-[85vw] max-w-xs z-30'>
+        <div className='absolute left-6 md:left-24 bottom-6 mt-8 flex items-center gap-2 w-[60vw] max-w-[260px] md:max-w-[280px] lg:max-w-[300px] xl:-max-w-[320px] 2xl:w-[85vw] 2xl:max-w-[340px] z-30'>
           <Progress
             value={progress}
             className='
@@ -173,7 +173,7 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
           />
           <button
             onClick={handlePlayToggle}
-            className='ml-3 w-6 h-6 flex items-center justify-center transition'
+            className='ml-3 w-5 h-5 2xl:w-6 2xl:h-6 flex items-center justify-center transition'
             aria-label={playing ? '정지' : '재생'}
             tabIndex={0}
           >
@@ -194,18 +194,18 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
 
         {/* 좌우 버튼 */}
         <IconButton
-          height={46}
-          width={30}
+          height={42}
+          width={26}
           imageSrc='/assets/icons/left.svg'
-          className='absolute top-1/2 left-4'
+          className='absolute top-1/2 left-4 md:left-6 xl:left-8 2xl:left-12'
           onClick={prevSlide}
           disabled={isResizing}
         />
         <IconButton
-          height={46}
-          width={30}
+          height={42}
+          width={26}
           imageSrc='/assets/icons/right.svg'
-          className='absolute top-1/2 right-4'
+          className='absolute top-1/2 right-4 md:right-6 xl:right-8 2xl:right-12'
           onClick={nextSlide}
           disabled={isResizing}
         />
