@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useThree } from '@react-three/fiber';
 import { Object3D, Plane, Raycaster, Vector2, Vector3 } from 'three';
-
+import * as THREE from 'three';
+THREE;
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
 import { useViewStore } from '@/stores/useViewStore';
 
@@ -12,6 +13,7 @@ interface DragOptions {
   halfWidth?: number;
   halfDepth?: number;
   halfHeight?: number;
+  onDrag?: (pos: THREE.Vector3, rot?: THREE.Euler) => void;
   onDragEnd?: (
     position: { x: number; y: number; z: number },
     rotation?: { y: number },
@@ -264,18 +266,26 @@ export default function useDragPosition(
           );
           newPos.y = roomBoundary.yMin;
 
-          // 충돌 처리 및 슬라이딩 위치 적용
           const prevPos = meshRef.current.position.clone();
           const adjusted = handleCollision(newPos, prevPos);
           meshRef.current.position.copy(adjusted);
+
+          options?.onDrag?.(adjusted.clone(), meshRef.current.rotation.clone());
         } else if (placementType === 'wall' && intersect.wall) {
-          // [wall] 벽 위 이동: 충돌 처리 훅에서 벽 제약 조건도 처리
           const prevPos = meshRef.current.position.clone();
-          const wallInfo = { id: intersect.wall.id, rotationY: intersect.wall.rotationY };
+          const wallInfo = {
+            id: intersect.wall.id,
+            rotationY: intersect.wall.rotationY,
+          };
           const adjusted = handleCollision(newPos, prevPos, wallInfo);
-          
+
           meshRef.current.position.copy(adjusted);
           meshRef.current.rotation.y = intersect.wall.rotationY;
+
+          options?.onDrag?.(
+            adjusted.clone(),
+            new THREE.Euler(0, intersect.wall.rotationY, 0),
+          );
         }
       }
     },
@@ -288,6 +298,7 @@ export default function useDragPosition(
       halfWidth,
       halfDepth,
       handleCollision,
+      options,
     ],
   );
 
