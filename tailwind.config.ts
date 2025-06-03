@@ -66,6 +66,7 @@ const config: Config = {
         'gradient-xy': 'gradient-xy 8s ease infinite',
         'fade-right': 'fade-right 0.7s cubic-bezier(0.4,0,0.2,1)',
         'fade-left': 'fade-left 0.7s cubic-bezier(0.4,0,0.2,1)',
+        'floating-horizontal': 'floating-horizontal 5s ease-in-out infinite',
       },
       keyframes: {
         'gradient-x': {
@@ -87,6 +88,12 @@ const config: Config = {
         'fade-left': {
           '0%': { opacity: '0', transform: 'translateX(-40px)' },
           '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+        'floating-horizontal': {
+          '0%': { transform: 'translate(-50%, 0) translateX(0px)' },
+          '25%': { transform: 'translate(-50%, 0) translateX(5px)' },
+          '75%': { transform: 'translate(-50%, 0) translateX(-5px)' },
+          '100%': { transform: 'translate(-50%, 0) translateX(0px)' },
         },
       },
     },

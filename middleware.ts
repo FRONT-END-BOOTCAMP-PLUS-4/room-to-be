@@ -1,5 +1,19 @@
-export { auth as middleware } from '@/auth';
+// middleware.ts
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+
+import { auth } from '@/auth';
+
+export async function middleware(req: NextRequest) {
+  const session = await auth();
+
+  if (!session?.user) {
+    return NextResponse.redirect(new URL('/', req.url));
+  }
+
+  return NextResponse.next();
+}
 
 export const config = {
-  matcher: ['/protected/:path*'], // TODO:인증 필요한 경로 설정
+  matcher: ['/rooms/:id/edit', '/rooms/:path*'],
 };
