@@ -24,6 +24,7 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
   const [playing, setPlaying] = useState(true);
   const [isResizing, setIsResizing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
 
   const [slideDirection, setSlideDirection] = useState<
     'left' | 'right' | 'none'
@@ -41,6 +42,7 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
   const goTo = useCallback(
     (idx: number) => {
       if (isSliding || isResizing) return;
+      if (isFirstLoad) setIsFirstLoad(false);
 
       // 방향 감지
       const prevCurrent = previousCurrentRef.current;
@@ -74,7 +76,7 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
         animationIdRef.current = null;
       }
     },
-    [isSliding, isResizing, SLIDE_COUNT],
+    [isSliding, isResizing, SLIDE_COUNT, isFirstLoad],
   );
 
   const nextSlide = useCallback(() => goTo(current + 1), [current, goTo]);
@@ -253,6 +255,7 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
               onOpenModal: handleOpenModal,
               slideDirection: isActiveSlide ? slideDirection : 'none',
               isActive: isActiveSlide,
+              isFirstLoad: isFirstLoad && isActiveSlide,
             });
 
             return (

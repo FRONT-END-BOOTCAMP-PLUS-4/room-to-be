@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
 
 import BoxTextButton from '../buttons/BoxTextButton';
@@ -19,6 +18,7 @@ type CarouselSlideItemProps = {
   onOpenModal?: () => void;
   slideDirection?: 'left' | 'right' | 'none';
   isActive?: boolean;
+  isFirstLoad?: boolean;
 };
 
 export default function CarouselSlideItem({
@@ -28,10 +28,11 @@ export default function CarouselSlideItem({
   onOpenModal,
   slideDirection = 'none',
   isActive = false,
+  isFirstLoad = false,
 }: CarouselSlideItemProps) {
   const [isVisible, setIsVisible] = useState(false);
-  const [animationKey, setAnimationKey] = useState(0);
   const [showFloating, setShowFloating] = useState(false);
+  const [animationTrigger, setAnimationTrigger] = useState(0);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -46,48 +47,21 @@ export default function CarouselSlideItem({
 
   useEffect(() => {
     if (isActive) {
-      setAnimationKey((prev) => prev + 1);
+      setAnimationTrigger((prev) => prev + 1);
     }
   }, [isActive]);
 
-  // 슬라이드 방향에 따른 애니메이션 variants
-  const textVariants = {
-    initial: (direction: string) => {
-      if (direction === 'right') {
-        return { x: 0, opacity: 1 };
-      } else if (direction === 'left') {
-        return { x: 0, opacity: 1 };
-      }
-      return { x: 0, opacity: 1 };
-    },
-    animate: (direction: string) => {
-      if (direction === 'right') {
-        return {
-          x: [0, 100, 0],
-          opacity: [1, 0.3, 1],
-          transition: {
-            duration: 0.8,
-            times: [0, 0.5, 1],
-            ease: 'easeInOut',
-          },
-        };
-      } else if (direction === 'left') {
-        return {
-          x: [0, -100, 0],
-          opacity: [1, 0.3, 1],
-          transition: {
-            duration: 0.8,
-            times: [0, 0.5, 1],
-            ease: 'easeInOut',
-          },
-        };
-      }
-      return {
-        x: 0,
-        opacity: 1,
-        transition: { duration: 0.5 },
-      };
-    },
+  const getAnimationClass = () => {
+    if (isFirstLoad && isActive) {
+      return 'animate-slideRight';
+    }
+    if (slideDirection === 'right') {
+      return 'animate-slideRight';
+    }
+    if (slideDirection === 'left') {
+      return 'animate-slideLeft';
+    }
+    return '';
   };
 
   return (
@@ -104,61 +78,47 @@ export default function CarouselSlideItem({
         md:left-12 md:translate-x-0 md:top-[40%] md:-translate-y-1/2
         lg:left-10 lg:top-1/2 xl:left-14 2xl:left-32'
       >
-        <AnimatePresence mode='wait'>
-          <motion.div
-            key={`text-${animationKey}`}
-            custom={slideDirection}
-            variants={textVariants}
-            initial='initial'
-            animate='animate'
-            className='flex flex-col gap-6 2xl:gap-8 w-[280px] text-center items-center md:items-start md:text-left md:w-[300px] lg:w-[420px] xl:w-[460px] 2xl:w-[580px]'
+        <div
+          key={`text-${animationTrigger}`}
+          className={`flex flex-col gap-6 2xl:gap-8 w-[280px] text-center items-center md:items-start md:text-left md:w-[300px] lg:w-[420px] xl:w-[460px] 2xl:w-[580px] ${getAnimationClass()}`}
+        >
+          <h2
+            className='text-white text-2xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-extrabold'
+            style={{ lineHeight: '1.2' }}
           >
-            <motion.h2
-              className='text-white text-2xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-extrabold'
-              style={{ lineHeight: '1.2' }}
+            {slide.title}
+          </h2>
+
+          <p className='text-white/90 text-sm lg:text-lg font-normal leading-relaxed mb-0 md:mb-2 lg:mb-4 2xl:mb-6'>
+            {slide.desc}
+          </p>
+
+          <div>
+            <BoxTextButton
+              showImg={true}
+              className='w-[200px] h-[48px] text-[0.8rem] rounded-2xl lg:text-[0.9rem] lg:w-[216px] lg:h-[52px] 2xl:w-[268px] 2xl:h-[64px] 2xl:text-[1.1rem]'
+              onClick={onOpenModal}
             >
-              {slide.title}
-            </motion.h2>
-
-            <motion.p className='text-white/90 text-sm lg:text-lg font-normal leading-relaxed mb-0 md:mb-2 lg:mb-4 2xl:mb-6'>
-              {slide.desc}
-            </motion.p>
-
-            <motion.div>
-              <BoxTextButton
-                showImg={true}
-                className='w-[200px] h-[48px] text-[0.8rem] rounded-2xl lg:text-[0.9rem] lg:w-[216px] lg:h-[52px] 2xl:w-[268px] 2xl:h-[64px] 2xl:text-[1.1rem]'
-                onClick={onOpenModal}
-              >
-                3D 인테리어 하러 가기
-              </BoxTextButton>
-            </motion.div>
-          </motion.div>
-        </AnimatePresence>
+              3D 인테리어 하러 가기
+            </BoxTextButton>
+          </div>
+        </div>
       </div>
 
       {/* 숫자 */}
       <div className='absolute top-[10%] md:top-auto md:bottom-[28rem] lg:bottom-[32rem] 2xl:bottom-[35rem] right-8 md:right-14 2xl:right-24 z-10'>
-        <AnimatePresence mode='wait'>
-          <motion.div
-            key={`number-${animationKey}`}
-            custom={slideDirection}
-            variants={textVariants}
-            initial='initial'
-            animate='animate'
+        <div key={`number-${animationTrigger}`} className={getAnimationClass()}>
+          <span
+            className='
+              text-[60px] md:text-[80px] lg:text-[90px] xl:text-[100px] 2xl:text-[140px]
+              font-extrabold text-white/30 select-none pointer-events-none leading-none
+            '
           >
-            <span
-              className='
-                text-[60px] md:text-[80px] lg:text-[90px] xl:text-[100px] 2xl:text-[140px]
-                font-extrabold text-white/30 select-none pointer-events-none leading-none
-              '
-            >
-              {String(
-                idx === 0 ? SLIDE_COUNT : idx > SLIDE_COUNT ? 1 : idx,
-              ).padStart(2, '0')}
-            </span>
-          </motion.div>
-        </AnimatePresence>
+            {String(
+              idx === 0 ? SLIDE_COUNT : idx > SLIDE_COUNT ? 1 : idx,
+            ).padStart(2, '0')}
+          </span>
+        </div>
       </div>
 
       {/* 이미지 영역 */}
@@ -212,6 +172,36 @@ export default function CarouselSlideItem({
       </div>
 
       <style jsx>{`
+        @keyframes slideRight {
+          0% {
+            transform: translateX(100px);
+            opacity: 0;
+          }
+          100% {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+
+        @keyframes slideLeft {
+          0% {
+            transform: translateX(-100px);
+            opacity: 0;
+          }
+          100% {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+
+        .animate-slideRight {
+          animation: slideRight 0.8s ease-in-out;
+        }
+
+        .animate-slideLeft {
+          animation: slideLeft 0.8s ease-in-out;
+        }
+
         @keyframes slideUpFromBottom {
           0% {
             transform: translate(-50%, 100px);
