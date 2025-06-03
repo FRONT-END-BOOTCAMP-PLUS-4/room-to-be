@@ -76,7 +76,7 @@ export default function RoomEditModal({
 
         await updateRoom(roomId, dto);
         onClose();
-        router.push('/rooms');
+        router.push('/list');
       } catch (error) {
       } finally {
         setIsSaving(false);
