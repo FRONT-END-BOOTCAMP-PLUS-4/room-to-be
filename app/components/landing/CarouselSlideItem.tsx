@@ -45,10 +45,8 @@ export default function CarouselSlideItem({
       <div
         className='absolute 
         left-1/2 -translate-x-1/2 top-[14%] 
-        md:left-12 md:translate-x-0 md:top-[40%] 
-        lg:left-10 lg:top-1/2 md:-translate-y-1/2
-        xl:left-14 
-        2xl:left-32'
+        md:left-12 md:translate-x-0 md:top-[40%] md:-translate-y-1/2
+        lg:left-10 lg:top-1/2 xl:left-14 2xl:left-32'
       >
         <div className='flex flex-col gap-6 2xl:gap-8 w-[280px] text-center items-center md:items-start md:text-left  md:w-[300px] lg:w-[420px] xl:w-[460px] 2xl:w-[580px]'>
           <h2

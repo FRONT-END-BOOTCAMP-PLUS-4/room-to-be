@@ -86,20 +86,47 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
     }
   }, [transition, isResizing]);
 
-  // 프로그레스 커스텀훅
-  const { progress, setProgress } = useSliderProgress({
-    playing: playing && !isResizing,
-    autoPlayInterval: AUTO_PLAY_INTERVAL,
-    onComplete: () => {
-      setTimeout(() => {
+  // 수동 프로그레스 관리
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    if (!playing || isResizing || isSliding) {
+      return;
+    }
+
+    let startTime: number;
+    let animationId: number;
+
+    const animate = (currentTime: number) => {
+      if (!startTime) startTime = currentTime;
+
+      const elapsed = currentTime - startTime;
+      const newProgress = (elapsed / AUTO_PLAY_INTERVAL) * 100;
+
+      if (newProgress >= 100) {
+        // 프로그레스 완료 - 슬라이드 변경
+        setProgress(0);
         setCurrent((prev) => prev + 1);
         setTransition(true);
         setIsSliding(true);
-        setProgress(0);
-      }, 10);
-    },
-    deps: [current],
-  });
+      } else {
+        setProgress(newProgress);
+        animationId = requestAnimationFrame(animate);
+      }
+    };
+
+    animationId = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+    };
+  }, [playing, isResizing, isSliding, current]);
+
+  useEffect(() => {
+    setProgress(0);
+  }, [current]);
 
   const handlePlayToggle = () => setPlaying((prev) => !prev);
 
@@ -159,7 +186,7 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
         </div>
 
         {/* Progress Bar & Play Button */}
-        <div className='absolute left-6 md:left-24 bottom-6 mt-8 flex items-center gap-2 w-[60vw] max-w-[260px] md:max-w-[280px] lg:max-w-[300px] xl:-max-w-[320px] 2xl:w-[85vw] 2xl:max-w-[340px] z-30'>
+        <div className='absolute bottom-6 2xl:bottom-8 flex items-center gap-2 w-[60vw] max-w-[280px] lg:max-w-[300px] xl:-max-w-[320px] 2xl:w-[85vw] 2xl:max-w-[340px] z-30 left-1/2 -translate-x-1/2 md:left-16 md:translate-x-0 xl:left-24 2xl:left-32'>
           <Progress
             value={progress}
             className='
@@ -169,6 +196,9 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
             overflow-hidden
             [&>div]:bg-white
             [&>div]:rounded-full
+            &>div]:transition-all
+            [&>div]:duration-100
+            [&>div]:ease-linear
           '
           />
           <button
