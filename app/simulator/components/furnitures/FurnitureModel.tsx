@@ -21,7 +21,6 @@ import { useLightingStore } from '@/stores/useLightingStore';
 export default function FurnitureModel({
   id,
   name,
-  category,
   modelUrl,
   placementType,
   positionX,

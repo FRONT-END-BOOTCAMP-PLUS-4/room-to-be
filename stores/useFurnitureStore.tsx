@@ -53,12 +53,10 @@ export const useFurnitureStore = create<FurnitureStore>((set) => ({
       const current = state.furnitures.find((f) => f.id === id);
       if (!current) return {};
 
-      const alreadySaved = state.prevFurnitureStates[id];
-
       return {
         prevFurnitureStates: {
           ...state.prevFurnitureStates,
-          [id]: alreadySaved ?? { ...current }, // 최초 한 번만 저장
+          [id]: { ...current }, 
         },
         furnitures: state.furnitures.map((f) =>
           f.id === id ? { ...f, ...updated } : f,
