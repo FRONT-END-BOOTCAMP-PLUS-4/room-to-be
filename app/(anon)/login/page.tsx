@@ -54,11 +54,7 @@ export default function LoginPage() {
           <button
             className='flex items-center gap-3 px-6 py-3 border border-[#FEE500] rounded-xl bg-[#FEE500] hover:bg-[#e6c800] transition text-[#3C1E1E] font-medium'
             type='button'
-            onClick={() =>
-              alert(
-                '카카오 로그인은 현재 준비 중입니다. google로 로그인 해주세요',
-              )
-            }
+            onClick={() => signIn('kakao')}
           >
             <span className='bg-white rounded-full w-7 h-7 flex items-center justify-center'>
               <Image
@@ -74,11 +70,7 @@ export default function LoginPage() {
           <button
             className='flex items-center gap-3 px-6 py-3 border border-[#03C75A] rounded-xl bg-[#03C75A] hover:bg-[#02b152] transition text-white font-medium'
             type='button'
-            onClick={() =>
-              alert(
-                '네이버 로그인은 현재 준비 중입니다. google로 로그인 해주세요',
-              )
-            }
+            onClick={() => signIn('naver')}
           >
             <span className='bg-white rounded w-7 h-7 flex items-center justify-center'>
               <span className='text-[#03C75A] font-extrabold text-lg'>N</span>

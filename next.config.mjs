@@ -8,7 +8,12 @@ const __dirname = path.dirname(__filename);
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['lh3.googleusercontent.com', 'ssl.pstatic.net', 'k.kakaocdn.net'],
+    domains: [
+      'lh3.googleusercontent.com',
+      'ssl.pstatic.net',
+      'k.kakaocdn.net',
+      'phinf.pstatic.net',
+    ],
     remotePatterns: [
       {
         protocol: 'https',
