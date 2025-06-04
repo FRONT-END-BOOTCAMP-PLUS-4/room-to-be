@@ -204,7 +204,10 @@ export default function useDragPosition(
         offset.current.subVectors(meshRef.current.position, intersect.point);
         setInternalDragging(true);
         setDragging?.(true);
-        startFloating(meshRef.current); // floating 효과만 부여
+
+        if (placementType === 'floor') {
+          startFloating(meshRef.current); // 바닥에만 floating 애니메이션 적용
+        }
       }
     },
     [getPlaneIntersection, meshRef, setDragging],
