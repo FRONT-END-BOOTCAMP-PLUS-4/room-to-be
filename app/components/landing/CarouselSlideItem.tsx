@@ -94,7 +94,7 @@ export default function CarouselSlideItem({
           </h2>
 
           <p
-            className='text-white/90 text-sm lg:text-lg font-normal leading-relaxed mb-0 md:mb-2 lg:mb-4 2xl:mb-6'
+            className='text-white/90 text-sm lg:text-lg font-normal leading-relaxed mb-0 md:mb-2 lg:mb-4 2xl:mb-6 2xl:text-xl whitespace-pre-line'
             style={{
               wordBreak: 'keep-all',
               overflowWrap: 'break-word',
@@ -106,7 +106,7 @@ export default function CarouselSlideItem({
           <div>
             <BoxTextButton
               showImg={true}
-              className='!w-[200px] !h-[48px] !text-[0.8rem] rounded-2xl lg:text-[0.9rem] lg:w-[216px] lg:h-[52px] 2xl:w-[268px] 2xl:h-[64px] 2xl:text-[1.1rem]'
+              className='!w-[200px] !h-[48px] !text-[0.8rem] rounded-2xl lg:text-[0.9rem] lg:w-[216px] lg:h-[52px] 2xl:!w-[250px] 2xl:!h-[62px] 2xl:!text-[1rem]'
               onClick={onOpenModal}
             >
               3D 인테리어 하러 가기
