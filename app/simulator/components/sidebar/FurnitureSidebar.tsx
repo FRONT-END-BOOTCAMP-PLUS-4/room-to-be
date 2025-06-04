@@ -58,16 +58,16 @@ export default function FurnitureSidebar({
     <div
       className={`
         h-full bg-gradient-to-r from-white/10 to-black/20 backdrop-blur-md shadow-[0_0_15px_#00000026] text-white transition-transform duration-300
-        rounded-tr-2xl rounded-br-2xl w-80 absolute left-0 top-0 z-20 flex flex-col
+        rounded-tr-2xl rounded-br-2xl w-80 absolute left-0 top-0 z-20 flex flex-col py-5 px-4
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}
     >
       {/* 상단 고정 영역 */}
-      <div className='flex-none p-4 pb-2'>
+      <div className='flex-none pb-2'>
         {/* 로고 */}
         <Link
           href='/'
-          className='mb-3 w-[80px] h-[33px] flex items-center justify-center'
+          className='mb-5 w-[80px] h-[33px] flex items-center justify-center'
         >
           <Image
             src='/assets/icons/roomtobe-logo.svg'
@@ -89,8 +89,7 @@ export default function FurnitureSidebar({
         )}
       </div>
 
-      {/* 스크롤 영역 - 남은 공간 모두 사용 */}
-      <div className='flex-1 px-4 pb-4 overflow-hidden'>
+      <div className='flex-1 overflow-hidden'>
         <ScrollArea className='h-full'>
           <div className='pr-4'>
             <FurnitureGroupList
