@@ -5,7 +5,7 @@ import { FurnitureStoreInfo } from '@/app/types/furniture';
 interface FurnitureStore {
   furnitures: FurnitureStoreInfo[];
   selectedFurnitureId: string | null;
-  prevFurnitureStates: Record<string, FurnitureStoreInfo | null>;
+  prevFurnitureStates: Record<string, FurnitureStoreInfo[]>;
   renderableFurnitureIds: string[];
   isCreating: boolean;
 
@@ -14,7 +14,11 @@ interface FurnitureStore {
 
   addFurniture: (info: FurnitureStoreInfo) => void;
   markRenderable: (id: string) => void;
-  updateFurniture: (id: string, updated: Partial<FurnitureStoreInfo>) => void;
+  updateFurniture: (
+    id: string,
+    updated: Partial<FurnitureStoreInfo>,
+    saveHistory?: boolean,
+  ) => void;
   removeFurniture: (id: string) => void;
 
   setFurnitures: (items: FurnitureStoreInfo[]) => void;
@@ -48,20 +52,45 @@ export const useFurnitureStore = create<FurnitureStore>((set) => ({
       renderableFurnitureIds: [...state.renderableFurnitureIds, id],
     })),
 
-  updateFurniture: (id, updated) =>
+  updateFurniture: (
+    id: string,
+    updated: Partial<FurnitureStoreInfo>,
+    saveHistory: boolean = true,
+  ) =>
     set((state) => {
       const current = state.furnitures.find((f) => f.id === id);
       if (!current) return {};
-      const alreadySaved = state.prevFurnitureStates[id];
+
+      const next = { ...current, ...updated };
+
+      const shouldSave =
+        saveHistory && JSON.stringify(current) !== JSON.stringify(next);
+
+      const prevStack = state.prevFurnitureStates[id] || [];
 
       return {
         prevFurnitureStates: {
           ...state.prevFurnitureStates,
-          [id]: alreadySaved ?? { ...current },
+          [id]: shouldSave ? [...prevStack, current] : prevStack,
         },
-        furnitures: state.furnitures.map((f) =>
-          f.id === id ? { ...f, ...updated } : f,
-        ),
+        furnitures: state.furnitures.map((f) => (f.id === id ? next : f)),
+      };
+    }),
+
+  undoFurniture: (id) =>
+    set((state) => {
+      const stack = state.prevFurnitureStates[id];
+      if (!stack || stack.length === 0) return {};
+
+      const previous = stack[stack.length - 1];
+      const updatedStack = stack.slice(0, -1);
+
+      return {
+        furnitures: state.furnitures.map((f) => (f.id === id ? previous : f)),
+        prevFurnitureStates: {
+          ...state.prevFurnitureStates,
+          [id]: updatedStack,
+        },
       };
     }),
 
@@ -70,7 +99,7 @@ export const useFurnitureStore = create<FurnitureStore>((set) => ({
       furnitures: state.furnitures.filter((f) => f.id !== id),
       prevFurnitureStates: {
         ...state.prevFurnitureStates,
-        [id]: null,
+        [id]: [],
       },
       renderableFurnitureIds: state.renderableFurnitureIds.filter(
         (rid) => rid !== id,
@@ -87,18 +116,4 @@ export const useFurnitureStore = create<FurnitureStore>((set) => ({
     }),
 
   setRenderableIds: (ids: string[]) => set({ renderableFurnitureIds: ids }),
-
-  undoFurniture: (id) =>
-    set((state) => {
-      const prev = state.prevFurnitureStates[id];
-      if (!prev) return {};
-
-      return {
-        furnitures: state.furnitures.map((f) => (f.id === id ? prev : f)),
-        prevFurnitureStates: {
-          ...state.prevFurnitureStates,
-          [id]: null,
-        },
-      };
-    }),
 }));

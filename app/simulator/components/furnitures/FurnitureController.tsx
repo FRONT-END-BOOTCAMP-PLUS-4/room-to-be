@@ -32,32 +32,35 @@ export default function FurnitureController({
     undoFurniture,
     prevFurnitureStates,
   } = useFurnitureStore();
+
   const [isScaleLocked, setIsScaleLocked] = useState(false);
 
   const isDay = useLightingStore((state) => state.isDay);
   const setIsDay = useLightingStore((state) => state.setIsDay);
 
   const selectedFurniture = useMemo(() => {
-    return (furnitures ?? []).find((f) => f.id === selectedFurnitureId) || null;
+    return furnitures.find((f) => f.id === selectedFurnitureId) || null;
   }, [furnitures, selectedFurnitureId]);
 
-  const updateSelectedFurniture = (updated: Partial<FurnitureStoreInfo>) => {
+  const updateSelectedFurniture = (
+    updated: Partial<FurnitureStoreInfo>,
+    saveHistory = true,
+  ) => {
     if (selectedFurniture) {
-      updateFurniture(selectedFurniture.id, updated);
+      updateFurniture(selectedFurniture.id, updated, saveHistory);
     }
   };
 
-  // undo 가능한 상태인지 확인 (명확하게 null이 아닌 이전 상태가 존재할 경우만 true)
   const isUndoAvailable = useMemo(() => {
     if (!selectedFurnitureId) return false;
 
-    const prev = prevFurnitureStates[selectedFurnitureId];
+    const stack = prevFurnitureStates[selectedFurnitureId];
     const current = furnitures.find((f) => f.id === selectedFurnitureId);
 
-    if (!prev || !current) return false;
+    if (!Array.isArray(stack) || stack.length === 0 || !current) return false;
 
-    // 이전 상태와 현재 상태가 다를 때만 undo 가능
-    return JSON.stringify(prev) !== JSON.stringify(current);
+    const last = stack[stack.length - 1];
+    return JSON.stringify(last) !== JSON.stringify(current);
   }, [selectedFurnitureId, furnitures, prevFurnitureStates]);
 
   const { isResettable, resetFurniture } = useResettableFurniture(
@@ -66,14 +69,9 @@ export default function FurnitureController({
   );
 
   return (
-    <div
-      className='w-[219px] px-[30px] py-[25px] rounded-[30px] bg-gradient-to-r from-white/10 to-black/20 backdrop-blur-md shadow-[0_0_15px_#00000026] flex flex-col items-center gap-4 max-h-[calc(100vh-60px)]
-      overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'
-    >
-      {/* 저장, 나가기 버튼 */}
+    <div className='w-[219px] px-[30px] py-[25px] rounded-[30px] bg-gradient-to-r from-white/10 to-black/20 backdrop-blur-md shadow-[0_0_15px_#00000026] flex flex-col items-center gap-4 max-h-[calc(100vh-60px)] overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'>
       <ActionButtons mode={mode} onSaveClick={onSaveClick} />
 
-      {/* 조명 모드 버튼 */}
       <div className='flex gap-[10px]'>
         <LightButton onClick={() => setIsDay(true)} isOn={isDay} />
         <DarkButton onClick={() => setIsDay(false)} isOn={!isDay} />
@@ -95,7 +93,7 @@ export default function FurnitureController({
           {isScaleLocked ? (
             <LockedScaleSlider
               furniture={selectedFurniture}
-              onChange={updateSelectedFurniture}
+              onChange={(updates) => updateSelectedFurniture(updates, true)}
             />
           ) : (
             <UnlockedScaleInputs
@@ -104,7 +102,6 @@ export default function FurnitureController({
             />
           )}
 
-          {/* 가구 조작 버튼 모음 */}
           <div className='w-full flex flex-col gap-[10px]'>
             {selectedFurniture.placementType === 'floor' && (
               <div className='w-full flex gap-[10px]'>
@@ -112,34 +109,31 @@ export default function FurnitureController({
                   width={14}
                   height={14}
                   icon='/assets/icons/rotate-left.svg'
-                  onClick={() => {
+                  onClick={() =>
                     updateSelectedFurniture({
-                      rotationY: selectedFurniture.rotationY + Math.PI / 4, // 반시계 방향으로 회전
-                    });
-                  }}
+                      rotationY: selectedFurniture.rotationY + Math.PI / 4,
+                    })
+                  }
                 />
                 <FurnitureControllerBtn
                   width={14}
                   height={14}
                   icon='/assets/icons/rotate-right.svg'
-                  onClick={() => {
+                  onClick={() =>
                     updateSelectedFurniture({
-                      rotationY: selectedFurniture.rotationY - Math.PI / 4, // 시계 방향으로 회전
-                    });
-                  }}
+                      rotationY: selectedFurniture.rotationY - Math.PI / 4,
+                    })
+                  }
                 />
               </div>
             )}
 
             <FurnitureControllerBtn
               text='이전 상태로 되돌리기'
-              onClick={() => {
-                if (selectedFurnitureId) {
-                  undoFurniture(selectedFurnitureId);
-                }
-              }}
+              onClick={() => undoFurniture(selectedFurnitureId!)}
               disabled={!isUndoAvailable}
             />
+
             <div className='w-full flex gap-[10px]'>
               <FurnitureControllerBtn
                 text='삭제'

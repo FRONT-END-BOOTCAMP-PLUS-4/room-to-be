@@ -195,7 +195,7 @@ export default function useDragPosition(
       getWallIntersections,
     ],
   );
-
+  const originalY = useRef<number>(0);
   const handlePointerDown = useCallback(
     (event: PointerEvent) => {
       event.stopPropagation();
@@ -206,7 +206,8 @@ export default function useDragPosition(
         setDragging?.(true);
 
         if (placementType === 'floor') {
-          startFloating(meshRef.current); // 바닥에만 floating 애니메이션 적용
+          originalY.current = meshRef.current.position.y; 
+          startFloating(meshRef.current);
         }
       }
     },
@@ -235,7 +236,7 @@ export default function useDragPosition(
           const prevPos = meshRef.current.position.clone();
           const adjusted = handleCollision(newPos, prevPos);
 
-          // ✅ floating 애니메이션이 덮어쓸 y값을 유지하기 위해 x, z만 반영
+          // floating 애니메이션이 덮어쓸 y값을 유지하기 위해 x, z만 반영
           meshRef.current.position.x = adjusted.x;
           meshRef.current.position.z = adjusted.z;
 
@@ -257,7 +258,6 @@ export default function useDragPosition(
             new THREE.Euler(0, intersect.wall.rotationY, 0),
           );
         }
-        
       }
     },
     [
@@ -285,7 +285,7 @@ export default function useDragPosition(
         let finalRotation = meshRef.current.rotation.y;
         if (placementType === 'floor') {
           final = checkFinalPosition(final);
-          final.y = roomBoundary.yMin;
+          final.y = originalY.current; // 👈 원래 y 복원
           meshRef.current.position.copy(final);
         } else if (placementType === 'wall') {
           final = checkFinalPosition(final, finalRotation);
@@ -301,7 +301,6 @@ export default function useDragPosition(
     meshRef,
     checkFinalPosition,
     placementType,
-    roomBoundary.yMin,
   ]);
 
   useEffect(() => {
