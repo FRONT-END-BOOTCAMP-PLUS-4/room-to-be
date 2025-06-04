@@ -32,7 +32,12 @@ export default function useHighlightMaterial({
       }
 
       // 창문 유리 재질인지 확인
-      const isWindowGlass = child.userData._isWindowGlass === true;
+      const isWindowGlass =
+        child.userData._isWindowGlass === true ||
+        (child.material &&
+          child.material.userData &&
+          child.material.userData._isWindowGlass === true);
+
       if (isWindowGlass) {
         return;
       }
@@ -57,7 +62,7 @@ export default function useHighlightMaterial({
         if (isSelected) {
           mat.emissive = new THREE.Color(0x00ffff);
           mat.emissiveIntensity = 0.8;
-        } else { 
+        } else {
           mat.emissive.copy(child.userData._originalEmissive);
           mat.emissiveIntensity = child.userData._originalIntensity ?? 0;
         }
