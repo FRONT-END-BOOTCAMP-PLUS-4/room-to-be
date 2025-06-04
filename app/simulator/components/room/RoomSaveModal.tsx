@@ -60,7 +60,7 @@ export default function RoomSaveModal({
       });
 
       const thumbnailUrl = await uploadRoomThumbnail(blob, roomId);
-
+      const isNightMode = !useLightingStore.getState().isDay;
       await saveRoom({
         id: roomId,
         name: roomName,
@@ -70,7 +70,7 @@ export default function RoomSaveModal({
         userId: userId,
         furnitures,
         background,
-        isNightMode: isNight,
+        isNightMode,
         cameraX: cameraPosition[0],
         cameraY: cameraPosition[1],
         cameraZ: cameraPosition[2],
