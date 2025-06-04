@@ -197,10 +197,14 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
       };
 
       load();
-    } else if (mode === 'create') {
-      // 방 상태 초기화
+    }
+  }, [mode, roomId, dataLoaded, lightingReady, cameraReady]);
+
+  useEffect(() => {
+    if (mode === 'create' && !dataLoaded && lightingReady && cameraReady) {
+      setRoomCameraPosition([5, 3, 5]);
       useCameraStore.getState().setPosition([5, 3, 5]);
-      useLightingStore.getState().setIsDay(true); // 항상 낮으로
+      useLightingStore.getState().setIsDay(true);
       useBackgroundStore.getState().setBackground('#ffffff');
 
       useFurnitureStore.getState().selectFurniture(null);
@@ -209,7 +213,7 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
 
       setDataLoaded(true);
     }
-  }, [mode, roomId, dataLoaded, lightingReady, cameraReady]);
+  }, [mode, dataLoaded, lightingReady, cameraReady]);
 
   const roomComponent = useMemo(() => {
     if (isNaN(roomWidth) || isNaN(roomHeight)) return null;
@@ -223,7 +227,7 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
       />
     );
   }, [roomWidth, roomHeight]);
-
+  // console.log('roomCameraPosition:', roomCameraPosition);
   return (
     <div className='relative w-full h-screen overflow-hidden'>
       <div className='absolute top-0 left-0 w-full h-full z-0'>
@@ -267,6 +271,7 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
             maxDistance={1.5}
           />
           <Lighting key={isDay ? 'day' : 'night'} />
+
           {roomCameraPosition && (
             <CameraController
               width={roomWidth}
