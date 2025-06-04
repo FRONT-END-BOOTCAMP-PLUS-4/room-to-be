@@ -25,7 +25,6 @@ interface Props {
 export default function FurnitureSidebar({
   fetchFurnitureByPlacementType,
   isOpen,
-  setIsOpen,
 }: Props) {
   const [placementType, setPlacementType] = useState<'wall' | 'floor'>('floor');
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
@@ -33,6 +32,7 @@ export default function FurnitureSidebar({
   const [furniture, setFurniture] = useState<Furnitures[]>([]);
   const addFurniture = useFurnitureStore((state) => state.addFurniture);
   const markRenderable = useFurnitureStore((state) => state.markRenderable);
+
   useEffect(() => {
     const fetch = async () => {
       const data = await fetchFurnitureByPlacementType(placementType);
@@ -57,43 +57,55 @@ export default function FurnitureSidebar({
   return (
     <div
       className={`
-        h-full bg-gradient-to-r from-white/10 to-black/20 backdrop-blur-md shadow-[0_0_15px_#00000026] p-4 text-white transition-transform duration-300
-        rounded-tr-2xl rounded-br-2xl w-80 absolute left-0 top-0 z-20
+        h-full bg-gradient-to-r from-white/10 to-black/20 backdrop-blur-md shadow-[0_0_15px_#00000026] text-white transition-transform duration-300
+        rounded-tr-2xl rounded-br-2xl w-80 absolute left-0 top-0 z-20 flex flex-col
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}
     >
-      {/* 로고 */}
-      <Link
-        href='/'
-        className='mb-3 w-[80px] h-[33px] flex items-center justify-center'
-      >
-        <Image
-          src='/assets/icons/roomtobe-logo.svg'
-          width={80}
-          height={33}
-          alt='RoomToBe Logo'
-          className='w-20 h-auto ml-1'
-        />
-      </Link>
+      {/* 상단 고정 영역 */}
+      <div className='flex-none p-4 pb-2'>
+        {/* 로고 */}
+        <Link
+          href='/'
+          className='mb-3 w-[80px] h-[33px] flex items-center justify-center'
+        >
+          <Image
+            src='/assets/icons/roomtobe-logo.svg'
+            width={80}
+            height={33}
+            alt='RoomToBe Logo'
+            className='w-20 h-auto ml-1'
+          />
+        </Link>
 
-      {!expandedCategory && (
-        <>
-          <FurnitureSearchInput value={search} onChange={setSearch} />
-          <PlacementToggle value={placementType} onChange={setPlacementType} />
-        </>
-      )}
-      <ScrollArea className='h-[calc(100vh-180px)] pr-2'>
-        <FurnitureGroupList
-          grouped={grouped}
-          expandedCategory={expandedCategory}
-          setExpandedCategory={setExpandedCategory}
-          onSelect={async (info) => {
-            addFurniture(info);
-            await new Promise((r) => setTimeout(r, 200));
-            markRenderable(info.id);
-          }}
-        />
-      </ScrollArea>
+        {!expandedCategory && (
+          <>
+            <FurnitureSearchInput value={search} onChange={setSearch} />
+            <PlacementToggle
+              value={placementType}
+              onChange={setPlacementType}
+            />
+          </>
+        )}
+      </div>
+
+      {/* 스크롤 영역 - 남은 공간 모두 사용 */}
+      <div className='flex-1 px-4 pb-4 overflow-hidden'>
+        <ScrollArea className='h-full'>
+          <div className='pr-4'>
+            <FurnitureGroupList
+              grouped={grouped}
+              expandedCategory={expandedCategory}
+              setExpandedCategory={setExpandedCategory}
+              onSelect={async (info) => {
+                addFurniture(info);
+                await new Promise((r) => setTimeout(r, 200));
+                markRenderable(info.id);
+              }}
+            />
+          </div>
+        </ScrollArea>
+      </div>
     </div>
   );
 }
