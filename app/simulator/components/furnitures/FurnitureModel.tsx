@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -13,6 +13,7 @@ import useLampLight from '@/app/hooks/useLampLight';
 import useSyncPositionFromStore from '@/app/hooks/useSyncPositionFromStore';
 import useSyncRotationFromStore from '@/app/hooks/useSyncRotationFromStore';
 import useSyncScaleFromStore from '@/app/hooks/useSyncScaleFromStore';
+import { useWindowGlass } from '@/app/hooks/useWindowGlass';
 import type { FurnitureModelProps } from '@/app/types/furniture';
 
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
@@ -55,7 +56,6 @@ export default function FurnitureModel({
   const [isDragging, setIsDragging] = useState(false);
 
   const isDay = useLightingStore((state) => state.isDay);
-  const glassMaterialRef = useRef<THREE.MeshStandardMaterial | null>(null);
 
   // 선택 가구 하이라이트 처리
   useHighlightMaterial({ scene: clonedScene, isSelected });
@@ -87,6 +87,7 @@ export default function FurnitureModel({
 
   useLampLight({ meshRef, name });
   useLampEmissiveMaterial({ scene: clonedScene, name });
+  useWindowGlass({ scene: clonedScene, name, isDay });
 
   // baseSize 계산 (baseSizeWithScale는 mm 단위, baseSizeRaw는 가구 기본 단위 )
   const { baseSizeWithScale, baseSizeRaw } = useGetBaseSize(clonedScene);
@@ -198,68 +199,6 @@ export default function FurnitureModel({
       );
     }
   };
-
-  // 창문 배경(유리) 생성
-  useEffect(() => {
-    if (
-      name.toLowerCase().includes('window') ||
-      name.toLowerCase().includes('창문')
-    ) {
-      const box = new THREE.Box3().setFromObject(clonedScene);
-      const size = box.getSize(new THREE.Vector3());
-      const center = box.getCenter(new THREE.Vector3());
-
-      const glassGeometry = new THREE.PlaneGeometry(size.x * 0.8, size.y * 0.8);
-
-      const glassMaterial = new THREE.MeshStandardMaterial({
-        color: 0xffffff,
-        transparent: false,
-        opacity: 1.0,
-        roughness: 0.0,
-        metalness: 0.0,
-        emissive: 0xffffff,
-        emissiveIntensity: 1,
-      });
-
-      glassMaterialRef.current = glassMaterial;
-
-      const glassMesh = new THREE.Mesh(glassGeometry, glassMaterial);
-
-      glassMesh.userData._isWindowGlass = true;
-
-      glassMesh.position.set(
-        center.x - clonedScene.position.x,
-        center.y - clonedScene.position.y,
-        0.001,
-      );
-
-      clonedScene.add(glassMesh);
-
-      updateGlassMaterial(isDay);
-    }
-  }, [clonedScene, name]);
-
-  // 낮/밤 모드 변경 시 창문 배경(유리) 색상 업데이트
-  const updateGlassMaterial = (isDay: boolean) => {
-    if (glassMaterialRef.current) {
-      if (isDay) {
-        // 낮: 밝은 흰색
-        glassMaterialRef.current.color.setHex(0xffffff);
-        glassMaterialRef.current.emissive.setHex(0xfff8e1);
-        glassMaterialRef.current.emissiveIntensity = 0.8;
-      } else {
-        // 밤: 어두운 남색
-        glassMaterialRef.current.color.setHex(0x1a237e);
-        glassMaterialRef.current.emissive.setHex(0x0d1b69);
-        glassMaterialRef.current.emissiveIntensity = 0.1;
-      }
-    }
-  };
-
-  // 낮/밤 모드 변경 시 창문 배경(유리) 색상 업데이트
-  useEffect(() => {
-    updateGlassMaterial(isDay);
-  }, [isDay]);
 
   return (
     <primitive

@@ -318,7 +318,7 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
             )}
           </Button>
 
-          <div className='absolute gap-4 flex top-[20px] left-[40%] z-40'>
+          <div className='absolute gap-4 flex top-[20px] left-1/2 -translate-x-1/2 z-40'>
             <div>
               {/* 카메라 모드 버튼*/}
               <CameraModeButtons />

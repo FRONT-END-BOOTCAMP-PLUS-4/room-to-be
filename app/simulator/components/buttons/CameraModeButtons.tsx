@@ -53,7 +53,7 @@ export default function CameraModeButtons() {
 
   return (
     <div
-      className='w-[200px] flex gap-[10px] px-[30px] py-[10px] rounded-[15px]
+      className='w-[200px] flex gap-[10px] px-[20px] py-[10px] rounded-[15px]
         bg-gradient-to-r from-white/10 to-black/20 h-full
         backdrop-blur-md shadow-[0_0_15px_#00000026]
         items-center
