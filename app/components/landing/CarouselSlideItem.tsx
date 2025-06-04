@@ -80,16 +80,26 @@ export default function CarouselSlideItem({
       >
         <div
           key={`text-${animationTrigger}`}
-          className={`flex flex-col gap-6 2xl:gap-8 w-[280px] text-center items-center md:items-start md:text-left md:w-[300px] lg:w-[420px] xl:w-[460px] 2xl:w-[580px] ${getAnimationClass()}`}
+          className={`flex flex-col gap-6 2xl:gap-8 w-[320px] text-center items-center md:items-start md:text-left md:w-[360px] lg:w-[480px] xl:w-[520px] 2xl:w-[640px] ${getAnimationClass()}`}
         >
           <h2
             className='text-white text-2xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-extrabold'
-            style={{ lineHeight: '1.2' }}
+            style={{
+              lineHeight: '1.2',
+              wordBreak: 'keep-all',
+              overflowWrap: 'break-word',
+            }}
           >
             {slide.title}
           </h2>
 
-          <p className='text-white/90 text-sm lg:text-lg font-normal leading-relaxed mb-0 md:mb-2 lg:mb-4 2xl:mb-6'>
+          <p
+            className='text-white/90 text-sm lg:text-lg font-normal leading-relaxed mb-0 md:mb-2 lg:mb-4 2xl:mb-6'
+            style={{
+              wordBreak: 'keep-all',
+              overflowWrap: 'break-word',
+            }}
+          >
             {slide.desc}
           </p>
 
@@ -106,7 +116,7 @@ export default function CarouselSlideItem({
       </div>
 
       {/* 숫자 */}
-      <div className='absolute top-[10%] md:top-auto md:bottom-[28rem] lg:bottom-[32rem] 2xl:bottom-[35rem] right-8 md:right-14 2xl:right-24 z-10'>
+      <div className='absolute top-[10%] md:top-auto md:bottom-[28rem] lg:bottom-[32rem] 2xl:bottom-[42rem] right-8 md:right-14 2xl:right-24 z-10'>
         <div key={`number-${animationTrigger}`} className={getAnimationClass()}>
           <span
             className='
@@ -127,7 +137,7 @@ export default function CarouselSlideItem({
         md:left-auto md:translate-x-0 md:right-12 
         lg:right-10 xl:right-14 2xl:right-24'
       >
-        <div className='relative w-[300px] md:w-[500px] lg:w-[550px] 2xl:w-[600px] h-[200px] md:h-[300px] lg:h-[350px] 2xl:h-[400px]'>
+        <div className='relative w-[300px] md:w-[500px] lg:w-[550px] 2xl:w-[700px] h-[200px] md:h-[300px] lg:h-[350px] 2xl:h-[500px]'>
           {/* 받침 이미지 */}
           {slide?.image2 && (
             <Image
@@ -157,7 +167,7 @@ export default function CarouselSlideItem({
             width={720}
             height={720}
             className={`
-              absolute bottom-14 md:bottom-24 lg:bottom-28 2xl:bottom-38 left-1/2 -translate-x-1/2
+              absolute bottom-14 md:bottom-24 lg:bottom-28 2xl:bottom-40 left-1/2 -translate-x-1/2
               w-[85%] h-auto
               ${isVisible ? 'animate-[slideDownFromTop_1s_ease-out_0.1s_both]' : 'opacity-0 -translate-y-[100px]'}
               ${showFloating ? 'animate-floating-horizontal' : ''}

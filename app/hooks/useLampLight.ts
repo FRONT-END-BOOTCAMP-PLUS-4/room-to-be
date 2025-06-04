@@ -23,7 +23,11 @@ export default function useLampLight({ meshRef, name }: UseLampLightProps) {
 
   // 조명 가구인지 여부 확인
   const isLamp =
-    name.toLowerCase().includes('램프') || name.toLowerCase().includes('lamp');
+    name.toLowerCase().includes('램프') ||
+    name.toLowerCase().includes('lamp') ||
+    name.toLowerCase().includes('스탠드') ||
+    name.toLowerCase().includes('조명') ||
+    name.toLowerCase().includes('벽등');
 
   useEffect(() => {
     if (!isLamp || !meshRef.current) return;
