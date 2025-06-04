@@ -239,6 +239,10 @@ export default function useDragPosition(
           meshRef.current.position.x = adjusted.x;
           meshRef.current.position.z = adjusted.z;
 
+          options?.onDrag?.(
+            new Vector3(adjusted.x, meshRef.current.position.y, adjusted.z),
+            meshRef.current.rotation.clone(),
+          );
         } else if (placementType === 'wall' && intersect.wall) {
           const prevPos = meshRef.current.position.clone();
           const wallInfo = {
@@ -248,7 +252,12 @@ export default function useDragPosition(
           const adjusted = handleCollision(newPos, prevPos, wallInfo);
           meshRef.current.position.copy(adjusted);
           meshRef.current.rotation.y = intersect.wall.rotationY;
+          options?.onDrag?.(
+            adjusted.clone(),
+            new THREE.Euler(0, intersect.wall.rotationY, 0),
+          );
         }
+        
       }
     },
     [

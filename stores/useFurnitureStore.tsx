@@ -52,11 +52,12 @@ export const useFurnitureStore = create<FurnitureStore>((set) => ({
     set((state) => {
       const current = state.furnitures.find((f) => f.id === id);
       if (!current) return {};
+      const alreadySaved = state.prevFurnitureStates[id];
 
       return {
         prevFurnitureStates: {
           ...state.prevFurnitureStates,
-          [id]: { ...current }, 
+          [id]: alreadySaved ?? { ...current },
         },
         furnitures: state.furnitures.map((f) =>
           f.id === id ? { ...f, ...updated } : f,
