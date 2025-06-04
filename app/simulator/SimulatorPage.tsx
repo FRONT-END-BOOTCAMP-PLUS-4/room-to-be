@@ -10,7 +10,9 @@ import { Button } from '@/components/ui/button';
 import { fetchFurnitureByPlacementType } from '@/apis/furnitures';
 import { getRoomById } from '@/apis/rooms';
 import { useBackgroundStore } from '@/stores/useBackgroundStore';
+import { useCameraStore } from '@/stores/useCameraStore';
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
+import { useLightingStore } from '@/stores/useLightingStore';
 import { useLoadingStore } from '@/stores/useLoadingStore';
 import { useLoginRedirectModalStore } from '@/stores/useLoginRedirectModalStore';
 import { useRoomSizeStore } from '@/stores/useRoomSizeStore';
@@ -36,6 +38,9 @@ interface SimulatorPageProps {
 }
 
 export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
+  const isDay = useLightingStore((s) => s.isDay);
+  const lightingReady = useLightingStore.persist.hasHydrated();
+  const cameraReady = useCameraStore.persist.hasHydrated();
   const { openModal } = useLoginRedirectModalStore();
   const { setLoading } = useLoadingStore();
 
@@ -123,18 +128,44 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
   }, [canvasCreated, dataLoaded, allResourcesReady, setLoading]);
 
   useEffect(() => {
-    if (mode === 'edit' && roomId && !dataLoaded) {
+    if (
+      mode === 'edit' &&
+      roomId &&
+      !dataLoaded &&
+      lightingReady &&
+      cameraReady
+    ) {
       const load = async () => {
         setLoading(true);
         try {
           const room = await getRoomById(roomId);
+
           if (
             room.cameraX !== undefined &&
             room.cameraY !== undefined &&
             room.cameraZ !== undefined
           ) {
-            setRoomCameraPosition([room.cameraX, room.cameraY, room.cameraZ]);
+            const cameraPos: [number, number, number] = [
+              room.cameraX,
+              room.cameraY,
+              room.cameraZ,
+            ];
+            setRoomCameraPosition(cameraPos);
+            useCameraStore.getState().setPosition(cameraPos);
           }
+
+          if (room.isNightMode !== undefined) {
+            useLightingStore.getState().setIsDay(!room.isNightMode);
+          }
+
+          if (room.background) {
+            useBackgroundStore.getState().setBackground(room.background);
+          }
+
+          useRoomSizeStore
+            .getState()
+            .setDimensions(room.roomWidth, room.roomHeight, 2.5);
+
           const validFurnitures = (room.furnitures ?? []).map((f) => ({
             id: f.id,
             furnitureId: f.furnitureId,
@@ -152,14 +183,6 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
             scaleZ: f.scaleZ,
           }));
 
-          if (room.background) {
-            useBackgroundStore.getState().setBackground(room.background);
-          }
-
-          useRoomSizeStore
-            .getState()
-            .setDimensions(room.roomWidth, room.roomHeight, 2.5);
-
           useFurnitureStore.getState().clearFurnitures();
           useFurnitureStore.getState().setFurnitures(validFurnitures);
           useFurnitureStore
@@ -175,12 +198,18 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
 
       load();
     } else if (mode === 'create') {
+      // 방 상태 초기화
+      useCameraStore.getState().setPosition([5, 3, 5]);
+      useLightingStore.getState().setIsDay(true); // 항상 낮으로
+      useBackgroundStore.getState().setBackground('#ffffff');
+
       useFurnitureStore.getState().selectFurniture(null);
       useFurnitureStore.getState().clearFurnitures();
       useFurnitureStore.getState().setRenderableIds([]);
+
       setDataLoaded(true);
     }
-  }, [mode, roomId, dataLoaded]);
+  }, [mode, roomId, dataLoaded, lightingReady, cameraReady]);
 
   const roomComponent = useMemo(() => {
     if (isNaN(roomWidth) || isNaN(roomHeight)) return null;
@@ -237,13 +266,15 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
             roomHeight={roomHeight}
             maxDistance={1.5}
           />
-          <Lighting />
-          <CameraController
-            width={roomWidth}
-            height={roomHeight}
-            initialCameraPosition={roomCameraPosition}
-            shouldStartIntro={allResourcesReady}
-          />
+          <Lighting key={isDay ? 'day' : 'night'} />
+          {roomCameraPosition && (
+            <CameraController
+              width={roomWidth}
+              height={roomHeight}
+              initialCameraPosition={roomCameraPosition}
+              shouldStartIntro={allResourcesReady}
+            />
+          )}
           <CameraTracker />
         </Canvas>
       </div>
