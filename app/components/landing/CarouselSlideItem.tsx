@@ -55,10 +55,10 @@ export default function CarouselSlideItem({
     if (isFirstLoad && isActive) {
       return 'animate-slideRight';
     }
-    if (slideDirection === 'right') {
+    if (isActive && slideDirection === 'right') {
       return 'animate-slideRight';
     }
-    if (slideDirection === 'left') {
+    if (isActive && slideDirection === 'left') {
       return 'animate-slideLeft';
     }
     return '';
