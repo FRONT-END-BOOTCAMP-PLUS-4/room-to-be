@@ -25,6 +25,7 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
   const [isResizing, setIsResizing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
+  const [slideChangeCounter, setSlideChangeCounter] = useState(0);
 
   const [slideDirection, setSlideDirection] = useState<
     'left' | 'right' | 'none'
@@ -36,7 +37,6 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
   const startTimeRef = useRef<number | null>(null);
   const pausedTimeRef = useRef<number>(0);
 
-  // 무한루프용 렌더 슬라이드
   const renderSlides = [slides[SLIDE_COUNT - 1], ...slides, slides[0]];
 
   const goTo = useCallback(
@@ -63,6 +63,7 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
 
       setSlideDirection(direction);
       previousCurrentRef.current = idx;
+      setSlideChangeCounter((prev) => prev + 1);
 
       setIsSliding(true);
       setCurrent(idx);
@@ -84,19 +85,23 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
 
   const handleTransitionEnd = () => {
     setIsSliding(false);
+
+    // 무한루프 점프 시에는 즉시 slideDirection을 'none'으로 설정
     if (current === SLIDE_COUNT + 1) {
+      setSlideDirection('none');
       setTransition(false);
       setCurrent(1);
       previousCurrentRef.current = 1;
     } else if (current === 0) {
+      setSlideDirection('none');
       setTransition(false);
       setCurrent(SLIDE_COUNT);
       previousCurrentRef.current = SLIDE_COUNT;
+    } else {
+      setTimeout(() => {
+        setSlideDirection('none');
+      }, 100);
     }
-
-    setTimeout(() => {
-      setSlideDirection('none');
-    }, 100);
   };
 
   // resize 이벤트 핸들러
@@ -158,6 +163,7 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
         // 자동 슬라이드 변경
         setSlideDirection('right');
         previousCurrentRef.current = current;
+        setSlideChangeCounter((prev) => prev + 1);
         setCurrent((prev) => prev + 1);
         setTransition(true);
         setIsSliding(true);
@@ -243,7 +249,6 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
 
             const isActiveSlide = idx === current;
 
-            // 배경 클래스명들
             const bgClasses = [
               'gradient-01',
               'gradient-02',
@@ -251,16 +256,19 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
               'gradient-04',
             ];
 
-            const slideElement = React.cloneElement(jsx as React.ReactElement, {
-              onOpenModal: handleOpenModal,
-              slideDirection: isActiveSlide ? slideDirection : 'none',
-              isActive: isActiveSlide,
-              isFirstLoad: isFirstLoad && isActiveSlide,
-            });
+            // 안정적인 키 생성: 실제 슬라이드 인덱스만 사용
+            let uniqueKey;
+            if (idx === 0) {
+              uniqueKey = `clone-last-${slideIndex}`;
+            } else if (idx === renderSlides.length - 1) {
+              uniqueKey = `clone-first-${slideIndex}`;
+            } else {
+              uniqueKey = `original-${slideIndex}`;
+            }
 
             return (
               <div
-                key={`${current}-${idx}`}
+                key={uniqueKey}
                 className={`
                 w-screen h-full 
                 px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 2xl:px-32
@@ -268,7 +276,17 @@ export default function CarouselSlider({ slides }: CarouselSliderProps) {
                 ${bgClasses[slideIndex] || 'gradient-01'}
               `}
               >
-                {slideElement}
+                {React.cloneElement(jsx as React.ReactElement, {
+                  key: `slide-${uniqueKey}-${slideChangeCounter}`,
+                  onOpenModal: handleOpenModal,
+                  slideDirection: isActiveSlide ? slideDirection : 'none',
+                  isActive: isActiveSlide,
+                  isFirstLoad:
+                    isFirstLoad &&
+                    isActiveSlide &&
+                    idx >= 1 &&
+                    idx <= SLIDE_COUNT,
+                })}
               </div>
             );
           })}
