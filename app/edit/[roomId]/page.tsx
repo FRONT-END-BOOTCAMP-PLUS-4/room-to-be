@@ -1,8 +1,11 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useParams } from 'next/navigation';
 
-import SimulatorPage from '../../simulator/SimulatorPage';
+const SimulatorPage = dynamic(() => import('../../simulator/SimulatorPage'), {
+  ssr: false,
+});
 
 export default function EditSimulatorPage() {
   const { roomId } = useParams();
