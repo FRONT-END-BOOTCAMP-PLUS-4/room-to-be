@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 
 import OnlyTextButton from './buttons/OnlyTextButton';
@@ -10,6 +10,7 @@ import OnlyTextButton from './buttons/OnlyTextButton';
 export default function MainHeader() {
   const session = useSession();
   const router = useRouter();
+  const pathname = usePathname();
 
   return (
     <div className='absolute w-full h-[70px] z-10 flex items-center justify-between px-10'>
@@ -23,9 +24,11 @@ export default function MainHeader() {
       </Link>
       {session.data ? (
         <div className='flex items-center gap-2'>
-          <OnlyTextButton onClick={() => router.push('/rooms')}>
-            My Page
-          </OnlyTextButton>
+          {pathname !== '/rooms' && (
+            <OnlyTextButton onClick={() => router.push('/rooms')}>
+              My Rooms
+            </OnlyTextButton>
+          )}
           <OnlyTextButton onClick={() => signOut()}>Logout</OnlyTextButton>
         </div>
       ) : (

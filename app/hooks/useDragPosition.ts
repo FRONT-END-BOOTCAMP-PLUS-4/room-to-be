@@ -257,6 +257,7 @@ export default function useDragPosition(
             new THREE.Euler(0, intersect.wall.rotationY, 0),
           );
         }
+        
       }
     },
     [
