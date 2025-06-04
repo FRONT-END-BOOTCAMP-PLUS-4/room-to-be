@@ -72,7 +72,7 @@ export default function FurnitureGroupList({
             </Button>
           </div>
 
-          <div className='grid grid-cols-3 gap-2'>
+          <div className='grid grid-cols-3 gap-2 p-1'>
             {items.slice(0, 3).map((item) => (
               <FurnitureThumbnail
                 key={item.id}
