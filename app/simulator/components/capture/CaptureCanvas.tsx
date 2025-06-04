@@ -45,8 +45,8 @@ const CaptureCanvas = forwardRef<HTMLCanvasElement, CaptureCanvasProps>(
           <Room
             width={width}
             height={height}
-            wallTexture='/assets/images/testwall.jpg'
-            floorTexture='/assets/images/woodfloor.png'
+            wallTexture='/assets/images/line-pattern-wall.png'
+            floorTexture='/assets/images/white-wood-floor.png'
             floorExtension={0}
           />
           {furnitures.map((furniture) => (
