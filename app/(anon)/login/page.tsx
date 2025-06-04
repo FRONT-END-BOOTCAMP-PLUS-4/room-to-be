@@ -38,7 +38,7 @@ export default function LoginPage() {
           <button
             className='flex items-center gap-3 px-6 py-3 border border-white rounded-xl bg-white/10 hover:bg-white/20 transition text-white font-medium'
             type='button'
-            onClick={() => signIn('google')}
+            onClick={() => signIn('google', { callbackUrl: '/' })}
           >
             <span className='bg-white text-[#EA4335] rounded-full w-7 h-7 flex items-center justify-center font-extrabold text-xl'>
               <Image

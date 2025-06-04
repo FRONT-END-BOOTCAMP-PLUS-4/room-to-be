@@ -36,7 +36,7 @@ export default function Page() {
   }, [userId]);
 
   useEffect(() => {
-    if (rooms.length > 0 && imagesLoaded === rooms.length) {
+    if (imagesLoaded === rooms.length) {
       setIsLoading(false);
     }
   }, [imagesLoaded, rooms.length]);
@@ -49,7 +49,7 @@ export default function Page() {
         <div className='absolute top-[320px] left-0 w-full z-10'>
           <div className='bg-white rounded-t-[28px] pt-10 overflow-hidden'>
             <div className='container mx-auto px-7'>
-              {rooms.length > 0 && (
+              {rooms.length > 0 ? (
                 <>
                   <RoomCount count={rooms.length} />
                   <RoomList
@@ -58,6 +58,10 @@ export default function Page() {
                     onImageLoad={() => setImagesLoaded((prev) => prev + 1)}
                   />
                 </>
+              ) : (
+                <div className='text-gray-500 text-center py-10'>
+                  생성된 방이 없습니다.
+                </div>
               )}
             </div>
           </div>
