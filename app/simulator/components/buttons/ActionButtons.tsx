@@ -12,15 +12,16 @@ export default function ActionButtons({
   onSaveClick,
 }: ActionButtonsProps) {
   return (
-    <div className='flex gap-2 font-medium text-base'>
+    <div className='flex gap-2'>
       <Button
         onClick={() => history.back()}
         className='
-        w-[74.5px]
+        w-[74.5px] h-8
         bg-white/30 text-white
         hover:bg-white/40
-        rounded-lg py-2
+        rounded-lg
         border-none shadow-none
+        font-normal text-[12px]
         transition
       '
       >
@@ -29,11 +30,12 @@ export default function ActionButtons({
       <Button
         onClick={onSaveClick}
         className='
-        w-[74.5px]
+        w-[74.5px] h-8
         bg-white/30 text-white
         hover:bg-white/40
-        rounded-lg py-2
+        rounded-lg
         border-none shadow-none
+        font-normal text-[12px]
         transition
       '
       >

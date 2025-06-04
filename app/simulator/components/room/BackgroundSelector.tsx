@@ -84,12 +84,9 @@ export default function BackgroundSelector() {
         <button
           className={`
             py-[7px] h-7 min-w-[100px] w-auto bg-white/30 rounded-md
-            hover:bg-white/40 transition-colors duration-300 ease-in-out 
+            hover:bg-white/40 transition-colors duration-300 ease-in-out text-[12px]
             flex justify-center items-center select-none
           `}
-          style={{
-            fontSize: '12px',
-          }}
         >
           <span className='px-[16px] text-white'>배경 선택</span>
         </button>
@@ -109,7 +106,7 @@ export default function BackgroundSelector() {
   return (
     <div
       className={`
-        px-[30px] py-[10px] rounded-[15px]
+        px-[25px] py-[10px] rounded-[15px]
         bg-gradient-to-r from-white/10 to-black/20 
         backdrop-blur-md shadow-[0_0_15px_#00000026]
         flex items-center
@@ -125,21 +122,18 @@ export default function BackgroundSelector() {
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className={`
-          py-[7px] min-w-[100px] w-auto bg-white/30 rounded-md
+          w-full py-[7px] h-7 bg-white/30 rounded-md
           hover:bg-white/40 transition-colors duration-300 ease-in-out 
           flex justify-center items-center select-none
         `}
-        style={{
-          fontSize: '12px',
-        }}
       >
-        <span className='px-[16px] text-white'>배경 선택</span>
+        <span className='px-[20px] text-white text-[12px]'>배경 선택</span>
       </button>
 
       {/* 항상 선택된 컬러는 왼쪽에 고정! */}
       <div className='flex items-center ml-4'>
         <div
-          className='w-6 h-6 rounded-full border-3 border-transparent ring-2 ring-white flex-shrink-0'
+          className='w-5 h-5 rounded-full border-3 border-transparent ring-2 ring-white flex-shrink-0'
           style={{
             background: createCSSGradient(currentBackground.dayBackground),
             backgroundSize: '100% 100%',
@@ -168,7 +162,7 @@ export default function BackgroundSelector() {
                   key={Background.id}
                   onClick={() => handleBackgroundSelect(Background.id)}
                   className={`
-                    w-6 h-6 rounded-full 
+                    w-5 h-5 rounded-full 
                     border-3 transition-all duration-200 flex-shrink-0
                     hover:ring-2 hover:ring-white/50
                   `}
