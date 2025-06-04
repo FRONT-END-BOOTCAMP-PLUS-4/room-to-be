@@ -9,6 +9,7 @@ import { createBoundingBox } from '@/utils/collisionUtils';
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
 
 import DistanceLine from './DistanceLine';
+import FloatingWarning from './FloatingWarning';
 
 interface Props {
   roomWidth?: number;
@@ -32,7 +33,7 @@ export default function DistanceVisualizer({
   const [tick, setTick] = useState(0);
 
   useFrame(() => {
-    setTick((t) => (t + 1) % 10000);
+    setTick((t) => (t + 1) % 10000); // 강제 리렌더링용
   });
 
   const selected = useMemo(
@@ -40,20 +41,22 @@ export default function DistanceVisualizer({
     [furnitures, selectedId],
   );
   const others = useMemo(
-    () => furnitures.filter((f) => f.id !== selectedId),
+    () =>
+      furnitures.filter(
+        (f) => f.id !== selectedId && f.placementType === 'floor',
+      ),
     [furnitures, selectedId],
   );
+  if (!selected || selected.placementType === 'wall') return null;
 
-  if (!selected) return null;
-
-  const lines = [];
+  const elements = [];
 
   const selectedBox = createBoundingBox(selected);
   const selectedCenter = selectedBox.getCenter(new Vector3());
   const selectedMin = selectedBox.min;
   const selectedMax = selectedBox.max;
 
-  // 가구와 가구 간 거리
+  // 가구 간 거리
   for (const f of others) {
     const otherBox = createBoundingBox(f);
     const distance = getMinDistanceBetweenBoxes(selectedBox, otherBox);
@@ -67,8 +70,9 @@ export default function DistanceVisualizer({
         selectedBox.getCenter(new Vector3()),
         new Vector3(),
       );
+      const mid = pointA.clone().lerp(pointB, 0.5);
 
-      lines.push(
+      elements.push(
         <DistanceLine
           key={`to-${f.id}`}
           from={[pointA.x, pointA.y, pointA.z]}
@@ -76,6 +80,22 @@ export default function DistanceVisualizer({
           color='red'
         />,
       );
+
+      if (distance < 0.2) {
+        const warningColor = distance < 0.1 ? 'red' : 'orange';
+        const warningPos = new Vector3(
+          (selectedBox.min.x + selectedBox.max.x) / 2,
+          selectedBox.max.y + 0.4,
+          (selectedBox.min.z + selectedBox.max.z) / 2,
+        );
+        elements.push(
+          <FloatingWarning
+            key={`alert-furniture-${f.id}`}
+            position={[warningPos.x, warningPos.y, warningPos.z]}
+            color={warningColor}
+          />,
+        );
+      }
     }
   }
 
@@ -105,8 +125,10 @@ export default function DistanceVisualizer({
 
   for (const [label, from, to] of wallPoints) {
     const distance = from.distanceTo(to);
+    const mid = from.clone().lerp(to, 0.5);
+
     if (distance < maxDistance) {
-      lines.push(
+      elements.push(
         <DistanceLine
           key={`wall-${label}`}
           from={[from.x, from.y, from.z]}
@@ -114,8 +136,23 @@ export default function DistanceVisualizer({
           color='red'
         />,
       );
+
+      if (distance < 0.2) {
+        const warningColor = distance < 0.1 ? 'red' : 'orange';
+        elements.push(
+          <FloatingWarning
+            key={`alert-wall-${label}`}
+            position={[
+              (selectedBox.min.x + selectedBox.max.x) / 2,
+              selectedBox.max.y + 0.4,
+              (selectedBox.min.z + selectedBox.max.z) / 2,
+            ]}
+            color={warningColor}
+          />,
+        );
+      }
     }
   }
 
-  return <>{lines}</>;
+  return <>{elements}</>;
 }
