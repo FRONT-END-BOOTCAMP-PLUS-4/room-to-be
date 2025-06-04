@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Loader2 } from 'lucide-react';
 import * as THREE from 'three';
 // @ts-ignore
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
@@ -17,9 +18,12 @@ import {
 
 import { createBoundingBoxFromGLTF } from '@/utils/boundingBoxUtils';
 import { createBoundingBox } from '@/utils/collisionUtils';
+import { getHiddenWalls } from '@/utils/viewUtils';
 
+import { cn } from '@/lib/utils';
 import { useFurnitureStore } from '@/stores/useFurnitureStore';
 import { useRoomSizeStore } from '@/stores/useRoomSizeStore';
+import { useViewStore } from '@/stores/useViewStore';
 
 interface Props {
   item: Furnitures;
@@ -42,9 +46,14 @@ interface Props {
 }
 
 export default function FurnitureThumbnail({ item, onSelect }: Props) {
-  const { isCreating, setIsCreating, furnitures } = useFurnitureStore();
+  const { furnitures } = useFurnitureStore();
   const { width: roomWidth, height: roomHeight } = useRoomSizeStore();
   const [showDialog, setShowDialog] = useState(false);
+  const [isClickable, setIsClickable] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const angle = useViewStore((state) => state.angle);
+  const isTopView = useViewStore((state) => state.isTopView);
 
   const findAvailablePosition = async (): Promise<{
     x: number;
@@ -53,14 +62,41 @@ export default function FurnitureThumbnail({ item, onSelect }: Props) {
     rotY: number;
   } | null> => {
     const isWall = item.placementType === 'wall';
-    //임시 중앙 생성
+
     if (isWall) {
-      return {
-        x: roomWidth / 2,
-        y: 1.2,
-        z: roomHeight / 2,
-        rotY: Math.PI,
-      };
+      const hiddenWalls = getHiddenWalls(angle, isTopView);
+      const wallY = 1.2;
+      const padding = 0.2;
+
+      if (hiddenWalls.includes('front')) {
+        return {
+          x: Math.random() * (roomWidth - 2 * padding) + padding, // x축 랜덤
+          y: wallY,
+          z: padding,
+          rotY: 0,
+        };
+      } else if (hiddenWalls.includes('right')) {
+        return {
+          x: roomWidth - padding,
+          y: wallY,
+          z: Math.random() * (roomHeight - 2 * padding) + padding, // z축 랜덤
+          rotY: -Math.PI / 2,
+        };
+      } else if (hiddenWalls.includes('left')) {
+        return {
+          x: padding,
+          y: wallY,
+          z: Math.random() * (roomHeight - 2 * padding) + padding, // z축 랜덤
+          rotY: Math.PI / 2,
+        };
+      } else {
+        return {
+          x: Math.random() * (roomWidth - 2 * padding) + padding, // x축 랜덤
+          y: wallY,
+          z: roomHeight - padding,
+          rotY: Math.PI,
+        };
+      }
     }
 
     const loader = new GLTFLoader();
@@ -98,8 +134,10 @@ export default function FurnitureThumbnail({ item, onSelect }: Props) {
   };
 
   const handleClick = async () => {
-    if (isCreating) return;
-    setIsCreating(true);
+    if (!isClickable || isLoading) return;
+
+    setIsClickable(false);
+    setIsLoading(true);
 
     try {
       const found = await findAvailablePosition();
@@ -127,21 +165,31 @@ export default function FurnitureThumbnail({ item, onSelect }: Props) {
     } catch (err) {
       console.error('모델 로딩 실패:', err);
     } finally {
-      setIsCreating(false);
+      setIsClickable(true);
+      setIsLoading(false);
     }
   };
 
   return (
     <>
       <div
-        className='bg-white rounded-md overflow-hidden aspect-square cursor-pointer'
         onClick={handleClick}
+        className={cn(
+          'relative rounded-md aspect-square overflow-hidden transition-all duration-200 bg-white shadow hover:shadow-md',
+          'cursor-pointer active:scale-95 hover:ring-2 hover:ring-blue-400',
+          !isClickable && 'pointer-events-none opacity-60',
+        )}
       >
         <img
           src={item.thumbnailUrl}
           alt={item.name}
           className='object-cover w-full h-full'
         />
+        {isLoading && (
+          <div className='absolute inset-0 bg-white/60 flex items-center justify-center z-10'>
+            <Loader2 className='w-5 h-5 animate-spin text-blue-500' />
+          </div>
+        )}
       </div>
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>

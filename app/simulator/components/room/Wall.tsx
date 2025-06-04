@@ -1,9 +1,9 @@
+import { useEffect } from 'react';
 import { useLoader } from '@react-three/fiber';
 import { TextureLoader } from 'three';
 
 import { useRoomSizeStore } from '@/stores/useRoomSizeStore';
 import { useViewStore } from '@/stores/useViewStore';
-
 interface WallProps {
   width: number;
   height: number;
@@ -43,7 +43,11 @@ export default function Wall({
   } else {
     hiddenWalls = hideWallsByAngle[angle] ?? [];
   }
-
+  useEffect(() => {
+    const allWalls = ['front', 'right', 'back', 'left'] as const;
+    const visibleWalls = allWalls.filter((w) => !hiddenWalls.includes(w));
+    useViewStore.getState().setVisibleWalls(visibleWalls);
+  }, [angle, isTopView, hiddenWalls]);
   return (
     <>
       {/* Z = height → front */}

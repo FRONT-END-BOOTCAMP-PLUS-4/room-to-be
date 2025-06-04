@@ -15,7 +15,7 @@ export default function TemplateSelectModal({
   const templates = [
     {
       id: 1,
-      imageUrl: '/assets/images/room01.jpg',
+      imageUrl: '/assets/images/room01.png',
       tags: ['우드', '내추럴', '미니멀'],
     },
     {
