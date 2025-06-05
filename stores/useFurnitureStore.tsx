@@ -25,7 +25,7 @@ interface FurnitureStore {
   undoFurniture: (id: string) => void;
   clearFurnitures: () => void;
   setRenderableIds: (ids: string[]) => void;
-
+  resetFurnitureHistory: (id: string) => void;
   setIsCreating: (value: boolean) => void;
 }
 
@@ -62,16 +62,16 @@ export const useFurnitureStore = create<FurnitureStore>((set) => ({
       if (!current) return {};
 
       const next = { ...current, ...updated };
-
-      const shouldSave =
-        saveHistory && JSON.stringify(current) !== JSON.stringify(next);
-
       const prevStack = state.prevFurnitureStates[id] || [];
+
+      const newStack = saveHistory
+        ? [...prevStack, { ...current }].slice(-10) // 항상 저장
+        : prevStack;
 
       return {
         prevFurnitureStates: {
           ...state.prevFurnitureStates,
-          [id]: shouldSave ? [...prevStack, current] : prevStack,
+          [id]: newStack,
         },
         furnitures: state.furnitures.map((f) => (f.id === id ? next : f)),
       };
@@ -80,7 +80,9 @@ export const useFurnitureStore = create<FurnitureStore>((set) => ({
   undoFurniture: (id) =>
     set((state) => {
       const stack = state.prevFurnitureStates[id];
-      if (!stack || stack.length === 0) return {};
+      if (!stack || stack.length <= 1) {
+        return {};
+      }
 
       const previous = stack[stack.length - 1];
       const updatedStack = stack.slice(0, -1);
@@ -114,6 +116,12 @@ export const useFurnitureStore = create<FurnitureStore>((set) => ({
       renderableFurnitureIds: [],
       selectedFurnitureId: null,
     }),
-
+  resetFurnitureHistory: (id: string) =>
+    set((state) => ({
+      prevFurnitureStates: {
+        ...state.prevFurnitureStates,
+        [id]: [],
+      },
+    })),
   setRenderableIds: (ids: string[]) => set({ renderableFurnitureIds: ids }),
 }));
