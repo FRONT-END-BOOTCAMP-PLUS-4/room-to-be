@@ -68,33 +68,30 @@ export default function CameraController({
   useEffect(() => {
     if (!cameraInitialized && !isCaptureMode) {
       let startPosition: Vector3;
+      let targetAngle = angle;
+
       if (hasInitial) {
-        // edit 모드: 저장된 카메라 위치 기준으로 시작 위치 계산
+        // edit 모드: 저장된 카메라 위치로부터 각도 계산
         const [x, , z] = initialCameraPosition!;
         const dx = x - centerX;
         const dz = z - centerZ;
         const rad = Math.atan2(dx, dz);
         const deg = (rad * 180) / Math.PI;
         const normalized = ((deg % 360) + 360) % 360;
+        targetAngle = normalized;
         setAngle(normalized);
-
-        const offsetDir = new Vector3()
-          .subVectors(targetLookAt, new Vector3(...initialCameraPosition!))
-          .normalize()
-          .multiplyScalar(5);
-        startPosition = new Vector3(...initialCameraPosition!).add(offsetDir);
-        startPosition.y += 3;
-      } else {
-        // create 모드: 먼 거리에서 시작
-        const dist = roomDiagonal * 5;
-        const height = roomDiagonal * 3;
-        const rad = (angle * Math.PI) / 180;
-        startPosition = new Vector3(
-          centerX + dist * Math.sin(rad),
-          height,
-          centerZ + dist * Math.cos(rad),
-        );
       }
+
+      // 항상 멀리서 시작하도록 수정
+      const farDistance = roomDiagonal * 4; // 더 멀리서 시작
+      const startHeight = roomDiagonal * 2.5; // 높이도 충분히
+      const rad = (targetAngle * Math.PI) / 180;
+      
+      startPosition = new Vector3(
+        centerX + farDistance * Math.sin(rad),
+        startHeight,
+        centerZ + farDistance * Math.cos(rad),
+      );
 
       // 카메라를 시작 위치에 고정 (애니메이션 시작 전까지)
       camera.position.copy(startPosition);
@@ -131,8 +128,6 @@ export default function CameraController({
       setIntroStarted(true);
 
       const targetPosition = getTargetPosition();
-
-      // 현재 카메라 위치에서 시작 (이미 올바른 위치에 있음)
       const startPosition = camera.position.clone();
 
       const startTime = performance.now();
@@ -152,10 +147,14 @@ export default function CameraController({
           ]);
         }
 
+        // 부드러운 easing 함수 사용
         const eased = 1 - Math.pow(1 - progress, 3);
+        
+        // 위치 보간
         camera.position.lerpVectors(startPosition, targetPosition, eased);
         camera.lookAt(targetLookAt);
 
+        // FOV 보간
         if (camera instanceof PerspectiveCamera) {
           const targetFov = Math.max(50 / Math.pow(scaleFactor, 0.6), 25);
           camera.fov = MathUtils.lerp(90, targetFov, eased);
@@ -227,6 +226,15 @@ export default function CameraController({
     scaleFactor,
     setCameraPosition,
   ]);
+
+  // 컴포넌트 언마운트 시 애니메이션 정리
+  useEffect(() => {
+    return () => {
+      if (animationIdRef.current) {
+        cancelAnimationFrame(animationIdRef.current);
+      }
+    };
+  }, []);
 
   return null;
 }
