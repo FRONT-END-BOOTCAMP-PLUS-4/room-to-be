@@ -17,7 +17,7 @@ export default function Header() {
     <div
       className='w-full h-[400px] text-white relative 
   bg-gradient-to-r from-orange-300 via-pink-500 to-purple-500
-  bg-[length:200%_200%] animate-gradient-x px-8 overflow-hidden'
+  bg-[length:200%_200%] animate-gradient-x overflow-hidden'
     >
       <MainHeader />
       <div className='absolute top-[90px] left-1/2 transform -translate-x-1/2 flex flex-col items-center'>
