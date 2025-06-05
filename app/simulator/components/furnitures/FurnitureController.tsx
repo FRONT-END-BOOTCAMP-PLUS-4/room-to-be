@@ -55,13 +55,9 @@ export default function FurnitureController({
     if (!selectedFurnitureId) return false;
 
     const stack = prevFurnitureStates[selectedFurnitureId];
-    const current = furnitures.find((f) => f.id === selectedFurnitureId);
 
-    if (!Array.isArray(stack) || stack.length === 0 || !current) return false;
-
-    const last = stack[stack.length - 1];
-    return JSON.stringify(last) !== JSON.stringify(current);
-  }, [selectedFurnitureId, furnitures, prevFurnitureStates]);
+    return Array.isArray(stack) && stack.length > 0;
+  }, [selectedFurnitureId, prevFurnitureStates]);
 
   const { isResettable, resetFurniture } = useResettableFurniture(
     selectedFurniture,
@@ -145,7 +141,12 @@ export default function FurnitureController({
               />
               <FurnitureControllerBtn
                 text='초기화'
-                onClick={resetFurniture}
+                onClick={() => {
+                  resetFurniture();
+                  useFurnitureStore
+                    .getState()
+                    .resetFurnitureHistory(selectedFurnitureId!);
+                }}
                 disabled={!isResettable}
               />
             </div>

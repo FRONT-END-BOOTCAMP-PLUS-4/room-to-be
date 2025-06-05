@@ -88,7 +88,8 @@ export default function UnlockedScaleInputs({
                 max={3000}
                 step={1}
                 onPointerDown={() => {
-                  dragStartValueRef.current = sliderVal; // 드래그 시작 시 원본 값 저장
+                  update(sliderVal, true); // 최초 상태 저장
+                  dragStartValueRef.current = sliderVal;
                 }}
                 onValueChange={([val]) => {
                   setSliderVal(val);

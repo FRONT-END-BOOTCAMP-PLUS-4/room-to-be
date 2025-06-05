@@ -227,7 +227,7 @@ export default function SimulatorPage({ mode, roomId }: SimulatorPageProps) {
       />
     );
   }, [roomWidth, roomHeight]);
-  // console.log('roomCameraPosition:', roomCameraPosition);
+  
   return (
     <div className='relative w-full h-screen overflow-hidden'>
       <div className='absolute top-0 left-0 w-full h-full z-0'>

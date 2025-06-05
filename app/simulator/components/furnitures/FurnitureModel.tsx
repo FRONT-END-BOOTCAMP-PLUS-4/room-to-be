@@ -107,7 +107,15 @@ export default function FurnitureModel({
       halfDepth,
       halfHeight,
       onDrag: (pos, rot) => {
-        setCurrentPosition([pos.x, pos.y, pos.z]);
+        if (!baseSizeWithScale) return;
+
+        const curScaleX = currentScale[0];
+        const curScaleY = currentScale[1];
+        const curScaleZ = currentScale[2];
+
+        const baseX = Math.round(baseSizeWithScale[0] * (curScaleX / scaleX));
+        const baseY = Math.round(baseSizeWithScale[1] * (curScaleY / scaleY));
+        const baseZ = Math.round(baseSizeWithScale[2] * (curScaleZ / scaleZ));
 
         updateFurniture(
           id,
@@ -116,12 +124,30 @@ export default function FurnitureModel({
             positionY: pos.y,
             positionZ: pos.z,
             rotationY: rot?.y,
+            scaleX: curScaleX,
+            scaleY: curScaleY,
+            scaleZ: curScaleZ,
+            baseX,
+            baseY,
+            baseZ,
           },
           false,
         );
       },
-      onDragEnd: (pos, rot) => {
-        setCurrentPosition([pos.x, pos.y, pos.z]);
+      onDragEnd: () => {
+        const mesh = meshRef.current;
+        if (!mesh || !baseSizeWithScale) return;
+
+        const pos = mesh.position;
+        const rot = mesh.rotation;
+
+        const curScaleX = currentScale[0];
+        const curScaleY = currentScale[1];
+        const curScaleZ = currentScale[2];
+
+        const baseX = Math.round(baseSizeWithScale[0] * (curScaleX / scaleX));
+        const baseY = Math.round(baseSizeWithScale[1] * (curScaleY / scaleY));
+        const baseZ = Math.round(baseSizeWithScale[2] * (curScaleZ / scaleZ));
 
         updateFurniture(
           id,
@@ -129,7 +155,13 @@ export default function FurnitureModel({
             positionX: pos.x,
             positionY: pos.y,
             positionZ: pos.z,
-            rotationY: rot?.y,
+            rotationY: rot.y,
+            scaleX: curScaleX,
+            scaleY: curScaleY,
+            scaleZ: curScaleZ,
+            baseX,
+            baseY,
+            baseZ,
           },
           true,
         );
@@ -138,7 +170,7 @@ export default function FurnitureModel({
   );
 
   // 드래그 커서 관리
-  useCursorOnDrag(isDragging, setIsDragging);
+  useCursorOnDrag(isDragging);
 
   const handlePointerOver = () => {
     if (!isDragging) {
