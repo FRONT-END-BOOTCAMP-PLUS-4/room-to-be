@@ -55,8 +55,7 @@ export default function FurnitureController({
     if (!selectedFurnitureId) return false;
 
     const stack = prevFurnitureStates[selectedFurnitureId];
-
-    return Array.isArray(stack) && stack.length > 0;
+    return Array.isArray(stack) && stack.length >= 2;
   }, [selectedFurnitureId, prevFurnitureStates]);
 
   const { isResettable, resetFurniture } = useResettableFurniture(
