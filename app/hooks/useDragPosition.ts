@@ -206,7 +206,7 @@ export default function useDragPosition(
         setDragging?.(true);
 
         if (placementType === 'floor') {
-          originalY.current = meshRef.current.position.y; 
+          originalY.current = meshRef.current.position.y;
           startFloating(meshRef.current);
         }
       }
@@ -285,7 +285,7 @@ export default function useDragPosition(
         let finalRotation = meshRef.current.rotation.y;
         if (placementType === 'floor') {
           final = checkFinalPosition(final);
-          final.y = originalY.current; // 👈 원래 y 복원
+          final.y = originalY.current;
           meshRef.current.position.copy(final);
         } else if (placementType === 'wall') {
           final = checkFinalPosition(final, finalRotation);
