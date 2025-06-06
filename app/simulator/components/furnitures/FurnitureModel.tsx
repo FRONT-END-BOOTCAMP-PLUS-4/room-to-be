@@ -227,7 +227,7 @@ export default function FurnitureModel({
           originalBaseY: furniture?.originalBaseY ?? baseSizeWithScale[1],
           originalBaseZ: furniture?.originalBaseZ ?? baseSizeWithScale[2],
         },
-        true,
+        false,
       );
     }
   };

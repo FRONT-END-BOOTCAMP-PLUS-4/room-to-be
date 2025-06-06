@@ -65,9 +65,15 @@ export const useFurnitureStore = create<FurnitureStore>((set) => ({
       const prevStack = state.prevFurnitureStates[id] || [];
 
       const newStack = saveHistory
-        ? [...prevStack, { ...current }].slice(-10) // 항상 저장
+        ? [...prevStack, { ...current }].slice(-10)
         : prevStack;
-
+      console.log('updateFurniture');
+      console.log('current:', current);
+      console.log('updated:', updated);
+      console.log(
+        'newStack:',
+        newStack.map((s, i) => ({ i, posX: s.positionX, posZ: s.positionZ })),
+      );
       return {
         prevFurnitureStates: {
           ...state.prevFurnitureStates,
@@ -80,18 +86,19 @@ export const useFurnitureStore = create<FurnitureStore>((set) => ({
   undoFurniture: (id) =>
     set((state) => {
       const stack = state.prevFurnitureStates[id];
-      if (!stack || stack.length <= 1) {
+      if (!stack || stack.length < 2) {
+        console.warn('undo 불가', stack);
         return {};
       }
 
-      const previous = stack[stack.length - 1];
-      const updatedStack = stack.slice(0, -1);
+      const previous = stack[stack.length - 2];
+      const updatedStack = stack.slice(0, -2);
 
       return {
         furnitures: state.furnitures.map((f) => (f.id === id ? previous : f)),
         prevFurnitureStates: {
           ...state.prevFurnitureStates,
-          [id]: updatedStack,
+          [id]: [...updatedStack, previous],
         },
       };
     }),
